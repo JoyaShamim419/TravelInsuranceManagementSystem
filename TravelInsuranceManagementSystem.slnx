@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="TravelInsuranceManagementSystem.Application/TravelInsuranceManagementSystem.Application.csproj" />
+  <Project Path="TravelInsuranceManagementSystem.Repo/TravelInsuranceManagementSystem.Repo.csproj" />
+  <Project Path="TravelInsuranceManagementSystem.Services/TravelInsuranceManagementSystem.Services.csproj" />
 </Solution>

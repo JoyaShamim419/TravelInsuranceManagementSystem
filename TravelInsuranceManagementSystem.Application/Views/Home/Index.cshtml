@@ -2,7 +2,232 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <div class="hero-content container">
+        <div class="row align-items-center g-4">
+
+            <!-- Left: Headline & CTAs -->
+            <div class="col-lg-6">
+                <span class="badge-soft mb-3">Destination</span>
+                <h1>Discover the World with Us</h1>
+                <p class="lead mt-3">
+                    Explore breathtaking destinations and create unforgettable memories with expertly crafted tours.
+                </p>
+                <div class="d-flex gap-3 mt-3">
+                    <a href="signIn.html" class="btn btn-cta-primary"><i class="bi bi-map me-1"></i> Start Exploring</a>
+                    <a href="signIn.html" class="btn btn-cta-secondary">Learn More</a>
+                </div>
+            </div>
+
+            <!-- Right: Search Card -->
+            <div class="col-lg-6">
+                <div class="search-card shadow-lg">
+                    <div class="mb-3">
+                        <h5 class="mb-1">Destination</h5>
+                        <input type="text" class="form-control" placeholder="Where do you want to go?" aria-label="Destination">
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label">Check In</label>
+                            <input type="date" class="form-control" placeholder="dd-mm-yyyy" aria-label="Check In">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Check Out</label>
+                            <input type="date" class="form-control" placeholder="dd-mm-yyyy" aria-label="Check Out">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-sm-6">
+                            <label class="form-label">Adults</label>
+                            <input type="number" class="form-control" min="1" value="2" aria-label="Adults">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Children</label>
+                            <input type="number" class="form-control" min="0" value="0" aria-label="Children">
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button class="btn btn-search">
+                            <i class="bi bi-search me-1"></i> Search Tours
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ABOUT US (Two-column split) -->
+<section class="py-5 about-split">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <!-- Left: Text card -->
+            <div class="col-lg-6">
+                <div class="tb-card h-100 p-4 p-md-5">
+                    <span class="badge-soft mb-3 d-inline-block">ABOUT US</span>
+                    <h2 class="mb-3">Creating Unforgettable Travel Experiences</h2>
+                    <p class="text-muted mb-4">
+                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+                        totam rem aperiam eaque ipsa quae ab illo inventore veritatis.
+                    </p>
+                    <p class="text-muted mb-4">
+                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+                        deleniti atque corrupti quos dolores.
+                    </p>
+
+                    <!-- Bullet list with icons -->
+                    <ul class="list-unstyled tb-list">
+                        <li class="d-flex align-items-start mb-2">
+                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
+                            <span>Expert local guides in every destination</span>
+                        </li>
+                        <li class="d-flex align-items-start mb-2">
+                            <i class="bi bi-check-circle-fill text-danger me-2"></i>
+                            <span>Customized itineraries for every traveler</span>
+                        </li>
+                        <li class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill text-info me-2"></i>
+                            <span>24/7 customer support throughout your journey</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right: Image card with badges -->
+            <div class="col-lg-6">
+                <div class="tb-card h-100 p-0 position-relative overflow-hidden">
+                    <!-- Hero-like travel image -->
+                    <img class="img-fluid w-100 h-100 object-cover"
+                         src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop%22
+                         alt="Traveler overlooking mountain lake"></i>
+                    <div>
+                        <div class="fw-semibold small">Award Winner</div>
+                        <div class="text-muted xsmall">Best Travel Agency 2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<!-- DIFFERENTIATORS / FEATURES -->
+<section class="py-5 features">
+    <div class="container text-center">
+        <span class="badge-soft mb-2 d-inline-block">WHY CHOOSE US</span>
+        <h2 class="mb-2">What Makes Us Different</h2>
+        <p class="text-muted mb-5 mx-auto" style="max-width:700px">
+            Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur adipisci velit.
+        </p>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="feature-item p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-compass"></i>
+                    </div>
+                    <h6 class="mb-2">Expert Navigation</h6>
+                    <p class="text-muted small mb-0">Quis nostrum exercitationem ullam corporis suscipit laboriosam.</p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="feature-item p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h6 class="mb-2">Personalized Care</h6>
+                    <p class="text-muted small mb-0">Excepteur sint occaecat cupidatat non proident sunt in culpa.</p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="feature-item p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <h6 class="mb-2">Instant Booking</h6>
+                    <p class="text-muted small mb-0">Ut enim ad minim veniam quis nostrud exercitation ullamco.</p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="feature-item p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-globe"></i>
+                    </div>
+                    <h6 class="mb-2">Worldwide Coverage</h6>
+                    <p class="text-muted small mb-0">Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- START YOUR NEXT ADVENTURE (CTA + features on tinted image) -->
+<section class="py-5 cta-adventure">
+    <div class="cta-bg"></div>
+
+    <div class="container position-relative">
+        <!-- Heading & CTAs -->
+        <div class="text-center mb-4 mb-lg-5">
+            <h2 class="cta-title">Ready to Start Your Next Adventure?</h2>
+            <p class="cta-sublead mx-auto">
+                Discover breathtaking destinations, create unforgettable memories, and explore the world with our expertly
+                crafted travel packages. From exotic beaches to mountain peaks, your perfect journey awaits.
+            </p>
+            <div class="btn btn-cta-primary  ">
+                <i class="bi bi-geo-alt me-1"></i> Plan Your Trip Now</a>
+                <a href="#" Trip></a>
+            </div>
+        </div>
+
+        <!-- Feature cards -->
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cta-feature-card text-center p-4">
+                    <div class="cta-feature-icon mb-3"><i class="bi bi-globe2"></i></div>
+                    <h6 class="mb-1">50+ Destinations</h6>
+                    <p class="small text-white-50 mb-0">Explore amazing destinations across all continents</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cta-feature-card text-center p-4">
+                    <div class="cta-feature-icon mb-3"><i class="bi bi-shield-lock"></i></div>
+                    <h6 class="mb-1">Safe &amp; Secure</h6>
+                    <p class="small text-white-50 mb-0">Travel with confidence with our safety guarantee</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cta-feature-card text-center p-4">
+                    <div class="cta-feature-icon mb-3"><i class="bi bi-headset"></i></div>
+                    <h6 class="mb-1">24/7 Support</h6>
+                    <p class="small text-white-50 mb-0">Round‑the‑clock assistance whenever you need it</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cta-feature-card text-center p-4">
+                    <div class="cta-feature-icon mb-3"><i class="bi bi-percent"></i></div>
+                    <h6 class="mb-1">Best Prices</h6>
+                    <p class="small text-white-50 mb-0">Competitive rates with exclusive deals and offers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+

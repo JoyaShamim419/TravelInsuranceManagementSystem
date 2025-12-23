@@ -1,5 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,20 +13,53 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TravelInsuranceManagementSystem.Application</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <img class="logo-img" src="~/assets/logo.png" alt="TravelBuddy">
+                    <span>TravelBuddy</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#tbNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="tbNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link active" href="/">Home</a>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown">
+                                Company
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Tours</a></li>
+                                <li><a class="dropdown-item" href="#">Packages</a></li>
+                                <li><a class="dropdown-item" href="#">Vision &amp; Mission</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="solutionDropdown" role="button" data-bs-toggle="dropdown">
+                                Solution
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/Home/Insurance">Insurance</a></li>
+                                <li><a class="dropdown-item" href="#">Customer</a></li>
+                                <li><a class="dropdown-item" href="#">Claim</a></li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" href="#">Contact Us</a>
+                        </li>
+
+                        <li class="ms-lg-3">
+                            <a class="btn btn-cta-primary nav-link" href="/Home/SignIn">
+                                <i class="bi bi-rocket-takeoff me-1"></i> User
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -37,9 +72,58 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    @* <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - TravelInsuranceManagementSystem.Application - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer> *@
+    <footer class="footer-dark py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Brand & Newsletter -->
+                <div class="col-lg-4">
+                    <h4 class="mb-3">TravelBuddy</h4>
+                    <p class="text-muted mb-4">
+                        Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+                        Donec velit neque auctor sit amet aliquam vel ullamcorper sit amet ligula.
+                    </p>
+                </div>
+
+                <!-- Company Links -->
+                <div class="col-lg-2 col-md-4">
+                    <h6 class="footer-heading">Company</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> About</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Careers</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Press</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Blog</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Solutions Links -->
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="footer-heading">Solutions</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li href="#"><i class="bi bi-chevron-right"></i> Digital Strategy</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Cloud Computing</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Data Analytics</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> AI Solutions</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Cybersecurity</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="footer-heading">Get in Touch</h6>
+                    <ul class="list-unstyled footer-contact">
+                        <li><i class="bi bi-geo-alt-fill"></i> Plot No H-4, Siruseri IT Park - Project Office, First Cross Road, Siruseri<br> Tamil Nadu 603103, India</li>
+                        <li><i class="bi bi-telephone-fill"></i> +1 (555) 987-6543</li>
+                        <li><i class="bi bi-envelope-fill"></i> contact@cognizant.com</li>
+                    </ul>
+
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
