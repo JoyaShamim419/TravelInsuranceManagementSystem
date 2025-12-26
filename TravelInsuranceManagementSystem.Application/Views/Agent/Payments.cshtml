@@ -1,0 +1,189 @@
+﻿@{
+    ViewData["Title"] = "Agent Payments";
+    Layout = "~/Views/Shared/_AgentLayout.cshtml";
+}
+
+<style>
+    /* PAGE BACKGROUND */
+    body {
+        background: #fafafa;
+    }
+
+    /* TITLE */
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 10px;
+    }
+
+    /* SEARCH */
+    .search-box {
+        max-width: 400px;
+        margin-bottom: 15px;
+    }
+
+    /* FILTER BUTTONS */
+    .filter-buttons .btn {
+        margin-right: 5px;
+        border-radius: 20px;
+    }
+
+        .filter-buttons .btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+    /* TABLE */
+    table {
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table th {
+        background: #f5f5f5;
+        color: #000;
+        font-weight: 600;
+    }
+
+    .table td {
+        color: #333;
+    }
+
+    /* BADGES */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* PLAN */
+    .plan-basic {
+        font-weight: 600;
+        color: #000;
+    }
+
+    .plan-premium {
+        font-weight: 700;
+        color: #1a73e8;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- TITLE -->
+    <div class="page-title">Payments</div>
+
+    <!-- SEARCH + FILTER -->
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control search-box" id="paymentSearch" placeholder="Search payments...">
+        </div>
+
+        <div class="col-md-6 text-end filter-buttons">
+            <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
+            <button class="btn btn-outline-success btn-sm filter-btn" data-status="success">Success</button>
+            <button class="btn btn-outline-warning btn-sm filter-btn" data-status="pending">Pending</button>
+            <button class="btn btn-outline-danger btn-sm filter-btn" data-status="failed">Failed</button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle" id="paymentTable">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Policy ID</th>
+                    <th>Payment ID</th>
+                    <th>Plan</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>U001</td>
+                    <td>P01015</td>
+                    <td>PAY-8821</td>
+                    <td class="plan-basic">Basic</td>
+                    <td>₹3,500</td>
+                    <td>2023-04-02</td>
+                    <td class="status">Success</td>
+                </tr>
+
+                <tr>
+                    <td>U002</td>
+                    <td>P01116</td>
+                    <td>PAY-9932</td>
+                    <td class="plan-premium">Premium</td>
+                    <td>₹2,200</td>
+                    <td>2023-04-01</td>
+                    <td class="status">Pending</td>
+                </tr>
+
+                <tr>
+                    <td>U003</td>
+                    <td>P01037</td>
+                    <td>PAY-7741</td>
+                    <td class="plan-premium">Premium</td>
+                    <td>₹1,580</td>
+                    <td>2023-11-20</td>
+                    <td class="status">Failed</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        /* SEARCH */
+        $("#paymentSearch").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#paymentTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+        /* FILTER */
+        $(".filter-btn").click(function () {
+
+            $(".filter-btn").removeClass("active");
+            $(this).addClass("active");
+
+            var status = $(this).data("status").toLowerCase();
+
+            if (status === "all") {
+                $("#paymentTable tbody tr").show();
+                return;
+            }
+
+            $("#paymentTable tbody tr").each(function () {
+                var rowStatus = $(this).find(".status").text().toLowerCase();
+                $(this).toggle(rowStatus === status);
+            });
+        });
+    </script>
+}
