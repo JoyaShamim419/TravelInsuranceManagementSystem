@@ -193,42 +193,70 @@
     </div>
   </div>
 </div>
+@section Scripts 
+{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Password toggle (Keep your existing functionality)
+            $('.toggle-pass').on('click', function () {
+                const targetId = $(this).data('target');
+                const input = $('#' + targetId);
+                const isPassword = input.attr('type') === 'password';
+                input.attr('type', isPassword ? 'text' : 'password');
+                $(this).find('i').toggleClass('bi-eye bi-eye-slash');
+            });
 
-@section Scripts {
-<script>
-  // Password toggle
-  document.querySelectorAll('.toggle-pass').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const input = document.getElementById(btn.dataset.target);
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      btn.innerHTML = isPassword
-        ? '<i class="bi bi-eye-slash"></i>'
-        : '<i class="bi bi-eye"></i>';
-    });
-  });
+            // Intercept Sign In Form Submission
+            $('#signin form').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
 
-  // Bootstrap validation
-  (() => {
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        const signupPass = form.querySelector('#signupPass');
-        const confirmPass = form.querySelector('#confirmPass');
-        if (signupPass && confirmPass) {
-          if (confirmPass.value !== signupPass.value) {
-            confirmPass.setCustomValidity('Passwords must match');
-          } else {
-            confirmPass.setCustomValidity('');
-          }
+                const email = $('#signinEmail').val();
+                const password = $('#signinPass').val();
+                const form = this;
+
+                // 1. Check for basic Bootstrap validation first
+                        // Inside your login form submission logic:
+        if (email === "admin@cognizant.com" && password === "1234567") {
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("userRole", "Admin");
+            window.location.href = '/Admin/Dashboard';
         }
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
+        else if (email === "agent@cognizant.com" && password === "1234567") {
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("userRole", "Agent");
+            window.location.href = '/Agent/Dashboard';
         }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-</script>
+        else if (email === "Use@cognizant.com" && password === "1234567") {
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("userRole", "User");
+            window.location.href = '/Home/Index'; // Redirects home, where navbar will now show "Dashboard"
+        }
+                else {
+                    // Logic for incorrect credentials
+                    alert("Invalid email or password!");
+                    $(form).addClass('was-validated');
+                }
+            });
+
+            // Bootstrap validation for Sign Up (Keep your existing functionality)
+            $('#signup form').on('submit', function (e) {
+                const signupPass = $('#signupPass').val();
+                const confirmPass = $('#confirmPass').val();
+                const form = this;
+
+                if (signupPass !== confirmPass) {
+                    $('#confirmPass')[0].setCustomValidity('Passwords must match');
+                } else {
+                    $('#confirmPass')[0].setCustomValidity('');
+                }
+
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                $(form).addClass('was-validated');
+            });
+        })();
+    </script>
 }

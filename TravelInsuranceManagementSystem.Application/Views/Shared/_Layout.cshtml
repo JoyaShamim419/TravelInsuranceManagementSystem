@@ -62,7 +62,7 @@
                         </li>
 
                         <li class="ms-lg-3">
-                            <a class="btn btn-cta-primary nav-link" href="/Home/SignIn">
+                            <a id="navUserButton" class="btn btn-cta-primary nav-link" href="/Home/SignIn">
                                 <i class="bi bi-rocket-takeoff me-1"></i> User
                             </a>
                         </li>
@@ -135,6 +135,40 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 1. Check if the user is logged in
+            const isLoggedIn = localStorage.getItem("isLoggedIn");
+            const userRole = localStorage.getItem("userRole");
+
+            // 2. Target the Navbar Button
+            const navBtn = $('#navUserButton');
+
+            if (isLoggedIn === "true") {
+                // Update button text and icon
+                navBtn.html('<i class="bi bi-layout-text-window-reverse"></i> Dashboard');
+
+                // Optional: Change color to indicate logged-in state
+                navBtn.removeClass('btn-primary').addClass('btn-success');
+
+                // 3. Handle the click behavior based on the stored role
+                navBtn.on('click', function(e) {
+                    e.preventDefault();
+
+                    if (userRole === "Admin") {
+                        window.location.href = '/Admin/Dashboard';
+                    } else if (userRole === "Agent") {
+                        window.location.href = '/Agent/Dashboard';
+                    } else {
+                        window.location.href = '/User/Dashboard';
+                    }
+                });
+
+                // 4. Bonus: Show a Logout button if you have one
+                $('#logoutNavItem').show();
+            }
+        });
+    </script>
 </body>
 </html>
