@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Agent Support Tickets";
+    Layout = "~/Views/Shared/_AgentLayout.cshtml";
+}
+
+<style>
+    /* PAGE BACKGROUND */
+    body {
+        background: #fafafa;
+    }
+
+    /* TITLE */
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 10px;
+    }
+
+    /* SEARCH */
+    .search-box {
+        max-width: 400px;
+        margin-bottom: 15px;
+    }
+
+    /* FILTER BUTTONS */
+    .filter-buttons .btn {
+        margin-right: 5px;
+        border-radius: 20px;
+    }
+
+        .filter-buttons .btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+    /* TABLE */
+    table {
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table th {
+        background: #f5f5f5;
+        color: #000;
+        font-weight: 600;
+    }
+
+    .table td {
+        color: #333;
+    }
+
+    /* BADGES */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-open {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-resolved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-closed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- TITLE -->
+    <div class="page-title">Support Tickets</div>
+
+    <!-- SEARCH + FILTER -->
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control search-box" id="ticketSearch" placeholder="Search tickets...">
+        </div>
+
+        <div class="col-md-6 text-end filter-buttons">
+            <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
+            <button class="btn btn-outline-warning btn-sm filter-btn" data-status="open">Open</button>
+            <button class="btn btn-outline-success btn-sm filter-btn" data-status="resolved">Resolved</button>
+            <button class="btn btn-outline-danger btn-sm filter-btn" data-status="closed">Closed</button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle" id="ticketTable">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Customer ID</th>
+                    <th>Customer Name</th>
+                    <th>Issue</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>T01901</td>
+                    <td>CUST-101</td>
+                    <td>Seren</td>
+                    <td>Unable to create policy</td>
+                    <td>2023-04-02</td>
+                    <td class="status">Open</td>
+                    <td>Unassigned</td>
+                </tr>
+
+                <tr>
+                    <td>T01945</td>
+                    <td>CUST-102</td>
+                    <td>Alex</td>
+                    <td>Cannot view policy</td>
+                    <td>2023-04-02</td>
+                    <td class="status">Open</td>
+                    <td>Sarah Jenkins</td>
+                </tr>
+
+                <tr>
+                    <td>T01900</td>
+                    <td>CUST-103</td>
+                    <td>Harold</td>
+                    <td>Password reset</td>
+                    <td>2023-04-02</td>
+                    <td class="status">Resolved</td>
+                    <td>Mike Ross</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        /* SEARCH */
+        $("#ticketSearch").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#ticketTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+        /* FILTER */
+        $(".filter-btn").click(function () {
+
+            $(".filter-btn").removeClass("active");
+            $(this).addClass("active");
+
+            var status = $(this).data("status").toLowerCase();
+
+            if (status === "all") {
+                $("#ticketTable tbody tr").show();
+                return;
+            }
+
+            $("#ticketTable tbody tr").each(function () {
+                var rowStatus = $(this).find(".status").text().toLowerCase();
+                $(this).toggle(rowStatus === status);
+            });
+        });
+    </script>
+}
