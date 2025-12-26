@@ -18,6 +18,14 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult Family() => View("Family");
+
+        [HttpGet]
+        public IActionResult Student() => View("Student");
+
+
+
         public IActionResult Privacy()
         {
             return View();

@@ -1,0 +1,268 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Raise a Ticket";
+    Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --navy: #001f3d;
+            --peach: #f7b980;
+            --coral: #ed985f;
+            --gray: #e6e6e6;
+            --white: #ffffff;
+            --text-dark: #0f172a;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #d7d7d7;
+            border-radius: .75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .req::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn-navy {
+            background-color: #001f3d;
+            border-color: #001f3d;
+            color: #fff;
+            border-radius: .6rem;
+        }
+
+            .btn-navy:hover {
+                background-color: #00335f;
+                border-color: #00335f;
+                color: #fff;
+            }
+
+        .btn-outline-secondary {
+            border-radius: .6rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: .6rem;
+        }
+
+        .file-preview {
+            border: 1px dashed #c9c9c9;
+            border-radius: .6rem;
+            padding: .75rem;
+            background: #f7fafc;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: linear-gradient(135deg,#f7b980,#ed985f);
+            color: #001f3d;
+            padding: .25rem .55rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: .8rem;
+        }
+    </style>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="fw-bold m-0" style="color:#001f3d;">Raise a Ticket</h1>
+    <a class="btn btn-outline-secondary" asp-controller="UserDashboard" asp-action="Dashboard">Back to Dashboard</a>
+</div>
+
+<div class="panel p-3">
+    @* Added method and name attributes for server binding *@
+    <form id="ticketForm" novalidate enctype="multipart/form-data" method="post">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label req">Subject</label>
+                <input id="subject" name="Subject" class="form-control" placeholder="Briefly describe the issue" required />
+                <div class="invalid-feedback">Subject is required.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Category</label>
+                <select id="category" name="Category" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option value="Claims">Claims</option>
+                    <option value="Policies">Policies</option>
+                    <option value="Payments">Payments</option>
+                    <option value="Account">Account</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Please select a category.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Priority</label>
+                <select id="priority" name="Priority" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Urgent">Urgent</option>
+                </select>
+                <div class="invalid-feedback">Please select a priority.</div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label req">Description</label>
+                <textarea id="description" name="Description" class="form-control" rows="5" maxlength="2000"
+                          placeholder="Provide details..." required></textarea>
+                <div class="d-flex justify-content-between">
+                    <div class="invalid-feedback">Description is required.</div>
+                    <small id="descCounter" class="text-muted">0 / 2000</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Related ID (Policy/Claim/Ref)</label>
+                <input id="relatedId" name="RelatedId" class="form-control" placeholder="e.g., TRVL-PL-8731" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Preferred Contact Method</label>
+                <select id="contactMethod" name="ContactMethod" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                </select>
+                <div class="invalid-feedback">Please select a contact method.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Contact Detail</label>
+                <input id="contactDetail" name="ContactDetail" class="form-control" required />
+                <div id="contactFeedback" class="invalid-feedback">Contact detail is required.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Attachment (optional)</label>
+                <input id="attachment" name="Attachment" type="file" class="form-control" accept=".pdf,image/*" />
+
+                <div id="filePreview" class="file-preview mt-2 d-none">
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="fileName" class="fw-semibold"></span>
+                        <span id="fileSize" class="text-muted small"></span>
+                        <button type="button" id="clearFile" class="btn btn-sm btn-outline-danger ms-auto">Remove</button>
+                    </div>
+                    <div id="imageHolder" class="mt-2 text-center"></div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="chip">Typical response time: within 24–48 hours</div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button id="submitBtn" type="submit" class="btn btn-navy">Submit Ticket</button>
+            <a class="btn btn-outline-secondary" asp-controller="UserDashboard" asp-action="Dashboard">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('ticketForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const description = document.getElementById('description');
+            const descCounter = document.getElementById('descCounter');
+            const contactMethod = document.getElementById('contactMethod');
+            const contactDetail = document.getElementById('contactDetail');
+            const contactFeedback = document.getElementById('contactFeedback');
+            const fileInput = document.getElementById('attachment');
+            const filePreview = document.getElementById('filePreview');
+
+            // Description counter
+            description.addEventListener('input', () => {
+                descCounter.textContent = `${description.value.length} / 2000`;
+            });
+
+            // Validation for Contact Detail
+            function validateContactDetail() {
+                const method = contactMethod.value;
+                const val = contactDetail.value.trim();
+                let isValid = true;
+
+                if (!val) {
+                    contactFeedback.textContent = "Contact detail is required.";
+                    isValid = false;
+                } else if (method === 'Email') {
+                    isValid = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(val);
+                    contactFeedback.textContent = "Please enter a valid email address.";
+                } else if (method === 'Phone' || method === 'WhatsApp') {
+                    isValid = /^(\+91[-\s]?)?[0]?[1-9]\d{9}$/.test(val.replace(/\s|-/g, ''));
+                    contactFeedback.textContent = "Please enter a valid phone number.";
+                }
+
+                contactDetail.classList.toggle('is-invalid', !isValid);
+                return isValid;
+            }
+
+            // File handling
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                if (file.size > 10 * 1024 * 1024) {
+                    alert("File exceeds 10MB");
+                    fileInput.value = "";
+                    return;
+                }
+
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                filePreview.classList.remove('d-none');
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-fluid rounded border';
+                        img.style.maxHeight = '150px';
+                        document.getElementById('imageHolder').innerHTML = '';
+                        document.getElementById('imageHolder').appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('clearFile').addEventListener('click', () => {
+                fileInput.value = '';
+                filePreview.classList.add('d-none');
+            });
+
+            // Submit Logic
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Trigger Bootstrap native validation
+                form.classList.add('was-validated');
+
+                const isContactValid = validateContactDetail();
+
+                if (!form.checkValidity() || !isContactValid) {
+                    e.stopPropagation();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
+
+                setTimeout(() => {
+                    alert('Success!');
+                    // Redirecting using the Razor-generated URL
+                    window.location.href = '@Url.Action("Dashboard", "UserDashboard")';
+                }, 1000);
+            });
+        })();
+    </script>
+}

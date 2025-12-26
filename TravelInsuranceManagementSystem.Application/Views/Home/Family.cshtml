@@ -1,0 +1,323 @@
+﻿@{
+    ViewData["Title"] = "Family Travel Insurance - Travel Buddy";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+@section Styles {
+    
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #001f3d;
+            scroll-behavior: smooth;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(rgba(0,31,61,0.8), rgba(0,31,61,0.8)), url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 90px 20px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+        }
+
+       .hero h1 {
+                font-weight: 700;
+        }
+
+        /* COMMON SECTION */
+        .section {
+            background: white;
+            padding: 50px 40px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+        }
+
+            .section h3 {
+                color: #001f3d;
+                margin-bottom: 30px;
+            }
+
+        .highlight {
+            color: #ed985f;
+            font-weight: bold;
+        }
+
+        /* PLAN CARDS */
+        .plan-card {
+            border-radius: 20px;
+            background: white;
+            padding: 30px;
+            position: relative;
+            height: 100%;
+            transition: all 0.35s ease-in-out;
+        }
+
+            .plan-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(0, 31, 61, 0.25);
+            }
+
+        .premium {
+            border: 3px solid #F7b980;
+        }
+
+        .badge-premium {
+            position: absolute;
+            top: -15px;
+            right: 25px;
+            background: #F7b980;
+            color: #001f3d;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #001f3d;
+        }
+
+        .btn-basic {
+            background: #001f3d;
+            color: white;
+            border-radius: 12px;
+        }
+
+        .btn-premium {
+            background: #ed985f;
+            color: white;
+            border-radius: 12px;
+        }
+
+        /* MODERN INFO CARDS (USED EVERYWHERE) */
+        .info-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 30px;
+            height: 100%;
+            border-left: 6px solid #ed985f;
+            transition: all 0.35s ease-in-out;
+        }
+
+            .info-card h5 {
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: #001f3d;
+            }
+
+            .info-card ul {
+                list-style: none;
+                padding-left: 0;
+            }
+
+                .info-card ul li {
+                    padding: 10px 0;
+                    border-bottom: 1px dashed #e6e6e6;
+                }
+
+            .info-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            }
+
+        /* CLAIM STEPS */
+        .claim-step {
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background-color: #fdf3eb;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .claim-step:hover {
+                transform: translateX(6px);
+                background-color: #fbe4d6;
+            }
+    </style>
+}
+
+<div class="hero">
+    
+    <h1>Family Travel Insurance</h1>
+    <p class="mt-3">One single-trip policy to protect your entire family — powered by <strong>Travel Buddy</strong>.</p>
+</div>
+
+<div class="container my-5">
+    <div class="section">
+        <h3>Select Family Members</h3>
+        <select class="form-select w-25" id="members" onchange="updatePremium()">
+            <option value="2">2 Members</option>
+            <option value="3">3 Members</option>
+            <option value="4">4 Members</option>
+            <option value="5">5 Members</option>
+        </select>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Basic Plan -->
+        <div class="col-md-6">
+            <div class="plan-card shadow">
+                <h4>Basic Plan</h4>
+                <p class="highlight">Coverage up to ₹10,00,000</p>
+                <p class="price">₹ <span id="basicPrice">4000</span></p>
+                <ul style="color:#001f3d">
+                    <li>Medical emergency – up to ₹3,00,000</li>
+                    <li>Trip cancellation – up to ₹50,000</li>
+                    <li>Lost luggage – up to ₹25,000</li>
+                </ul>
+                <button class="btn btn-basic w-100">Choose Basic</button>
+            </div>
+        </div>
+
+        <!-- Premium Plan -->
+        <div class="col-md-6">
+            <div class="plan-card premium shadow">
+                <div class="badge-premium">Recommended</div>
+                <h4>Premium Plan</h4>
+                <p class="highlight">Coverage up to ₹20,00,000</p>
+                <p class="price">₹ <span id="premiumPrice">7000</span></p>
+                <ul style="color:#001f3d">
+                    <li>Medical emergency – up to ₹10,00,000</li>
+                    <li>Trip cancellation – up to ₹2,00,000</li>
+                    <li>Lost luggage – up to ₹1,00,000</li>
+                </ul>
+                <button class="btn btn-premium w-100">Choose Premium</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h3>Why Buy Family Travel Insurance & Eligibility</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Why Should You Buy?</h5>
+                <ul style="color:#001f3d">
+                    <li>One policy for the entire family</li>
+                    <li>Lower cost than individual policies</li>
+                    <li>Protection against emergencies</li>
+                    <li>Peace of mind while travelling</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Eligibility Criteria</h5>
+                <ul style="color:#001f3d">
+                    <li>Minimum 2 and maximum 5 members</li>
+                    <li>All members must travel together</li>
+                    <li>Valid for a single trip only</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h3>Coverage Details</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>What is Covered</h5>
+                <ul style="color:#001f3d">
+                    <li>Medical emergencies & hospitalization</li>
+                    <li>Trip cancellation</li>
+                    <li>Baggage loss or delay</li>
+                    <li>Accidental injuries</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>What is Not Covered</h5>
+                <ul style="color:#001f3d">
+                    <li>Pre-existing conditions</li>
+                    <li>Alcohol or drug-related incidents</li>
+                    <li>Adventure sports</li>
+                    <li>Negligence-related losses</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="section">
+    <h3>Benefits & Why Choose Travel Buddy</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Benefits of Family Insurance</h5>
+                <ul style="color:#001f3d">
+                    <li>Single premium for all members</li>
+                    <li>Easy claim handling</li>
+                    <li>Shared coverage limits</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Why Choose Travel Buddy?</h5>
+                <ul style="color:#001f3d">
+                    <li>Transparent & simple plans</li>
+                    <li>Fast claim processing</li>
+                    <li>Customer-first approach</li>
+                    <li>Designed for modern travellers</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="section">
+    <h3>Claim Process</h3>
+    <div class="info-card" style="color:#001f3d">
+        <div class="claim-step" >Login to Travel Buddy</div>
+        <div class="claim-step">Select your policy</div>
+        <div class="claim-step">Submit claim details</div>
+        <div class="claim-step">Verification by our team</div>
+        <div class="claim-step">Approved amount credited</div>
+    </div>
+</div>
+
+
+@section Scripts {
+    
+         If Bootstrap bundle is already loaded in _Layout, you can remove this CDN include. -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        function updatePremium() {
+            // Parse member count safely
+            const membersEl = document.getElementById("members");
+            if (!membersEl) return;
+
+            const members = parseInt(membersEl.value, 10);
+            if (isNaN(members) || members < 2) return; // guard
+
+            const basicBase = 4000;
+            const premiumBase = 7000;
+            const extraCost = (members - 2) * 1000;
+
+            const basicPriceEl = document.getElementById("basicPrice");
+            const premiumPriceEl = document.getElementById("premiumPrice");
+
+            if (basicPriceEl) basicPriceEl.innerText = (basicBase + extraCost).toLocaleString("en-IN");
+            if (premiumPriceEl) premiumPriceEl.innerText = (premiumBase + extraCost).toLocaleString("en-IN");
+        }
+
+        // Initialize prices on first load
+        document.addEventListener("DOMContentLoaded", updatePremium);
+    </script>
+
+
+}
+

@@ -23,6 +23,14 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+
+app.MapControllerRoute(
+    name: "user-dashboard",
+    pattern: "dashboard",
+    defaults: new { controller = "UserDashboard", action = "Dashboard" })
+    .WithStaticAssets();
+
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

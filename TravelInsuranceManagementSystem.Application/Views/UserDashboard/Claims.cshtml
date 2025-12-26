@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Claims";
+    Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .panel {
+            background: #fff;
+            border: 1px solid #d7d7d7;
+            border-radius: .75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .status {
+            border-radius: 1rem;
+            padding: .25rem .6rem;
+            font-weight: 600;
+            font-size: .8rem;
+        }
+
+        .status-approved {
+            background: #d2f6d6;
+            color: #0b5c19;
+        }
+
+        .status-pending {
+            background: #fff2cc;
+            color: #7a5b00;
+        }
+
+        .status-rejected {
+            background: #ffd9d6;
+            color: #7a0b00;
+        }
+
+        .btn-navy {
+            background-color: #001f3d;
+            border-color: #001f3d;
+            color: #fff;
+            border-radius: .6rem;
+        }
+
+            .btn-navy:hover {
+                background-color: #00335f;
+                border-color: #00335f;
+            }
+
+        .btn-chip {
+            border-radius: 999px;
+        }
+    </style>
+}
+
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="fw-bold m-0" style="color:#001f3d;">Claims</h1>
+
+    <a asp-controller="UserDashboard"
+       asp-action="ClaimCreate"
+       class="btn btn-navy d-flex align-items-center gap-1"
+       style="border-radius: .6rem;">
+        <span class="fw-bold">+</span> File New Claim
+    </a>
+</div>
+
+<div class="panel p-3">
+    <!-- Filters -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <input id="searchBox" type="text" class="form-control" placeholder="Search by Claim , Policy, Type…" style="max-width: 320px; border-radius:.6rem;" />
+        <div class="btn-group" role="group" aria-label="Status filter">
+            <button class="btn btn-outline-secondary btn-chip active" data-status="All">All</button>
+            <button class="btn btn-outline-secondary btn-chip" data-status="Pending">Pending</button>
+            <button class="btn btn-outline-secondary btn-chip" data-status="Approved">Approved</button>
+            <button class="btn btn-outline-secondary btn-chip" data-status="Rejected">Rejected</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table id="claimsTable" class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Policy ID</th>
+                    <th>Type</th>
+                    <th>Date Filed</th>
+                    <th class="text-end">Amount</th>
+                    <th>Status</th>
+                    <th>Document</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample rows; replace with server-side binding later -->
+                <tr>
+                    <td>CLM-1027</td>
+                    <td>P01842</td>
+                    <td>Medical</td>
+                    <td>2025-12-12</td>
+                    <td class="text-end">₹ 18,500</td>
+                    <td><span class="status status-pending">Pending</span></td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>CLM-0986</td>
+                    <td>P01037</td>
+                    <td>BaggageLoss</td>
+                    <td>2025-12-01</td>
+                    <td class="text-end">₹ 12,000</td>
+                    <td><span class="status status-approved">Approved</span></td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>CLM-0941</td>
+                    <td>P01016</td>
+                    <td>TripCancellation</td>
+                    <td>2025-11-19</td>
+                    <td class="text-end">₹ 7,900</td>
+                    <td><span class="status status-rejected">Rejected</span></td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const table = document.getElementById('claimsTable');
+            const searchInput = document.getElementById('searchBox');
+            const filterButtons = document.querySelectorAll('[data-status]');
+            let statusFilter = 'All';
+
+            // Filter by status
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    statusFilter = btn.getAttribute('data-status');
+                    applyFilters();
+                });
+            });
+
+            // Search filter
+            searchInput.addEventListener('input', applyFilters);
+
+            function applyFilters() {
+                const q = (searchInput.value || '').toLowerCase();
+                [...table.tBodies[0].rows].forEach(row => {
+                    const txt = row.innerText.toLowerCase();
+                    const statusCell = row.cells[5];
+                    const statusText = statusCell ? statusCell.innerText.trim() : '';
+                    const statusMatch = (statusFilter === 'All') || (statusText === statusFilter);
+                    const searchMatch = !q || txt.includes(q);
+                    row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+                });
+            }
+        })();
+    </script>
+}

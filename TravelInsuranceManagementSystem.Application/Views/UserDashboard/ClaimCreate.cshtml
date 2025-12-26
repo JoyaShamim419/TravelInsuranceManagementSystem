@@ -1,0 +1,308 @@
+﻿@{
+    ViewData["Title"] = "File New Claim";
+    Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .panel {
+            background: #fff;
+            border: 1px solid #d7d7d7;
+            border-radius: .75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .req::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn-navy {
+            background-color: #001f3d;
+            border-color: #001f3d;
+            color: #fff;
+            border-radius: .6rem;
+        }
+
+            .btn-navy:hover {
+                background-color: #00335f;
+                border-color: #00335f;
+            }
+
+        .btn-outline-secondary {
+            border-radius: .6rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: .6rem;
+        }
+
+        .file-preview {
+            border: 1px dashed #c9c9c9;
+            border-radius: .6rem;
+            padding: .75rem;
+            background: #f7fafc;
+        }
+    </style>
+}
+
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="fw-bold m-0" style="color:#001f3d;">File New Claim</h1>
+
+    <a asp-controller="UserDashboard" asp-action="Claims" class="btn btn-outline-secondary">
+        Back to Claims
+    </a>
+</div>
+
+
+<div class="panel p-3">
+    <!-- Front-end only -->
+    <form id="claimForm" novalidate enctype="multipart/form-data">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label req">Policy Number</label>
+                <input id="policyNumber" class="form-control" placeholder="e.g., TRVL-PL-8731" required />
+                <div class="invalid-feedback">Policy number is required.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Claim Type</label>
+                <select id="claimType" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option value="Medical">Medical</option>
+                    <option value="BaggageLoss">Baggage Loss</option>
+                    <option value="TripCancellation">Trip Cancellation</option>
+                    <option value="FlightDelay">Flight Delay</option>
+                    <option value="PersonalLiability">Personal Liability</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Please select a claim type.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Date of Incident</label>
+                <input id="incidentDate" class="form-control" type="date" required />
+                <div class="invalid-feedback">Date of incident is required and cannot be in the future.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label req">Claim Amount (₹)</label>
+                <input id="amount" class="form-control" inputmode="decimal" placeholder="e.g., 18500" required />
+                <div class="form-text">We’ll format it as INR automatically.</div>
+                <div class="invalid-feedback">Enter a valid non-negative amount.</div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label req">Description</label>
+                <textarea id="description" class="form-control" rows="4" maxlength="1000" placeholder="Describe what happened…" required></textarea>
+                <div class="d-flex justify-content-between">
+                    <div class="invalid-feedback">Description is required.</div>
+                    <small id="descCounter" class="text-muted">0 / 1000</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Location (City/Country)</label>
+                <input id="location" class="form-control" placeholder="e.g., Singapore" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Reference/Booking ID</label>
+                <input id="referenceId" class="form-control" placeholder="e.g., PNR/Booking Ref" />
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Supporting Document (PDF/Image)</label>
+                <input id="document" type="file" class="form-control" accept=".pdf,image/*" />
+                <small class="text-muted d-block">Max 10 MB. PDF/JPG/PNG recommended.</small>
+
+                <div id="filePreview" class="file-preview mt-2 d-none">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary">Selected:</span>
+                        <span id="fileName" class="fw-semibold"></span>
+                        <span id="fileSize" class="text-muted"></span>
+                        <button type="button" id="clearFile" class="btn btn-sm btn-outline-danger ms-auto">Remove</button>
+                    </div>
+                    <div id="imageHolder" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button id="submitBtn" type="submit" class="btn btn-navy">Submit Claim</button>
+            <a  class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('claimForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            const policyNumber = document.getElementById('policyNumber');
+            const claimType = document.getElementById('claimType');
+            const incidentDate = document.getElementById('incidentDate');
+            const amountInput = document.getElementById('amount');
+            const desc = document.getElementById('description');
+            const descCounter = document.getElementById('descCounter');
+
+            const fileInput = document.getElementById('document');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const imageHolder = document.getElementById('imageHolder');
+            const clearFileBtn = document.getElementById('clearFile');
+
+            // --- Helpers ---
+            const inrFormatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
+
+            function setMaxDateToday(input) {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                input.setAttribute('max', `${yyyy}-${mm}-${dd}`);
+            }
+
+            function validateFutureDate(input) {
+                const val = input.value;
+                if (!val) return false;
+                const selected = new Date(val + 'T00:00:00');
+                const today = new Date();
+                selected.setHours(0,0,0,0);
+                today.setHours(0,0,0,0);
+                return selected > today;
+            }
+
+            // --- Amount formatting (INR) ---
+            amountInput.addEventListener('blur', () => {
+                const raw = amountInput.value.replace(/[,₹\s]/g, '');
+                const num = Number(raw);
+                if (!isNaN(num) && num >= 0) {
+                    amountInput.value = inrFormatter.format(num);
+                    amountInput.classList.remove('is-invalid');
+                } else {
+                    amountInput.classList.add('is-invalid');
+                }
+            });
+
+            amountInput.addEventListener('input', () => {
+                amountInput.classList.remove('is-invalid');
+            });
+
+            // --- Description counter ---
+            function updateCounter() {
+                const len = desc.value.length;
+                descCounter.textContent = `${len} / 1000`;
+            }
+            desc.addEventListener('input', updateCounter);
+            updateCounter();
+
+            // --- Date guard ---
+            setMaxDateToday(incidentDate);
+            incidentDate.addEventListener('change', () => {
+                if (validateFutureDate(incidentDate)) {
+                    incidentDate.classList.add('is-invalid');
+                } else {
+                    incidentDate.classList.remove('is-invalid');
+                }
+            });
+
+            // --- File preview / validation ---
+            fileInput.addEventListener('change', () => {
+                imageHolder.innerHTML = '';
+                fileName.textContent = '';
+                fileSize.textContent = '';
+                filePreview.classList.add('d-none');
+
+                const file = fileInput.files?.[0];
+                if (!file) return;
+
+                const MAX_MB = 10;
+                const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+                if (file.size > MAX_MB * 1024 * 1024) {
+                    alert(`File is too large. Max ${MAX_MB} MB allowed.`);
+                    fileInput.value = '';
+                    return;
+                }
+                if (!validTypes.includes(file.type)) {
+                    alert('Unsupported file type. Please upload PDF/JPG/PNG/WEBP/GIF.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                fileName.textContent = file.name;
+                fileSize.textContent = `(${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+                filePreview.classList.remove('d-none');
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Preview';
+                        img.className = 'img-fluid rounded';
+                        img.style.maxHeight = '180px';
+                        imageHolder.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            clearFileBtn.addEventListener('click', () => {
+                fileInput.value = '';
+                imageHolder.innerHTML = '';
+                fileName.textContent = '';
+                fileSize.textContent = '';
+                filePreview.classList.add('d-none');
+            });
+
+            // --- Client-side validation + submit UX (front-end only) ---
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let valid = true;
+
+                // Required checks
+                [policyNumber, claimType, incidentDate, amountInput, desc].forEach(el => {
+                    if (!el.value || (el === incidentDate && validateFutureDate(el))) {
+                        el.classList.add('is-invalid');
+                        valid = false;
+                    } else {
+                        el.classList.remove('is-invalid');
+                    }
+                });
+
+                // Amount numeric sanity (strip currency to verify)
+                const raw = amountInput.value.replace(/[,₹\s]/g, '');
+                const num = Number(raw);
+                if (isNaN(num) || num < 0) {
+                    amountInput.classList.add('is-invalid');
+                    valid = false;
+                }
+
+                if (!valid) {
+                    const firstInvalid = document.querySelector('.is-invalid');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                // Simulate submit UX
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting…';
+
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Submit Claim';
+                    alert('Claim submitted successfully (client-side only). Wire this to your controller next.');
+                    window.location.href = '@Url.Content("~/UserDashboard/Claims")';
+                }, 900);
+            });
+        })();
+    </script>
+}
+
