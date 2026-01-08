@@ -1,4 +1,4 @@
-﻿@* Views/Insurance/FamilyInsurance.cshtml (Option C with Offcanvas) *@
+﻿@* Views/Insurance/FamilyInsurance.cshtml *@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Family Travel Insurance | Travel Buddy";
@@ -6,12 +6,11 @@
 
 @section Styles {
     <style>
-        /* PALETTE */
         :root {
-            --navy: #001f3d; /* headings & primary */
-            --accent: #ed985f; /* CTA */
-            --accent-soft: #f7b980; /* badges/soft buttons */
-            --divider: #e6e6e6; /* borders & separators */
+            --navy: #001f3d;
+            --accent: #ed985f;
+            --accent-soft: #f7b980;
+            --divider: #e6e6e6;
             --text: #1a1a1a;
             --text-muted: #495057;
             --card-bg: #ffffff;
@@ -25,7 +24,6 @@
             scroll-behavior: smooth;
         }
 
-        /* HERO */
         .hero {
             background: linear-gradient(rgba(0,31,61,0.85), rgba(0,31,61,0.85)), url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee");
             background-size: cover;
@@ -36,19 +34,6 @@
             text-align: center;
         }
 
-            .hero h1 {
-                font-weight: 700;
-                letter-spacing: .3px;
-                margin-bottom: 8px;
-            }
-
-            .hero p {
-                margin: 0 auto;
-                max-width: 880px;
-                color: #e9f0f8;
-            }
-
-        /* SECTION */
         .section {
             background: var(--card-bg);
             padding: 32px;
@@ -56,12 +41,6 @@
             border-radius: 18px;
             box-shadow: 0 8px 22px rgba(0,0,0,0.08);
         }
-
-            .section h3 {
-                color: var(--navy);
-                font-weight: 700;
-                margin-bottom: 18px;
-            }
 
         .card-plain {
             background: var(--card-bg);
@@ -71,25 +50,9 @@
             padding: 18px;
         }
 
-            .card-plain .card-title {
-                color: var(--navy);
-                font-weight: 700;
-            }
-
-        /* FORM */
         .form-label {
             font-weight: 600;
             color: var(--navy);
-        }
-
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 1px solid #e2e6ee;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-        }
-
-        .form-text {
-            color: var(--text-muted);
         }
 
         .divider {
@@ -97,126 +60,81 @@
             margin: 12px 0;
         }
 
-        /* BUTTONS */
         .btn-navy {
             background: var(--navy);
             color: #fff;
-            border: none;
             border-radius: 10px;
+            border: none;
         }
-
-            .btn-navy:hover {
-                background: #02284f;
-                color: #fff;
-            }
 
         .btn-accent {
             background: var(--accent);
             color: #fff;
-            border: none;
             border-radius: 10px;
+            border: none;
         }
-
-            .btn-accent:hover {
-                background: #e27f3f;
-                color: #fff;
-            }
 
         .btn-soft {
             background: var(--accent-soft);
             color: var(--navy);
-            border: none;
             border-radius: 10px;
+            border: none;
         }
 
-            .btn-soft:hover {
-                filter: brightness(0.95);
-            }
-
-        .badge-recommended {
-            background: var(--accent-soft);
-            color: var(--navy);
-            font-weight: 700;
-            border-radius: 12px;
-            padding: 6px 10px;
-        }
-
-        /* MEMBER CARD */
         .member-card {
             border-left: 6px solid var(--accent);
         }
 
-        /* Sticky submit (kept but no overlap with offcanvas) */
         .sticky-submit {
             position: sticky;
-            bottom: 12px;
-            z-index: 3; /* modest */
+            bottom: 20px;
+            z-index: 1020;
             background: var(--card-bg);
             border: 1px solid var(--divider);
-            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
             border-radius: 12px;
-            padding: 12px 16px;
-            margin-top: 12px;
+            padding: 16px;
         }
 
-       
-
-
-        /* Offcanvas styling in palette */
         .offcanvas {
             background: var(--card-bg);
-            border-left: 1px solid var(--divider);
         }
 
-            .offcanvas .offcanvas-title {
-                color: var(--navy);
-                font-weight: 700;
-            }
-
-        #summaryBody .summary-line {
+        .summary-line {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px dashed var(--divider);
         }
-
-            #summaryBody .summary-line:last-child {
-                border-bottom: none;
-            }
     </style>
 }
 
-<!-- HERO -->
-<div class="hero" role="banner" aria-label="Family Travel Insurance hero section">
-    <h1>Travel Insurance</h1>
-    <p class="mt-2">
-        Add multiple family members, capture personal details, and get a single Insurance ID
-        for both Admin and User dashboards — powered by <b>Travel Buddy</b>.
-    </p>
+@Html.AntiForgeryToken()
+
+<div class="hero" role="banner">
+    <h1>Family Travel Insurance</h1>
+    <p class="mt-2">Secure your family's journey with a single Insurance ID — powered by <b>Travel Buddy</b>.</p>
 </div>
 
 <div class="container my-5">
-    <!-- POLICY DETAILS -->
-    <div class="section">
+    <div class="section" id="policySection">
         <h3>Policy Details</h3>
         <div class="row g-3">
             <div class="col-md-3">
-                <label class="form-label" for="TripStart">Trip Start</label>
-                <input type="date" class="form-control" id="TripStart" name="TripStart" required />
-                <div class="form-text">Start date of travel</div>
+                <label class="form-label">Trip Start</label>
+                <input type="date" class="form-control" id="TripStart" required />
             </div>
             <div class="col-md-3">
-                <label class="form-label" for="TripEnd">Trip End</label>
-                <input type="date" class="form-control" id="TripEnd" name="TripEnd" required />
-                <div class="form-text">End date of travel</div>
+                <label class="form-label">Trip End</label>
+                <input type="date" class="form-control" id="TripEnd" required />
             </div>
             <div class="col-md-3">
-                <label class="form-label" for="Destination">Destination Country</label>
-                <input type="text" class="form-control" id="Destination" name="Destination" placeholder="e.g., Singapore" required />
+                <label class="form-label">Destination</label>
+                <input type="text" class="form-control" id="Destination" placeholder="e.g., Singapore" required />
             </div>
             <div class="col-md-3">
-                <label class="form-label" for="PlanType">Plan</label>
-                <select class="form-select" id="PlanType" name="PlanType" required>
+                <label class="form-label">Plan</label>
+                <select class="form-select" id="PlanType" required>
                     <option value="">Select Plan</option>
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
@@ -226,96 +144,78 @@
         <div class="divider"></div>
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label" for="PrimaryEmail">Primary Email</label>
-                <input type="email" class="form-control" id="PrimaryEmail" name="PrimaryEmail" placeholder="name@example.com" required />
+                <label class="form-label">Primary Email</label>
+                <input type="email" class="form-control" id="PrimaryEmail" required />
             </div>
             <div class="col-md-6">
-                <label class="form-label" for="PrimaryMobile">Primary Mobile</label>
-                <input type="tel" class="form-control" id="PrimaryMobile" name="PrimaryMobile" placeholder="+91XXXXXXXXXX" required />
+                <label class="form-label">Primary Mobile</label>
+                <input type="tel" class="form-control" id="PrimaryMobile" required />
             </div>
         </div>
     </div>
 
-    <!-- FAMILY MEMBERS -->
     <div class="section">
         <div class="d-flex align-items-center justify-content-between">
             <h3>Family Members</h3>
             <button type="button" class="btn btn-soft" id="addMemberBtn">+ Add Member</button>
         </div>
         <div id="membersContainer" class="mt-3"></div>
-        <div class="alert alert-info mt-3" role="alert">
-            Tip: Add at least one member. You can remove a member by clicking the “Remove” button in the member card.
-        </div>
     </div>
 
-    <!-- NOMINEE -->
     <div class="section">
         <h3>Nominee Details</h3>
         <div class="card-plain">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label" for="NomineeName">Nominee Name</label>
-                    <input type="text" class="form-control" id="NomineeName" name="NomineeName" placeholder="John Doe" required />
+                    <label class="form-label">Nominee Name</label>
+                    <input type="text" class="form-control" id="NomineeName" required />
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="NomineeRelation">Relation</label>
-                    <select class="form-select" id="NomineeRelation" name="NomineeRelation" required>
+                    <label class="form-label">Relation</label>
+                    <select class="form-select" id="NomineeRelation" required>
                         <option value="">Select</option>
                         <option>Spouse</option>
                         <option>Son</option>
                         <option>Daughter</option>
                         <option>Parent</option>
-                        <option>Sibling</option>
-                        <option>Other</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="NomineeMobile">Nominee Mobile</label>
-                    <input type="tel" class="form-control" id="NomineeMobile" name="NomineeMobile" placeholder="+91XXXXXXXXXX" />
+                    <label class="form-label">Nominee Mobile</label>
+                    <input type="tel" class="form-control" id="NomineeMobile" />
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- DECLARATIONS -->
     <div class="section">
         <h3>Declarations</h3>
         <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" value="true" id="IsResident" name="IsResident" required>
-            <label class="form-check-label" for="IsResident">
-                All travellers are residents and aged 18+ or accompanied by guardian, and I agree to the Terms &amp; Conditions.
-            </label>
+            <input class="form-check-input" type="checkbox" id="IsResident" required>
+            <label class="form-check-label" for="IsResident">All travellers are residents.</label>
         </div>
         <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" value="true" id="IsNotPEP" name="IsNotPEP" required>
-            <label class="form-check-label" for="IsNotPEP">
-                We are not Politically Exposed Persons (PEP) nor their close relatives.
-            </label>
+            <input class="form-check-input" type="checkbox" id="IsNotPEP" required>
+            <label class="form-check-label" for="IsNotPEP">We are not PEP persons.</label>
         </div>
     </div>
 
-    <!-- SUBMIT BAR (opens offcanvas) -->
     <div class="sticky-submit d-flex align-items-center justify-content-between">
-        <div class="d-flex flex-column">
-            <strong style="color: var(--navy)">Review &amp; Submit</strong>
-            <small class="text-muted">An Insurance ID will be generated and shared to Admin &amp; User dashboards.</small>
+        <div>
+            <strong style="color: var(--navy)">Ready to Protect?</strong><br>
+            <small class="text-muted">Review your details before generating ID.</small>
         </div>
         <div>
-            <button id="submitBtn" class="btn btn-accent me-2">Submit &amp; Generate ID</button>
-            <button class="btn btn-navy" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#summaryOffcanvas"
-                    aria-controls="summaryOffcanvas">
-                View Summary
-            </button>
+            <button class="btn btn-navy me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#summaryOffcanvas">View Summary</button>
+            <button id="submitBtn" class="btn btn-accent px-4">Submit & Generate ID</button>
         </div>
     </div>
 </div>
 
-<!-- Offcanvas Form Summary -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="summaryOffcanvas" aria-labelledby="summaryOffcanvasLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="summaryOffcanvasLabel">Form Summary</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="summaryOffcanvas">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title">Form Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
         <div id="summaryBody"></div>
@@ -324,235 +224,142 @@
 
 @section Scripts {
     <script>
-        // ---------- CONFIG: endpoints (adjust to your routes) ----------
-        const createEndpoint = '@Url.Action("CreateFamily", "Insurance")';          // returns { insuranceId: "...", ... }
-        const adminReceiveEndpoint = '@Url.Action("Receive", "AdminInsurance")';    // expects payload + insuranceId
-        const userReceiveEndpoint  = '@Url.Action("Receive", "UserInsurance")';     // expects payload + insuranceId
+        const createEndpoint = '@Url.Action("CreateFamily", "Insurance")';
+        const adminReceiveEndpoint = '@Url.Action("Receive", "AdminInsurance")';
+        const userReceiveEndpoint = '@Url.Action("Receive", "UserInsurance")';
+        const membersContainer = document.getElementById('membersContainer');
+        let memberCounter = 0;
 
-        // ---------- MEMBER CARD TEMPLATE ----------
         const memberTemplate = (index) => `
             <div class="card-plain member-card mb-3" data-index="${index}">
-                <div class="d-flex align-items-center justify-content-between">
-                    <h5 class="card-title mb-2">Member #${index + 1}</h5>
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeMember(${index})">Remove</button>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Member #${index + 1}</h5>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-member-btn">Remove</button>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-2">
-                        <label class="form-label" for="Members_${index}__Title">Title</label>
-                        <select class="form-select" id="Members_${index}__Title" name="Members[${index}].Title" required>
-                            <option value="">Title</option>
-                            <option>Mr</option>
-                            <option>Mrs</option>
-                            <option>Ms</option>
-                            <option>Dr</option>
+                        <label class="form-label">Title</label>
+                        <select class="form-select field-watch" name="Members[${index}].Title" required>
+                            <option value="">Title</option><option>Mr</option><option>Mrs</option><option>Ms</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__FirstName">First Name</label>
-                        <input class="form-control" id="Members_${index}__FirstName" name="Members[${index}].FirstName" placeholder="John" required />
+                    <div class="col-md-5">
+                        <label class="form-label">First Name</label>
+                        <input class="form-control field-watch" name="Members[${index}].FirstName" required />
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__LastName">Last Name</label>
-                        <input class="form-control" id="Members_${index}__LastName" name="Members[${index}].LastName" placeholder="Doe" required />
+                    <div class="col-md-5">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-control field-watch" name="Members[${index}].LastName" required />
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label" for="Members_${index}__DOB">Date of Birth</label>
-                        <input type="date" class="form-control" id="Members_${index}__DOB" name="Members[${index}].DOB" required />
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label" for="Members_${index}__Gender">Gender</label>
-                        <select class="form-select" id="Members_${index}__Gender" name="Members[${index}].Gender" required>
-                            <option value="">Select</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
+                    <div class="col-md-4">
+                        <label class="form-label">Relation</label>
+                        <select class="form-select field-watch" name="Members[${index}].Relation" required>
+                            <option value="">Select</option><option>Self</option><option>Spouse</option><option>Child</option>
                         </select>
                     </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__Relation">Relation</label>
-                        <select class="form-select" id="Members_${index}__Relation" name="Members[${index}].Relation" required>
-                            <option value="">Select</option>
-                            <option>Self</option>
-                            <option>Spouse</option>
-                            <option>Son</option>
-                            <option>Daughter</option>
-                            <option>Father</option>
-                            <option>Mother</option>
-                            <option>Sibling</option>
-                            <option>Other</option>
-                        </select>
+                    <div class="col-md-4">
+                        <label class="form-label">DOB</label>
+                        <input type="date" class="form-control field-watch" name="Members[${index}].DOB" required />
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__Email">Email</label>
-                        <input type="email" class="form-control" id="Members_${index}__Email" name="Members[${index}].Email" placeholder="name@example.com" required />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__Mobile">Mobile</label>
-                        <input type="tel" class="form-control" id="Members_${index}__Mobile" name="Members[${index}].Mobile" placeholder="+91XXXXXXXXXX" required />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__PAN">PAN Number</label>
-                        <input class="form-control" id="Members_${index}__PAN" name="Members[${index}].PAN" placeholder="ABCDE1234F" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__Passport">Passport Number</label>
-                        <input class="form-control" id="Members_${index}__Passport" name="Members[${index}].Passport" placeholder="A1234567" />
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label d-block">Pre-existing Disease?</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="Members[${index}].HasPreExisting" id="Members_${index}__HasPreExisting_Yes" value="true" />
-                            <label class="form-check-label" for="Members_${index}__HasPreExisting_Yes">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="Members[${index}].HasPreExisting" id="Members_${index}__HasPreExisting_No" value="false" checked />
-                            <label class="form-check-label" for="Members_${index}__HasPreExisting_No">No</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label" for="Members_${index}__GovtIDMissing">Don’t have docs handy?</label>
-                        <select class="form-select" id="Members_${index}__GovtIDMissing" name="Members[${index}].GovtIDMissing">
-                            <option value="false">No</option>
-                            <option value="true">Yes (complete later)</option>
-                        </select>
+                    <div class="col-md-4">
+                        <label class="form-label">Mobile</label>
+                        <input type="tel" class="form-control field-watch" name="Members[${index}].Mobile" required />
                     </div>
                 </div>
-            </div>
-        `;
-
-        let memberCounter = 0;
-        const membersContainer = document.getElementById('membersContainer');
+            </div>`;
 
         function addMember() {
-            const index = memberCounter++;
             const wrapper = document.createElement('div');
-            wrapper.innerHTML = memberTemplate(index);
+            wrapper.innerHTML = memberTemplate(memberCounter++);
             membersContainer.appendChild(wrapper.firstElementChild);
             updateSummary();
         }
-        function removeMember(index) {
-            const card = membersContainer.querySelector('.member-card[data-index="' + index + '"]');
-            if (card) {
-                card.parentElement.remove();
+
+        // Re-indexing logic for Model Binder compatibility
+        membersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-member-btn')) {
+                e.target.closest('.member-card').remove();
+                reIndexMembers();
                 updateSummary();
             }
-        }
-        document.getElementById('addMemberBtn').addEventListener('click', addMember);
-        addMember(); // initial member
+        });
 
-        // ---------- SUMMARY ----------
-        function collectFormData() {
-            const policy = {
-                TripStart: document.getElementById('TripStart').value,
-                TripEnd: document.getElementById('TripEnd').value,
-                Destination: document.getElementById('Destination').value,
-                PlanType: document.getElementById('PlanType').value,
-                PrimaryEmail: document.getElementById('PrimaryEmail').value,
-                PrimaryMobile: document.getElementById('PrimaryMobile').value
-            };
-            const members = Array.from(membersContainer.querySelectorAll('.member-card')).map(card => {
-                const idx = card.getAttribute('data-index');
-                const get = id => card.querySelector('#' + id)?.value ?? '';
-                const getCheckedRadio = name => {
-                    const el = card.querySelector('input[name="' + name + '"]:checked');
-                    return el ? el.value === 'true' : false;
-                };
-                return {
-                    Index: +idx,
-                    Title: get(`Members_${idx}__Title`),
-                    FirstName: get(`Members_${idx}__FirstName`),
-                    LastName: get(`Members_${idx}__LastName`),
-                    DOB: get(`Members_${idx}__DOB`),
-                    Gender: get(`Members_${idx}__Gender`),
-                    Relation: get(`Members_${idx}__Relation`),
-                    Email: get(`Members_${idx}__Email`),
-                    Mobile: get(`Members_${idx}__Mobile`),
-                    PAN: get(`Members_${idx}__PAN`),
-                    Passport: get(`Members_${idx}__Passport`),
-                    HasPreExisting: getCheckedRadio(`Members[${idx}].HasPreExisting`),
-                    GovtIDMissing: (get(`Members_${idx}__GovtIDMissing`) === 'true')
-                };
+        function reIndexMembers() {
+            const cards = membersContainer.querySelectorAll('.member-card');
+            memberCounter = 0;
+            cards.forEach((card, i) => {
+                card.setAttribute('data-index', i);
+                card.querySelector('.card-title').innerText = `Member #${i + 1}`;
+                card.querySelectorAll('[name]').forEach(input => {
+                    const name = input.getAttribute('name');
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
+                });
+                memberCounter++;
             });
-            const nominee = {
-                NomineeName: document.getElementById('NomineeName').value,
-                NomineeRelation: document.getElementById('NomineeRelation').value,
-                NomineeMobile: document.getElementById('NomineeMobile').value
+        }
+
+        function collectFormData() {
+            const getVal = id => document.getElementById(id)?.value || '';
+            const data = {
+                policy: {
+                    TripStart: getVal('TripStart'), TripEnd: getVal('TripEnd'),
+                    Destination: getVal('Destination'), PlanType: getVal('PlanType'),
+                    PrimaryEmail: getVal('PrimaryEmail'), PrimaryMobile: getVal('PrimaryMobile')
+                },
+                nominee: {
+                    NomineeName: getVal('NomineeName'), NomineeRelation: getVal('NomineeRelation'),
+                    NomineeMobile: getVal('NomineeMobile')
+                },
+                declarations: {
+                    IsResident: document.getElementById('IsResident').checked,
+                    IsNotPEP: document.getElementById('IsNotPEP').checked
+                },
+                members: Array.from(membersContainer.querySelectorAll('.member-card')).map(card => {
+                    const obj = {};
+                    card.querySelectorAll('[name]').forEach(input => {
+                        const key = input.getAttribute('name').split('.').pop();
+                        obj[key] = input.value;
+                    });
+                    return obj;
+                })
             };
-            const declarations = {
-                IsResident: document.getElementById('IsResident').checked,
-                IsNotPEP: document.getElementById('IsNotPEP').checked
-            };
-            return { policy, members, nominee, declarations };
+            return data;
         }
 
         function updateSummary() {
             const data = collectFormData();
-            const sb = document.getElementById('summaryBody');
-            const lines = [];
-            lines.push(`<div class="summary-line"><span>Plan</span><span>${data.policy.PlanType || '-'}</span></div>`);
-            lines.push(`<div class="summary-line"><span>Trip</span><span>${data.policy.TripStart || '-'} to ${data.policy.TripEnd || '-'}</span></div>`);
-            lines.push(`<div class="summary-line"><span>Destination</span><span>${data.policy.Destination || '-'}</span></div>`);
-            lines.push(`<div class="summary-line"><span>Members</span><span>${data.members.length}</span></div>`);
+            const lines = [
+                `<div class="summary-line"><b>Plan</b><span>${data.policy.PlanType || '-'}</span></div>`,
+                `<div class="summary-line"><b>Trip</b><span>${data.policy.TripStart} to ${data.policy.TripEnd}</span></div>`,
+                `<div class="summary-line"><b>Members</b><span>${data.members.length}</span></div>`
+            ];
             data.members.forEach((m, i) => {
-                const name = [m.Title, m.FirstName, m.LastName].filter(Boolean).join(' ');
-                lines.push(`<div class="summary-line"><span>Member #${i+1}</span><span>${name || '-'} (${m.Relation || '-'})</span></div>`);
+                lines.push(`<div class="summary-line"><span>${m.FirstName || 'Member ' + (i+1)}</span><span>${m.Relation || '-'}</span></div>`);
             });
-            lines.push(`<div class="summary-line"><span>Nominee</span><span>${data.nominee.NomineeName || '-'} (${data.nominee.NomineeRelation || '-'})</span></div>`);
-            sb.innerHTML = lines.join('');
+            document.getElementById('summaryBody').innerHTML = lines.join('');
         }
 
-        // live summary updates
-        ['TripStart','TripEnd','Destination','PlanType',
-         'NomineeName','NomineeRelation','NomineeMobile',
-         'PrimaryEmail','PrimaryMobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', updateSummary);
+        // Event Delegation for live updates
+        document.addEventListener('input', (e) => {
+            if (e.target.id || e.target.classList.contains('field-watch')) updateSummary();
         });
 
-        // ---------- SUBMIT ----------
-        document.getElementById('submitBtn').addEventListener('click', async function (e) {
-            e.preventDefault();
+        document.getElementById('addMemberBtn').addEventListener('click', addMember);
+        document.getElementById('submitBtn').addEventListener('click', async (e) => {
             const data = collectFormData();
-            if (!data.policy.TripStart || !data.policy.TripEnd || !data.policy.PlanType || data.members.length === 0) {
-                alert('Please complete Policy details and add at least one member.');
-                return;
-            }
-            if (!data.declarations.IsResident || !data.declarations.IsNotPEP) {
-                alert('Please accept the declarations to proceed.');
-                return;
-            }
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
             try {
-                // Create Insurance
-                const createRes = await fetch(createEndpoint, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                const res = await fetch(createEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                    body: JSON.stringify(data)
                 });
-                if (!createRes.ok) throw new Error('Failed to create insurance.');
-                const createJson = await createRes.json();
-                const insuranceId = createJson.insuranceId || createJson.InsuranceId;
-                if (!insuranceId) throw new Error('Insurance ID not returned by server.');
-
-                // Send to Admin & User Dashboards
-                const payloadWithId = { insuranceId, ...data };
-                const [adminRes, userRes] = await Promise.all([
-                    fetch(adminReceiveEndpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payloadWithId) }),
-                    fetch(userReceiveEndpoint,  { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payloadWithId) })
-                ]);
-                if (!adminRes.ok || !userRes.ok) throw new Error('Failed to send details to one or more dashboards.');
-
-                alert(`Insurance created successfully. Insurance ID: ${insuranceId}`);
-                // Optional redirect:
-                // window.location.href = '@Url.Action("Index", "UserInsurance")' + '?insuranceId=' + encodeURIComponent(insuranceId);
-            } catch (err) {
-                console.error(err);
-                alert('Something went wrong while submitting. Please try again.');
-            }
+                if(res.ok) alert("Success!"); else alert("Check form data.");
+            } catch (err) { alert("Error connecting to server."); }
         });
 
-        // Initialize summary when page loads
-        document.addEventListener('DOMContentLoaded', updateSummary);
+        // Init
+        addMember();
     </script>
 }
-

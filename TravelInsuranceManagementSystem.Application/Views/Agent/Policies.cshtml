@@ -3,201 +3,158 @@
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
 
-<style>
-    /* PAGE BACKGROUND */
-    body {
-        background: #fafafa;
-    }
-
-    /* TITLE */
-    .page-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #000;
-        margin-bottom: 10px;
-    }
-
-    /* SEARCH */
-    .search-box {
-        max-width: 400px;
-        margin-bottom: 15px;
-    }
-
-    /* FILTER BUTTONS */
-    .filter-buttons .btn {
-        margin-right: 5px;
-        border-radius: 20px;
-    }
-
-        .filter-buttons .btn.active {
-            background-color: #0d6efd;
-            color: white;
+@section Styles {
+    <style>
+        .search-box {
+            max-width: 400px;
+            border-radius: 10px;
         }
 
-    /* TABLE */
-    table {
-        background: #ffffff;
-        border-radius: 10px;
-        overflow: hidden;
-    }
+        /* Table Layout & Spacing */
+        .table thead th {
+            padding: 1.25rem 1rem;
+            white-space: nowrap;
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
 
-    .table th {
-        background: #f5f5f5;
-        color: #000;
-        font-weight: 600;
-    }
+        .table tbody td {
+            padding: 1.5rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
-    .table td {
-        color: #333;
-    }
+        /* Pill Badges for Payment Status */
+        .pill-payment {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px; /* Full pill shape */
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            min-width: 100px;
+            text-align: center;
+        }
 
-    /* BADGES */
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
+        .pill-paid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-    .badge-active {
-        background: #d4edda;
-        color: #155724;
-    }
+        .pill-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
 
-    .badge-expired {
-        background: #fff3cd;
-        color: #856404;
-    }
+        .pill-overdue {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-    .badge-cancelled {
-        background: #f8d7da;
-        color: #721c24;
-    }
+        /* General Status Badges */
+        .badge-active {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
 
-    /* PLAN */
-    .plan-basic {
-        font-weight: 600;
-        color: #000;
-    }
+        .policy-id {
+            font-weight: 700;
+            color: #1e293b;
+        }
 
-    .plan-premium {
-        font-weight: 700;
-        color: #1a73e8;
-    }
-</style>
+        .plan-type {
+            font-weight: 600;
+            color: #2563eb;
+        }
+    </style>
+}
 
-<div class="container-fluid">
+<div class="mb-4">
+    <h2 class="fw-bold m-0 text-navy">Policy Management</h2>
+    <p class="text-muted">Review active policies and track payment installments.</p>
+</div>
 
-    <!-- TITLE -->
-    <div class="page-title">Policies</div>
-
-    <!-- SEARCH + FILTER -->
-    <div class="row align-items-center mb-3">
-        <div class="col-md-6">
-            <input type="text" class="form-control search-box" id="policySearch" placeholder="Search policies...">
-        </div>
-
-        <div class="col-md-6 text-end filter-buttons">
-            <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
-            <button class="btn btn-outline-success btn-sm filter-btn" data-status="active">Active</button>
-            <button class="btn btn-outline-warning btn-sm filter-btn" data-status="expired">Expired</button>
-            <button class="btn btn-outline-danger btn-sm filter-btn" data-status="cancelled">Cancelled</button>
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-md-6">
+        <div class="input-group search-box shadow-sm">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" id="policySearch" class="form-control border-start-0" placeholder="Search by Policy ID or Date...">
         </div>
     </div>
+</div>
 
-    <!-- TABLE -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-bordered align-middle" id="policyTable">
+        <table class="table table-hover align-middle mb-0" id="policyTable">
             <thead>
                 <tr>
-                    <th>Policy ID</th>
-                    <th>Customer ID</th>
-                    <th>Customer Name</th>
-                    <th>Plan</th>
-                    <th>Coverage</th>
+                    <th class="ps-4">Policy ID</th>
+                    <th>Plan Name</th>
+                    <th>Premium Amount</th>
                     <th>Start Date</th>
                     <th>End Date</th>
-                    <th>Status</th>
+                    <th>Policy Status</th>
+                    <th class="text-center">Payment Status</th>
                 </tr>
             </thead>
             <tbody>
-
                 <tr>
-                    <td>P01042</td>
-                    <td>CUST-101</td>
-                    <td>John Doe</td>
-                    <td class="plan-basic">Basic</td>
-                    <td>Medical</td>
-                    <td>2023-05-01</td>
-                    <td>2023-05-15</td>
-                    <td class="status">Active</td>
+                    <td class="ps-4 policy-id">P-01842</td>
+                    <td class="plan-type">Silver Medical Plan</td>
+                    <td class="fw-bold">₹12,500</td>
+                    <td>2025-05-10</td>
+                    <td>2026-05-09</td>
+                    <td><span class="badge-active">Active</span></td>
+                    <td class="text-center">
+                        <span class="pill-payment pill-paid">Paid</span>
+                    </td>
                 </tr>
-
                 <tr>
-                    <td>P01037</td>
-                    <td>CUST-102</td>
-                    <td>Jane Smith</td>
-                    <td class="plan-premium">Premium</td>
-                    <td>Trip Cancellation</td>
-                    <td>2023-08-10</td>
-                    <td>2023-09-25</td>
-                    <td class="status">Expired</td>
+                    <td class="ps-4 policy-id">P-02231</td>
+                    <td class="plan-type">Premium Travel Care</td>
+                    <td class="fw-bold">₹4,200</td>
+                    <td>2025-12-01</td>
+                    <td>2026-12-01</td>
+                    <td><span class="badge-active">Active</span></td>
+                    <td class="text-center">
+                        <span class="pill-payment pill-pending">Pending</span>
+                    </td>
                 </tr>
-
                 <tr>
-                    <td>P01016</td>
-                    <td>CUST-103</td>
-                    <td>Michael Scott</td>
-                    <td class="plan-premium">Premium</td>
-                    <td>Medical</td>
-                    <td>2024-01-05</td>
-                    <td>2024-01-14</td>
-                    <td class="status">Active</td>
+                    <td class="ps-4 policy-id">P-00985</td>
+                    <td class="plan-type">Life Secure Plus</td>
+                    <td class="fw-bold">₹28,000</td>
+                    <td>2024-01-15</td>
+                    <td>2025-01-15</td>
+                    <td><span class="badge-active">Active</span></td>
+                    <td class="text-center">
+                        <span class="pill-payment pill-overdue">Overdue</span>
+                    </td>
                 </tr>
-
-                <tr>
-                    <td>P00887</td>
-                    <td>CUST-104</td>
-                    <td>Jean Tremblay</td>
-                    <td class="plan-basic">Basic</td>
-                    <td>Lost Luggage</td>
-                    <td>2024-03-15</td>
-                    <td>2024-04-05</td>
-                    <td class="status">Cancelled</td>
-                </tr>
-
             </tbody>
         </table>
     </div>
-
 </div>
 
 @section Scripts {
     <script>
-        /* SEARCH */
-        $("#policySearch").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $("#policyTable tbody tr").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        });
-
-        /* FILTER */
-        $(".filter-btn").click(function () {
-
-            $(".filter-btn").removeClass("active");
-            $(this).addClass("active");
-
-            var status = $(this).data("status").toLowerCase();
-
-            if (status === "all") {
-                $("#policyTable tbody tr").show();
-                return;
-            }
-
-            $("#policyTable tbody tr").each(function () {
-                var rowStatus = $(this).find(".status").text().toLowerCase();
-                $(this).toggle(rowStatus === status);
+        $(document).ready(function () {
+            // Search Logic
+            $("#policySearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#policyTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
             });
         });
     </script>

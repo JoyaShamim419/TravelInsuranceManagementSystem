@@ -3,157 +3,213 @@
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
 
-<style>
-    /* SEARCH + FILTER */
-    .search-box {
-        max-width: 400px;
-    }
+@section Styles {
+    <style>
+        .search-box {
+            max-width: 400px;
+            border-radius: 10px;
+        }
 
-    .filter-buttons .btn {
-        margin-left: 5px;
-    }
+        /* Modern Badge System */
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
-    /* BADGES */
-    .badge {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
+        .badge-open {
+            background: #fff3cd;
+            color: #856404;
+        }
 
-    .badge-open {
-        background: #fff3cd;
-        color: #856404;
-    }
+        .badge-progress {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
 
-    .badge-approved {
-        background: #d4edda;
-        color: #155724;
-    }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
 
-    .badge-rejected {
-        background: #f8d7da;
-        color: #721c24;
-    }
+        .badge-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
-    /* PLAN */
-    .plan-basic {
-        font-weight: 600;
-        color: #000;
-    }
+        .badge-closed {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        /* Neutral gray for closed */
 
-    .plan-premium {
-        font-weight: 700;
-        color: #1a73e8;
-    }
-</style>
+        .plan-premium {
+            font-weight: 700;
+            color: #1a73e8;
+        }
 
-<!-- PAGE TITLE -->
-<div class="page-title">Claims</div>
+        .plan-basic {
+            font-weight: 600;
+            color: #64748b;
+        }
 
-<!-- SEARCH + FILTER -->
-<div class="row align-items-center mb-3">
+        .btn-action {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+            .btn-action:hover {
+                background: #f8fafc;
+                border-color: #cbd5e1;
+                color: #2563eb;
+            }
+    </style>
+}
+
+<div class="mb-4">
+    <h2 class="fw-bold m-0">Claim Management</h2>
+    <p class="text-muted">Review and update customer insurance claims.</p>
+</div>
+
+<div class="row align-items-center mb-4 g-3">
     <div class="col-md-6">
-        <input type="text" id="claimSearch" class="form-control search-box" placeholder="Search claims...">
+        <div class="input-group search-box shadow-sm">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" id="claimSearch" class="form-control border-start-0" placeholder="Search by Policy ID or Name...">
+        </div>
     </div>
-
-    <div class="col-md-6 text-end filter-buttons">
-        <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
-        <button class="btn btn-outline-warning btn-sm filter-btn" data-status="open">Open</button>
-        <button class="btn btn-outline-success btn-sm filter-btn" data-status="approved">Approved</button>
-        <button class="btn btn-outline-danger btn-sm filter-btn" data-status="rejected">Rejected</button>
+    <div class="col-md-6 text-md-end">
+        <div class="btn-group shadow-sm">
+            <button class="btn btn-white btn-sm filter-btn active" data-status="all">All</button>
+            <button class="btn btn-white btn-sm filter-btn" data-status="open">Open</button>
+            <button class="btn btn-white btn-sm filter-btn" data-status="approved">Approved</button>
+            <button class="btn btn-white btn-sm filter-btn" data-status="closed">Closed</button>
+        </div>
     </div>
 </div>
 
-<!-- TABLE -->
-<div class="table-responsive">
-    <table class="table table-bordered align-middle" id="claimsTable">
-        <thead>
-            <tr>
-                <th>Policy ID</th>
-                <th>Customer ID</th>
-                <th>Customer Name</th>
-                <th>Plan</th>
-                <th>Coverage</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Status</th>
-               @* <th>Agent</th> *@
-            </tr>
-        </thead>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="claimsTable">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Policy ID</th>
+                    <th>Customer</th>
+                    <th>Plan</th>
+                    <th>Coverage</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-row-id="P01842">
+                    <td class="ps-4 fw-bold">P01842</td>
+                    <td> John Doe <br /><small class="text-muted">CUST-101</small></td>
+                    <td class="plan-basic">Basic</td>
+                    <td>Medical</td>
+                    <td class="fw-bold">₹5,500</td>
+                    <td>2023-05-10</td>
+                    <td class="status-cell"><span class="badge-status badge-open">Open</span></td>
+                    <td class="text-center">
+                        <button class="btn-action edit-status-btn" data-id="P01842">
+                            <i class="bi bi-gear-fill me-1"></i> Manage
+                        </button>
+                    </td>
+                </tr>
+                <tr data-row-id="P01037">
+                    <td class="ps-4 fw-bold">P01037</td>
+                    <td> Jane Smith <br /><small class="text-muted">CUST-102</small></td>
+                    <td class="plan-premium">Premium</td>
+                    <td>Trip Cancellation</td>
+                    <td class="fw-bold">₹2,200</td>
+                    <td>2023-09-01</td>
+                    <td class="status-cell"><span class="badge-status badge-success">Approved</span></td>
+                    <td class="text-center">
+                        <button class="btn-action edit-status-btn" data-id="P01037">
+                            <i class="bi bi-gear-fill me-1"></i> Manage
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        <tbody>
-            <tr>
-                <td>P01842</td>
-                <td>CUST-101</td>
-                <td>John Doe</td>
-                <td class="plan-basic">Basic</td>
-                <td>Medical</td>
-                <td>₹5,500</td>
-                <td>2023-05-10</td>
-                <td class="status">
-                    <span class="badge badge-open">Open</span>
-                </td>
-               @*  <td>Unassigned</td> *@
-            </tr>
-
-            <tr>
-                <td>P01037</td>
-                <td>CUST-102</td>
-                <td>Jane Smith</td>
-                <td class="plan-premium">Premium</td>
-                <td>Trip Cancellation</td>
-                <td>₹2,200</td>
-                <td>2023-09-01</td>
-                <td class="status">
-                    <span class="badge badge-approved">Approved</span>
-                </td>
-@*                 <td>Sarah Jenkins</td>
- *@            </tr>
-
-            <tr>
-                <td>P01016</td>
-                <td>CUST-103</td>
-                <td>Michael Scott</td>
-                <td class="plan-premium">Premium</td>
-                <td>Medical</td>
-                <td>₹3,200</td>
-                <td>2024-01-17</td>
-                <td class="status">
-                    <span class="badge badge-rejected">Rejected</span>
-                </td>
-@*                 <td>Mike Ross</td>
- *@            </tr>
-        </tbody>
-    </table>
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold">Update Status</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="targetClaimId" />
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-info text-dark status-opt" data-status="In-Progress">In-Progress</button>
+                    <button class="btn btn-outline-success text-dark status-opt" data-status="Approved">Approve</button>
+                    <button class="btn btn-outline-danger text-dark status-opt" data-status="Rejected">Reject</button>
+                    <hr class="my-1">
+                    <button class="btn btn-secondary status-opt" data-status="Closed">Close Claim</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        /* SEARCH */
-        $("#claimSearch").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $("#claimsTable tbody tr").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        $(document).ready(function () {
+            const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+            // Open Modal
+            $('.edit-status-btn').on('click', function() {
+                $('#targetClaimId').val($(this).data('id'));
+                statusModal.show();
             });
-        });
 
-        /* FILTER */
-        $(".filter-btn").click(function () {
+            // Status Update Logic
+            $('.status-opt').on('click', function() {
+                const newStatus = $(this).data('status');
+                const claimId = $('#targetClaimId').val();
+                const $cell = $(`tr[data-row-id="${claimId}"] .status-cell`);
 
-            $(".filter-btn").removeClass("active");
-            $(this).addClass("active");
+                let badgeClass = "badge-open";
+                if(newStatus === "In-Progress") badgeClass = "badge-progress";
+                if(newStatus === "Approved") badgeClass = "badge-success";
+                if(newStatus === "Rejected") badgeClass = "badge-rejected";
+                if(newStatus === "Closed") badgeClass = "badge-closed";
 
-            var status = $(this).data("status");
+                $cell.html(`<span class="badge-status ${badgeClass}">${newStatus}</span>`);
+                statusModal.hide();
+            });
 
-            if (status === "all") {
-                $("#claimsTable tbody tr").show();
-                return;
-            }
+            // Search
+            $("#claimSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#claimsTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
 
-            $("#claimsTable tbody tr").each(function () {
-                var rowStatus = $(this).find(".badge").text().toLowerCase();
-                $(this).toggle(rowStatus === status);
+            // Filter
+            $(".filter-btn").click(function () {
+                $(".filter-btn").removeClass("active btn-primary").addClass("btn-white");
+                $(this).addClass("active btn-primary").removeClass("btn-white");
+
+                var filter = $(this).data("status").toLowerCase();
+                $("#claimsTable tbody tr").each(function () {
+                    var rowStatus = $(this).find(".badge-status").text().toLowerCase();
+                    $(this).toggle(filter === "all" || rowStatus === filter);
+                });
             });
         });
     </script>

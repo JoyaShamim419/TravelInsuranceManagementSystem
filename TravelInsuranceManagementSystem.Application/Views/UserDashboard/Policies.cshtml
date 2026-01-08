@@ -5,83 +5,220 @@
 
 @section Styles {
     <style>
+        :root {
+            --color-active: #0b5c19;
+            --bg-active: #d2f6d6;
+            --color-expired: #7a0b00;
+            --bg-expired: #ffd9d6;
+            --color-navy: #001f3d;
+        }
+
         .panel {
             background: #fff;
             border: 1px solid #d7d7d7;
             border-radius: .75rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
 
-        .btn-navy {
-            background-color: #001f3d;
-            border-color: #001f3d;
-            color: #fff;
+        /* Search & Filter Styling */
+        .search-wrapper {
+            position: relative;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        #policySearch {
             border-radius: .6rem;
+            padding-left: 2.5rem;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
         }
 
-            .btn-navy:hover {
-                background-color: #00335f;
-                border-color: #00335f;
-            }
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+
+        /* Dynamic Search Border colors */
+        .search-mode-active #policySearch {
+            border-color: var(--color-active);
+            box-shadow: 0 0 0 0.2rem rgba(11, 92, 25, 0.1);
+        }
+
+        .search-mode-expired #policySearch {
+            border-color: var(--color-expired);
+            box-shadow: 0 0 0 0.2rem rgba(122, 11, 0, 0.1);
+        }
+
+        /* Table Design */
+        .table thead th {
+            background-color: #f8f9fa;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem .75rem;
+            text-transform: uppercase;
+            color: #495057;
+        }
+
+        .status-badge {
+            border-radius: 50px;
+            padding: .35rem .75rem;
+            font-weight: 600;
+            font-size: .75rem;
+            display: inline-block;
+            min-width: 85px;
+            text-align: center;
+        }
 
         .badge-active {
-            background: #d2f6d6;
-            color: #0b5c19;
+            background: var(--bg-active);
+            color: var(--color-active);
         }
 
         .badge-expired {
-            background: #ffd9d6;
-            color: #7a0b00;
+            background: var(--bg-expired);
+            color: var(--color-expired);
+        }
+
+        .btn-chip {
+            border-radius: 50px;
+            padding: .4rem 1.2rem;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-weight: 600;
+            min-width: 130px;
+        }
+
+        @@media (max-width: 768px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .search-wrapper {
+                max-width: 100% !important;
+            }
         }
     </style>
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="fw-bold m-0" style="color:#001f3d;">Policies</h1>
-</div>
+<div class="container-fluid py-3">
+    <div class="mb-4">
+        <h1 class="fw-bold m-0" style="color:var(--color-navy);">Policy History</h1>
+        <p class="text-muted small">View and manage your insurance coverage records</p>
+    </div>
 
-<div class="panel p-3">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Policy #</th>
-                    <th>Plan</th>
-                    <th>Coverage</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Status</th>
-                    <th>Documents</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Sample rows - replace with server data later -->
-                <tr>
-                    <td>TRVL-PL-8731</td>
-                    <td>Gold</td>
-                    <td>₹ 10,00,000</td>
-                    <td>2025-11-01</td>
-                    <td>2026-10-31</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>TRVL-PL-8620</td>
-                    <td>Silver</td>
-                    <td>₹ 5,00,000</td>
-                    <td>2024-12-01</td>
-                    <td>2025-11-30</td>
-                    <td><span class="badge badge-expired">Expired</span></td>
-                    <td>—</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="panel p-3">
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-4 filter-section">
+            <div class="search-wrapper" id="searchContainer">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input id="policySearch" type="text" class="form-control" placeholder="Search Policy ID, Destination, or Plan..." />
+            </div>
+
+            <div class="btn-group shadow-sm">
+                <button class="btn btn-outline-secondary btn-chip active" data-filter="All">All</button>
+                <button class="btn btn-outline-success btn-chip" data-filter="Active">Active</button>
+                <button class="btn btn-outline-danger btn-chip" data-filter="Expired">Expired</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="policiesTable" class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Policy ID</th>
+                        <th>Destination</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th class="text-end">Coverage Amt</th>
+                        <th>Plan</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">P01842</td>
+                        <td>Singapore</td>
+                        <td>2025-11-01</td>
+                        <td>2026-10-31</td>
+                        <td class="amount-cell">₹ 10,00,000</td>
+                        <td>Gold Plus</td>
+                        <td class="text-center"><span class="status-badge badge-active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">P01037</td>
+                        <td>France</td>
+                        <td>2025-01-15</td>
+                        <td>2025-12-15</td>
+                        <td class="amount-cell">₹ 15,00,000</td>
+                        <td>Platinum</td>
+                        <td class="text-center"><span class="status-badge badge-active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">P01016</td>
+                        <td>United Arab Emirates</td>
+                        <td>2024-06-01</td>
+                        <td>2024-06-15</td>
+                        <td class="amount-cell">₹ 5,00,000</td>
+                        <td>Silver Basic</td>
+                        <td class="text-center"><span class="status-badge badge-expired">Expired</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        
+        (function () {
+            const table = document.getElementById('policiesTable');
+            const searchInput = document.getElementById('policySearch');
+            const searchContainer = document.getElementById('searchContainer');
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            let statusFilter = 'All';
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    statusFilter = btn.getAttribute('data-filter');
+
+                    // Sync search bar color with filter
+                    searchContainer.className = 'search-wrapper';
+                    if (statusFilter !== 'All') {
+                        searchContainer.classList.add('search-mode-' + statusFilter.toLowerCase());
+                    }
+
+                    applyFilters();
+                });
+            });
+
+            searchInput.addEventListener('input', applyFilters);
+
+            function applyFilters() {
+                const query = (searchInput.value || '').toLowerCase();
+                const rows = table.tBodies[0].rows;
+
+                for (let row of rows) {
+                    const rowText = row.innerText.toLowerCase();
+                    // Status is the 7th column (index 6)
+                    const statusText = row.cells[6].innerText.trim();
+
+                    const matchesSearch = !query || rowText.includes(query);
+                    const matchesStatus = (statusFilter === 'All') || (statusText === statusFilter);
+
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                }
+            }
+        })();
     </script>
 }
-

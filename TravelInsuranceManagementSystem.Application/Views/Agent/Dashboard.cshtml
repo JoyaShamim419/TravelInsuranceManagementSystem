@@ -1,192 +1,258 @@
-﻿@*
- *@
-@{
+﻿@{
     ViewData["Title"] = "Agent Dashboard";
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
 
-<style>
-    /* SUMMARY CARDS */
-    .summary-card {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 18px;
-        box-shadow: 0 6px 18px rgba(0,0,0,.08);
-        text-align: center;
-    }
-
-    .summary-title {
-        font-size: 14px;
-        color: #6c757d;
-    }
-
-    .summary-value {
-        font-size: 22px;
-        font-weight: 700;
-        margin-top: 5px;
-    }
-
-    /* FILTER BUTTONS */
-    .dashboard-filters .btn {
-        margin-left: 6px;
-        border-radius: 20px;
-    }
-
-        .dashboard-filters .btn.active {
-            background: #1a73e8;
-            color: white;
+@section Styles {
+    <style>
+        /* Modern Summary Cards */
+        .summary-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
         }
 
-    /* ACTIVITY TABLE */
-    .activity-type {
-        font-weight: 600;
-    }
+            .summary-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
 
-    /* BADGES — added to make statuses visible */
-    .badge {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        line-height: 1;
-    }
+        .summary-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+        }
 
-    .badge-active {
-        background-color: #d1e7dd; /* green-ish */
-        color: #0f5132;
-    }
+        .bg-light-blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
 
-    .badge-pending {
-        background-color: #fff3cd; /* yellow-ish */
-        color: #664d03;
-    }
+        .bg-light-orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
 
-    .badge-approved,
-    .badge-resolved {
-        background-color: #e2e3e5; /* grey-ish */
-        color: #343a40;
-    }
-</style>
+        .bg-light-green {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
 
-<!-- PAGE TITLE -->
-<div class="page-title">Dashboard</div>
+        .bg-light-purple {
+            background: #faf5ff;
+            color: #9333ea;
+        }
 
-<!-- SEARCH + FILTER -->
-<div class="row align-items-center mb-3">
-    <div class="col-md-6">
-        <input type="text" id="dashboardSearch" class="form-control"
-               placeholder="Search recent activity..." />
+        .summary-title {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 4px 0;
+        }
+
+        /* Filter Chips */
+        .filter-container {
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            gap: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-chip {
+            border: none;
+            background: transparent;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+            .filter-chip.active {
+                background: #001f3d;
+                color: white;
+            }
+
+        /* Table Styling */
+        .card-table {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .bg-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="fw-bold m-0">Operational Overview</h2>
+        <p class="text-muted m-0">Real-time tracking of active insurance activities.</p>
     </div>
-
-    <div class="col-md-6 text-end dashboard-filters">
-        <button class="btn btn-outline-primary btn-sm active filter-btn" data-status="all">All</button>
-        <button class="btn btn-outline-success btn-sm filter-btn" data-status="active">Active</button>
-        <button class="btn btn-outline-warning btn-sm filter-btn" data-status="pending">Pending</button>
-        <button class="btn btn-outline-secondary btn-sm filter-btn" data-status="resolved">Resolved</button>
+    <div class="text-end">
+        <span class="badge bg-dark text-white p-2 px-3 rounded-pill">
+            <i class="bi bi-calendar3 me-2"></i>Jan 08, 2026
+        </span>
     </div>
 </div>
 
-<!-- SUMMARY -->
-<div class="row mb-4">
+<div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="summary-card">
+            <div class="summary-icon bg-light-blue"><i class="bi bi-shield-check"></i></div>
             <div class="summary-title">Active Policies</div>
             <div class="summary-value">132</div>
         </div>
     </div>
-
     <div class="col-md-3">
         <div class="summary-card">
-            <div class="summary-title">Open Claims</div>
-            <div class="summary-value">7</div>
+            <div class="summary-icon bg-light-orange"><i class="bi bi- exclamation-circle"></i></div>
+            <div class="summary-title">Active Claims</div>
+            <div class="summary-value">07</div>
         </div>
     </div>
-
     <div class="col-md-3">
         <div class="summary-card">
-            <div class="summary-title">Payments Today</div>
-            <div class="summary-value">₹48,500</div>
+            <div class="summary-icon bg-light-green"><i class="bi bi-currency-rupee"></i></div>
+            <div class="summary-title">Today's Revenue</div>
+            <div class="summary-value">48.5K</div>
         </div>
     </div>
-
     <div class="col-md-3">
         <div class="summary-card">
-            <div class="summary-title">Support Tickets</div>
-            <div class="summary-value">5</div>
+            <div class="summary-icon bg-light-purple"><i class="bi bi-ticket-perforated"></i></div>
+            <div class="summary-title">Open Tickets</div>
+            <div class="summary-value">05</div>
         </div>
     </div>
 </div>
 
-<!-- RECENT ACTIVITY TABLE -->
-<div class="table-responsive">
-    <table class="table table-bordered align-middle" id="dashboardTable">
-        <thead>
-            <tr>
-                <th>Type</th>
-                <th>Reference</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
+<div class="card-table shadow-sm">
+    <div class="p-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="filter-container">
+            <button class="filter-chip active" data-type="all">All Active</button>
+            <button class="filter-chip" data-type="policy">Policies</button>
+            <button class="filter-chip" data-type="claim">Claims</button>
+            <button class="filter-chip" data-type="ticket">Tickets</button>
+        </div>
 
-        <tbody>
-            <tr>
-                <td class="activity-type">Policy</td>
-                <td>P01842</td>
-                <td>Senem</td>
-                <td>2025-12-20</td>
-                <td class="status"><span class="badge badge-active">Active</span></td>
-            </tr>
+        <div style="width: 300px;">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="dashboardSearch" class="form-control border-start-0 ps-0" placeholder="Quick search..." />
+            </div>
+        </div>
+    </div>
 
-            <tr>
-                <td class="activity-type">Claim</td>
-                <td>C01016</td>
-                <td>Alex</td>
-                <td>2025-12-21</td>
-                <td class="status"><span class="badge badge-pending">Pending</span></td>
-            </tr>
-
-            <tr>
-                <td class="activity-type">Ticket</td>
-                <td>T01900</td>
-                <td>Harold</td>
-                <td>2025-12-22</td>
-                <td class="status"><span class="badge badge-approved">Resolved</span></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="dashboardTable">
+            <thead>
+                <tr>
+                    <th>Activity Type</th>
+                    <th>Reference ID</th>
+                    <th>Customer Name</th>
+                    <th>Engagement Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-category="policy">
+                    <td><span class="fw-bold text-primary"><i class="bi bi-shield me-2"></i>Policy</span></td>
+                    <td><code class="fw-bold">P-01842</code></td>
+                    <td>Senem</td>
+                    <td>2025-12-20</td>
+                    <td><span class="badge-status bg-active">Active</span></td>
+                </tr>
+                <tr data-category="claim">
+                    <td><span class="fw-bold text-warning"><i class="bi bi-file-earmark-medical me-2"></i>Claim</span></td>
+                    <td><code class="fw-bold">C-01016</code></td>
+                    <td>Alex</td>
+                    <td>2025-12-21</td>
+                    <td><span class="badge-status bg-active">In-Progress</span></td>
+                </tr>
+                <tr data-category="ticket">
+                    <td><span class="fw-bold text-purple" style="color:#9333ea;"><i class="bi bi-ticket me-2"></i>Ticket</span></td>
+                    <td><code class="fw-bold">T-01900</code></td>
+                    <td>Harold</td>
+                    <td>2025-12-22</td>
+                    <td><span class="badge-status bg-active">Open</span></td>
+                </tr>
+                <tr data-category="policy">
+                    <td><span class="fw-bold text-primary"><i class="bi bi-shield me-2"></i>Policy</span></td>
+                    <td><code class="fw-bold">P-02231</code></td>
+                    <td>Priya Sharma</td>
+                    <td>2026-01-05</td>
+                    <td><span class="badge-status bg-active">Active</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-
-
 
 @section Scripts {
     <script>
-        /* SEARCH */
-        $("#dashboardSearch").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $("#dashboardTable tbody tr").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        $(document).ready(function () {
+            // SEARCH LOGIC
+            $("#dashboardSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#dashboardTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
             });
-        });
 
-        /* FILTER */
-        $(".filter-btn").click(function () {
+            // CATEGORY FILTER LOGIC
+            $(".filter-chip").click(function () {
+                $(".filter-chip").removeClass("active");
+                $(this).addClass("active");
 
-            $(".filter-btn").removeClass("active");
-            $(this).addClass("active");
+                var type = $(this).data("type");
 
-            var status = $(this).data("status");
-
-            if (status === "all") {
-                $("#dashboardTable tbody tr").show();
-                return;
-            }
-
-            $("#dashboardTable tbody tr").each(function () {
-                var rowStatus = $(this).find(".status").text().toLowerCase();
-                $(this).toggle(rowStatus.includes(status));
+                if (type === "all") {
+                    $("#dashboardTable tbody tr").fadeIn(200);
+                } else {
+                    $("#dashboardTable tbody tr").hide();
+                    $("#dashboardTable tbody tr[data-category='" + type + "']").fadeIn(200);
+                }
             });
         });
     </script>

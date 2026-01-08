@@ -3,175 +3,323 @@
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
 
-<style>
-    /* PAGE BACKGROUND */
-    body {
-        background: #fafafa;
-    }
-
-    /* TITLE */
-    .page-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #000;
-        margin-bottom: 10px;
-    }
-
-    /* SEARCH */
-    .search-box {
-        max-width: 400px;
-        margin-bottom: 15px;
-    }
-
-    /* FILTER BUTTONS */
-    .filter-buttons .btn {
-        margin-right: 5px;
-        border-radius: 20px;
-    }
-
-        .filter-buttons .btn.active {
-            background-color: #0d6efd;
-            color: white;
+@section Styles {
+    <style>
+        /* PAGE LAYOUT FIXES */
+        .search-box {
+            max-width: 400px;
+            border-radius: 10px;
         }
 
-    /* TABLE */
-    table {
-        background: #ffffff;
-        border-radius: 10px;
-        overflow: hidden;
-    }
+        /* TABLE SPACING & ALIGNMENT */
+        .table thead th {
+            padding: 1.25rem 1rem;
+            white-space: nowrap;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .table th {
-        background: #f5f5f5;
-        color: #000;
-        font-weight: 600;
-    }
+        .table tbody td {
+            padding: 1.5rem 1rem; /* Increased vertical spacing */
+            vertical-align: middle;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
-    .table td {
-        color: #333;
-    }
+        /* COLUMN WIDTH CONTROLS */
+        .col-ticket {
+            width: 100px;
+        }
 
-    /* BADGES */
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
+        .col-policy {
+            width: 120px;
+        }
 
-    .badge-open {
-        background: #fff3cd;
-        color: #856404;
-    }
+        .col-details {
+            min-width: 200px;
+        }
 
-    .badge-resolved {
-        background: #d4edda;
-        color: #155724;
-    }
+        .col-issue {
+            min-width: 320px;
+        }
 
-    .badge-closed {
-        background: #f8d7da;
-        color: #721c24;
-    }
-</style>
+        .col-date {
+            width: 130px;
+        }
 
-<div class="container-fluid">
+        .col-status {
+            width: 150px;
+        }
 
-    <!-- TITLE -->
-    <div class="page-title">Support Tickets</div>
+        .col-agent {
+            width: 110px;
+        }
 
-    <!-- SEARCH + FILTER -->
-    <div class="row align-items-center mb-3">
-        <div class="col-md-6">
-            <input type="text" class="form-control search-box" id="ticketSearch" placeholder="Search tickets...">
-        </div>
+        .col-actions {
+            width: 80px;
+        }
 
-        <div class="col-md-6 text-end filter-buttons">
-            <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
-            <button class="btn btn-outline-warning btn-sm filter-btn" data-status="open">Open</button>
-            <button class="btn btn-outline-success btn-sm filter-btn" data-status="resolved">Resolved</button>
-            <button class="btn btn-outline-danger btn-sm filter-btn" data-status="closed">Closed</button>
+        /* CUSTOMER DETAILS SPACING */
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* BADGE DESIGN */
+        .badge-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .badge-open {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-progress {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-closed {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* DESCRIPTION & SEE MORE */
+        .description-container {
+            line-height: 1.6;
+        }
+
+        .full-text {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .see-more-btn {
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        /* ACTION BUTTON */
+        .btn-manage {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            transition: all 0.2s;
+        }
+
+            .btn-manage:hover {
+                background: #f1f5f9;
+                color: #2563eb;
+                border-color: #cbd5e1;
+            }
+
+        .policy-link {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .agent-id {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+            color: #64748b;
+        }
+    </style>
+}
+
+<div class="mb-4">
+    <h2 class="fw-bold m-0 text-navy">Support Center</h2>
+    <p class="text-muted">Track customer issues and manage resolution workflows.</p>
+</div>
+
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-md-6">
+        <div class="input-group search-box shadow-sm border-0">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" id="ticketSearch" class="form-control border-start-0 ps-0" placeholder="Search by Ticket ID, Policy or Name...">
         </div>
     </div>
+    <div class="col-md-6 text-md-end">
+        <div class="btn-group shadow-sm bg-white rounded-3 p-1">
+            <button class="btn btn-sm filter-btn active px-3" data-status="all">All</button>
+            <button class="btn btn-sm filter-btn px-3" data-status="open">Open</button>
+            <button class="btn btn-sm filter-btn px-3" data-status="resolved">Resolved</button>
+            <button class="btn btn-sm filter-btn px-3" data-status="closed">Closed</button>
+        </div>
+    </div>
+</div>
 
-    <!-- TABLE -->
+<div class="card border-0 shadow-sm rounded-4">
     <div class="table-responsive">
-        <table class="table table-bordered align-middle" id="ticketTable">
+        <table class="table table-hover align-middle mb-0" id="ticketTable">
             <thead>
                 <tr>
-                    <th>Ticket ID</th>
-                    <th>Customer ID</th>
-                    <th>Customer Name</th>
-                    <th>Issue</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Agent</th>
+                    <th class="ps-4 col-ticket">Ticket ID</th>
+                    <th class="col-policy">Policy ID</th>
+                    <th class="col-details">Customer Details</th>
+                    <th class="col-issue">Issue Description</th>
+                    <th class="col-date">Raised Date</th>
+                    <th class="col-status text-center">Status</th>
+                    <th class="col-agent">Agent ID</th>
+                    <th class="col-actions text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
-
-                <tr>
-                    <td>T01901</td>
-                    <td>CUST-101</td>
-                    <td>Seren</td>
-                    <td>Unable to create policy</td>
-                    <td>2023-04-02</td>
-                    <td class="status">Open</td>
-                    <td>Unassigned</td>
+                <tr data-row-id="T01901">
+                    <td class="ps-4 fw-bold">#T01901</td>
+                    <td><a href="#" class="policy-link">P-01842</a></td>
+                    <td>
+                        <div class="customer-info">
+                            <span class="fw-bold">Seren</span>
+                            <span class="text-muted small"><i class="bi bi-telephone me-1"></i>+91 98765 43210</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="description-container">
+                            <span class="short-text text-muted">Unable to generate policy PDF...</span>
+                            <div class="full-text d-none">
+                                Customer is unable to generate the policy PDF from the dashboard.
+                                Error 404 appears when clicking download. This has been happening
+                                since the last 200-word detailed report was filed regarding the server timeout issues.
+                            </div>
+                            <a class="see-more-btn">See More</a>
+                        </div>
+                    </td>
+                    <td class="text-nowrap">2026-01-05</td>
+                    <td class="status-cell text-center">
+                        <span class="badge-status badge-success">Resolved</span>
+                    </td>
+                    <td class="agent-id">AG-7721</td>
+                    <td class="text-center">
+                        <button class="btn-manage edit-status-btn" data-id="T01901">
+                            <i class="bi bi-gear-fill"></i>
+                        </button>
+                    </td>
                 </tr>
-
-                <tr>
-                    <td>T01945</td>
-                    <td>CUST-102</td>
-                    <td>Alex</td>
-                    <td>Cannot view policy</td>
-                    <td>2023-04-02</td>
-                    <td class="status">Open</td>
-                    <td>Sarah Jenkins</td>
-                </tr>
-
-                <tr>
-                    <td>T01900</td>
-                    <td>CUST-103</td>
-                    <td>Harold</td>
-                    <td>Password reset</td>
-                    <td>2023-04-02</td>
-                    <td class="status">Resolved</td>
-                    <td>Mike Ross</td>
-                </tr>
-
             </tbody>
         </table>
     </div>
+</div>
 
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold">Update Ticket</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="targetTicketId" />
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-info text-dark status-opt" data-status="In-Progress">In-Progress</button>
+                    <button class="btn btn-outline-success text-dark status-opt" data-status="Resolved">Mark Resolved</button>
+                    <button class="btn btn-outline-danger text-dark status-opt" data-status="Rejected">Reject</button>
+                    <hr class="my-1">
+                    <button class="btn btn-secondary status-opt" data-status="Closed">Close Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        /* SEARCH */
-        $("#ticketSearch").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $("#ticketTable tbody tr").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        $(document).ready(function () {
+            const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+            // See More/Less Logic
+            $(document).on('click', '.see-more-btn', function() {
+                const container = $(this).closest('.description-container');
+                const shortText = container.find('.short-text');
+                const fullText = container.find('.full-text');
+
+                if (fullText.hasClass('d-none')) {
+                    shortText.addClass('d-none');
+                    fullText.removeClass('d-none');
+                    $(this).text('See Less');
+                } else {
+                    shortText.removeClass('d-none');
+                    fullText.addClass('d-none');
+                    $(this).text('See More');
+                }
             });
-        });
 
-        /* FILTER */
-        $(".filter-btn").click(function () {
+            // Modal Trigger
+            $('.edit-status-btn').on('click', function() {
+                $('#targetTicketId').val($(this).data('id'));
+                statusModal.show();
+            });
 
-            $(".filter-btn").removeClass("active");
-            $(this).addClass("active");
+            // Status Update Logic
+            $('.status-opt').on('click', function() {
+                const newStatus = $(this).data('status');
+                const ticketId = $('#targetTicketId').val();
+                const $cell = $(`tr[data-row-id="${ticketId}"] .status-cell`);
 
-            var status = $(this).data("status").toLowerCase();
+                let badgeClass = "badge-open";
+                if(newStatus === "In-Progress") badgeClass = "badge-progress";
+                if(newStatus === "Resolved") badgeClass = "badge-success";
+                if(newStatus === "Rejected") badgeClass = "badge-rejected";
+                if(newStatus === "Closed") badgeClass = "badge-closed";
 
-            if (status === "all") {
-                $("#ticketTable tbody tr").show();
-                return;
-            }
+                $cell.html(`<span class="badge-status ${badgeClass}">${newStatus}</span>`);
+                statusModal.hide();
+            });
 
-            $("#ticketTable tbody tr").each(function () {
-                var rowStatus = $(this).find(".status").text().toLowerCase();
-                $(this).toggle(rowStatus === status);
+            // Search Filter
+            $("#ticketSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#ticketTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            // Status Tabs
+            $(".filter-btn").click(function () {
+                $(".filter-btn").removeClass("active btn-primary").addClass("btn-white");
+                $(this).addClass("active btn-primary").removeClass("btn-white");
+
+                var filter = $(this).data("status").toLowerCase();
+                $("#ticketTable tbody tr").each(function () {
+                    var rowStatus = $(this).find(".badge-status").text().toLowerCase();
+                    $(this).toggle(filter === "all" || rowStatus === filter);
+                });
             });
         });
     </script>

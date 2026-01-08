@@ -5,122 +5,229 @@
 
 @section Styles {
     <style>
+        :root {
+            --color-pending: #7a5b00;
+            --bg-pending: #fff2cc;
+            --color-approved: #0b5c19;
+            --bg-approved: #d2f6d6;
+            --color-rejected: #7a0b00;
+            --bg-rejected: #ffd9d6;
+            --color-navy: #001f3d;
+        }
+
         .panel {
             background: #fff;
             border: 1px solid #d7d7d7;
             border-radius: .75rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Dynamic Search Box Styling */
+        .search-wrapper {
+            position: relative;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        #searchBox {
+            border-radius: .6rem;
+            padding-left: 2.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid #dee2e6;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+
+        /* Status-specific Search Box States */
+        .search-mode-pending #searchBox {
+            border-color: var(--color-pending);
+            box-shadow: 0 0 0 0.2rem rgba(122, 91, 0, 0.15);
+        }
+
+        .search-mode-approved #searchBox {
+            border-color: var(--color-approved);
+            box-shadow: 0 0 0 0.2rem rgba(11, 92, 25, 0.15);
+        }
+
+        .search-mode-rejected #searchBox {
+            border-color: var(--color-rejected);
+            box-shadow: 0 0 0 0.2rem rgba(122, 11, 0, 0.15);
+        }
+
+        /* Filter Button Styling */
+        .btn-chip {
+            border-radius: 50px;
+            padding: .4rem 1.2rem;
+            font-size: .85rem;
+            font-weight: 600;
+            border-width: 2px;
+        }
+
+        .btn-outline-pending {
+            color: var(--color-pending);
+            border-color: var(--color-pending);
+        }
+
+            .btn-outline-pending.active, .btn-outline-pending:hover {
+                background: var(--color-pending);
+                color: white;
+                border-color: var(--color-pending);
+            }
+
+        .btn-outline-approved {
+            color: var(--color-approved);
+            border-color: var(--color-approved);
+        }
+
+            .btn-outline-approved.active, .btn-outline-approved:hover {
+                background: var(--color-approved);
+                color: white;
+                border-color: var(--color-approved);
+            }
+
+        .btn-outline-rejected {
+            color: var(--color-rejected);
+            border-color: var(--color-rejected);
+        }
+
+            .btn-outline-rejected.active, .btn-outline-rejected:hover {
+                background: var(--color-rejected);
+                color: white;
+                border-color: var(--color-rejected);
+            }
+
+        /* Table Design */
+        .table thead th {
+            background-color: #f8f9fa;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem .75rem;
+            text-transform: uppercase;
         }
 
         .status {
-            border-radius: 1rem;
-            padding: .25rem .6rem;
+            border-radius: 50px;
+            padding: .35rem .75rem;
             font-weight: 600;
-            font-size: .8rem;
+            font-size: .75rem;
+            display: inline-block;
+            min-width: 90px;
+            text-align: center;
         }
 
         .status-approved {
-            background: #d2f6d6;
-            color: #0b5c19;
+            background: var(--bg-approved);
+            color: var(--color-approved);
         }
 
         .status-pending {
-            background: #fff2cc;
-            color: #7a5b00;
+            background: var(--bg-pending);
+            color: var(--color-pending);
         }
 
         .status-rejected {
-            background: #ffd9d6;
-            color: #7a0b00;
+            background: var(--bg-rejected);
+            color: var(--color-rejected);
         }
 
         .btn-navy {
-            background-color: #001f3d;
-            border-color: #001f3d;
+            background-color: var(--color-navy);
             color: #fff;
             border-radius: .6rem;
         }
 
-            .btn-navy:hover {
-                background-color: #00335f;
-                border-color: #00335f;
+        @@media (max-width: 768px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch !important;
             }
 
-        .btn-chip {
-            border-radius: 999px;
+            .search-wrapper {
+                max-width: 100% !important;
+            }
         }
     </style>
 }
 
-
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="fw-bold m-0" style="color:#001f3d;">Claims</h1>
-
-    <a asp-controller="UserDashboard"
-       asp-action="ClaimCreate"
-       class="btn btn-navy d-flex align-items-center gap-1"
-       style="border-radius: .6rem;">
-        <span class="fw-bold">+</span> File New Claim
-    </a>
-</div>
-
-<div class="panel p-3">
-    <!-- Filters -->
-    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-        <input id="searchBox" type="text" class="form-control" placeholder="Search by Claim , Policy, Type…" style="max-width: 320px; border-radius:.6rem;" />
-        <div class="btn-group" role="group" aria-label="Status filter">
-            <button class="btn btn-outline-secondary btn-chip active" data-status="All">All</button>
-            <button class="btn btn-outline-secondary btn-chip" data-status="Pending">Pending</button>
-            <button class="btn btn-outline-secondary btn-chip" data-status="Approved">Approved</button>
-            <button class="btn btn-outline-secondary btn-chip" data-status="Rejected">Rejected</button>
+<div class="container-fluid py-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="fw-bold m-0" style="color:var(--color-navy);">Claims Dashboard</h1>
+            <p class="text-muted small m-0">Managing @DateTime.Now.Year Active Claims</p>
         </div>
+        <a asp-action="ClaimCreate" class="btn btn-navy px-4 fw-bold">+ File New Claim</a>
     </div>
 
-    <!-- Table -->
-    <div class="table-responsive">
-        <table id="claimsTable" class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Claim ID</th>
-                    <th>Policy ID</th>
-                    <th>Type</th>
-                    <th>Date Filed</th>
-                    <th class="text-end">Amount</th>
-                    <th>Status</th>
-                    <th>Document</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Sample rows; replace with server-side binding later -->
-                <tr>
-                    <td>CLM-1027</td>
-                    <td>P01842</td>
-                    <td>Medical</td>
-                    <td>2025-12-12</td>
-                    <td class="text-end">₹ 18,500</td>
-                    <td><span class="status status-pending">Pending</span></td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>CLM-0986</td>
-                    <td>P01037</td>
-                    <td>BaggageLoss</td>
-                    <td>2025-12-01</td>
-                    <td class="text-end">₹ 12,000</td>
-                    <td><span class="status status-approved">Approved</span></td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>CLM-0941</td>
-                    <td>P01016</td>
-                    <td>TripCancellation</td>
-                    <td>2025-11-19</td>
-                    <td class="text-end">₹ 7,900</td>
-                    <td><span class="status status-rejected">Rejected</span></td>
-                    <td>—</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="panel p-3">
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-4 filter-section">
+            <div class="search-wrapper" id="searchContainer">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input id="searchBox" type="text" class="form-control" placeholder="Search claims..." />
+            </div>
+
+            <div class="btn-group shadow-sm" style="border-radius: 50px; overflow: hidden;">
+                <button class="btn btn-outline-secondary btn-chip active" data-status="All">All</button>
+                <button class="btn btn-outline-pending btn-chip" data-status="Pending">Pending</button>
+                <button class="btn btn-outline-approved btn-chip" data-status="Approved">Approved</button>
+                <button class="btn btn-outline-rejected btn-chip" data-status="Rejected">Rejected</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="claimsTable" class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Policy ID</th>
+                        <th>Plan Name</th>
+                        <th>Incident</th>
+                        <th class="text-end">Amount</th>
+                        <th>Date</th>
+                        <th class="text-center">Status</th>
+                        <th>Agent ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">CLM-1027</td>
+                        <td class="text-muted">P01842</td>
+                        <td>Gold Plus</td>
+                        <td>Medical Emergency</td>
+                        <td class="text-end fw-bold">₹ 18,500</td>
+                        <td>2025-12-12</td>
+                        <td class="text-center"><span class="status status-pending">Pending</span></td>
+                        <td>AGT-772</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">CLM-0986</td>
+                        <td class="text-muted">P01037</td>
+                        <td>Platinum</td>
+                        <td>Baggage Loss</td>
+                        <td class="text-end fw-bold">₹ 12,000</td>
+                        <td>2025-12-01</td>
+                        <td class="text-center"><span class="status status-approved">Approved</span></td>
+                        <td>AGT-104</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">CLM-0941</td>
+                        <td class="text-muted">P01016</td>
+                        <td>Silver Basic</td>
+                        <td>Trip Cancellation</td>
+                        <td class="text-end fw-bold">₹ 7,900</td>
+                        <td>2025-11-19</td>
+                        <td class="text-center"><span class="status status-rejected">Rejected</span></td>
+                        <td>AGT-550</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -129,32 +236,41 @@
         (function () {
             const table = document.getElementById('claimsTable');
             const searchInput = document.getElementById('searchBox');
+            const searchContainer = document.getElementById('searchContainer');
             const filterButtons = document.querySelectorAll('[data-status]');
             let statusFilter = 'All';
 
-            // Filter by status
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     filterButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     statusFilter = btn.getAttribute('data-status');
+
+                    // Update Search Bar Color based on status
+                    searchContainer.className = 'search-wrapper'; // reset
+                    if(statusFilter !== 'All') {
+                        searchContainer.classList.add('search-mode-' + statusFilter.toLowerCase());
+                    }
+
                     applyFilters();
                 });
             });
 
-            // Search filter
             searchInput.addEventListener('input', applyFilters);
 
             function applyFilters() {
-                const q = (searchInput.value || '').toLowerCase();
-                [...table.tBodies[0].rows].forEach(row => {
-                    const txt = row.innerText.toLowerCase();
-                    const statusCell = row.cells[5];
-                    const statusText = statusCell ? statusCell.innerText.trim() : '';
-                    const statusMatch = (statusFilter === 'All') || (statusText === statusFilter);
-                    const searchMatch = !q || txt.includes(q);
-                    row.style.display = (statusMatch && searchMatch) ? '' : 'none';
-                });
+                const query = (searchInput.value || '').toLowerCase();
+                const rows = table.tBodies[0].rows;
+
+                for (let row of rows) {
+                    const rowText = row.innerText.toLowerCase();
+                    const statusText = row.cells[6].innerText.trim();
+
+                    const matchesSearch = !query || rowText.includes(query);
+                    const matchesStatus = (statusFilter === 'All') || (statusText === statusFilter);
+
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                }
             }
         })();
     </script>
