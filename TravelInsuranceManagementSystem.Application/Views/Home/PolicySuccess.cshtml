@@ -1,0 +1,31 @@
+﻿@model string
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";  // Or your _UserDashboardLayout.cshtml
+    ViewData["Title"] = "Policy Success";
+    var insuranceId = Model;  // safe alias
+}
+
+<section style="display:flex;justify-content:center;align-items:center;height:80vh;background:#E6E6E6;">
+    <div style="background:#fff;padding:30px;border-radius:12px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.1);width:400px;">
+        <!-- Success Icon -->
+        <div style="width:60px;height:60px;margin:0 auto 15px auto;background:#E99C5E;border-radius:50%;display:flex;justify-content:center;align-items:center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" />
+            </svg>
+        </div>
+
+        <!-- Success Message -->
+        <h2 style="color:#0D2847;margin-bottom:10px;">Policy Generated Successfully</h2>
+        <p style="color:#333;margin-bottom:20px;">
+            Your Insurance ID: <strong>@insuranceId</strong>
+        </p>
+
+        <!-- Payment Button (GET redirect with route values) -->
+        <form method="get" action="@Url.Action("Checkout", "Payments")">
+            <input type="hidden" name="insuranceId" value="@insuranceId" />
+            <button type="submit" style="background:#0D2847;color:#fff;border:none;padding:12px 20px;border-radius:8px;font-size:16px;cursor:pointer;">
+                Initiate Payment
+            </button>
+        </form>
+    </div>
+</section>

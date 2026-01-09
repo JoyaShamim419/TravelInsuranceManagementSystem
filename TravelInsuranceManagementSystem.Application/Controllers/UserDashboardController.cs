@@ -1,38 +1,36 @@
-﻿
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-public class UserDashboardController : Controller
+// IMPORTANT: This must match the namespace in your AccountController
+namespace TravelInsuranceManagementSystem.Application.Controllers
 {
-    public IActionResult Dashboard()
+    [Authorize] // Only logged-in users can enter
+    public class UserDashboardController : Controller
     {
-        return View(); // Views/UserDashboard/Dashboard.cshtml
+        public IActionResult Dashboard()
+        {
+            // This will look for Views/UserDashboard/Dashboard.cshtml
+            return View();
+        }
+
+        public IActionResult Claims()
+        {
+            return View("~/Views/UserDashboard/Claims.cshtml");
+        }
+
+        public IActionResult ClaimCreate()
+        {
+            return View("~/Views/UserDashboard/ClaimCreate.cshtml");
+        }
+
+        public IActionResult Policies()
+        {
+            return View("~/Views/UserDashboard/Policies.cshtml");
+        }
+
+        public IActionResult RaiseTicket()
+        {
+            return View("~/Views/UserDashboard/RaiseTicket.cshtml");
+        }
     }
-
-
-    public IActionResult Claims()
-    {
-        return View(viewName: "~/Views/UserDashboard/Claims.cshtml");
-    }
-
-    // Claim create view stored at Views/UserDashboard/ClaimCreate.cshtml
-    public IActionResult ClaimCreate()
-    {
-        return View(viewName: "~/Views/UserDashboard/ClaimCreate.cshtml");
-    }
-
-
-    public IActionResult Policies()
-    {
-        return View("~/Views/UserDashboard/Policies.cshtml");
-    }
-    public IActionResult RaiseTicket()
-    {
-        return View("~/Views/UserDashboard/RaiseTicket.cshtml");
-    }
-
-   
-
-
-
 }
-

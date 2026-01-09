@@ -9,38 +9,46 @@
     <title>@ViewData["Title"] - Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         :root {
-            --navy: #0E2A47; /* dark navy */
-            --orange: #E79045; /* orange */
-            --peach: #F3B77A; /* peach */
-            --gray: #E6E6E6; /* light gray */
-
-            --bg: #f9fafb; /* soft page bg */
-            --text: #111827; /* dark text */
+            --navy: #0E2A47;
+            --orange: #E79045;
+            --peach: #F3B77A;
+            --gray: #E6E6E6;
+            --bg: #f9fafb;
+            --text: #111827;
         }
 
         body {
             background: var(--bg);
             color: var(--text);
+            margin: 0;
+            overflow-x: hidden;
         }
 
-        .sidebar {
-            min-height: 100vh;
-            border-right: 1px solid var(--gray);
+        .sidebar-container {
             background: #fff;
+            border-right: 1px solid var(--gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .nav-link {
             color: var(--navy);
             border-radius: 10px;
+            margin-bottom: 5px;
+            padding: 12px 15px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: block;
         }
 
             .nav-link:hover {
                 background: var(--gray);
+                color: var(--navy);
             }
 
             .nav-link.active {
@@ -52,6 +60,9 @@
         .topbar {
             background: #fff;
             border-bottom: 1px solid var(--gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .avatar {
@@ -66,84 +77,21 @@
             font-weight: 700;
         }
 
-        .table-responsive {
-            border: 1px solid var(--gray);
-            border-radius: 12px;
-            overflow: auto;
+        .main-section {
+            min-height: 100vh;
         }
-
-        .card {
-            border: 1px solid var(--gray);
-            border-radius: 12px;
-        }
-
-        .table thead th {
-            background: #f3f4f6;
-        }
-
-        .badge-pill {
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-weight: 700;
-            font-size: 12px;
-            display: inline-block;
-        }
-
-        .badge-open {
-            color: var(--navy);
-            background: rgba(14,42,71,.10);
-            border: 1px solid rgba(14,42,71,.30);
-        }
-
-        .badge-approved {
-            color: #1f2937;
-            background: rgba(243,183,122,.28);
-            border: 1px solid rgba(243,183,122,.55);
-        }
-        /* peach */
-        .badge-pending {
-            color: #1f2937;
-            background: rgba(231,144,69,.25);
-            border: 1px solid rgba(231,144,69,.55);
-        }
-        /* orange */
-        .badge-rejected {
-            color: #fff;
-            background: var(--orange);
-            border: 1px solid rgba(231,144,69,.85);
-        }
-
-        .btn-primary {
-            background: var(--navy);
-            border-color: var(--navy);
-        }
-
-            .btn-primary:hover {
-                background: #0b2138;
-                border-color: #0b2138;
-            }
-
-        .btn-outline-primary {
-            color: var(--navy);
-            border-color: var(--navy);
-        }
-
-            .btn-outline-primary:hover {
-                background: var(--navy);
-                color: #fff;
-            }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <aside class="col-12 col-md-3 col-lg-2 p-3 sidebar d-flex flex-column">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="avatar me-2">SJ</div>
-                    <strong style="color:var(--navy)">Admin</strong>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <aside class="col-12 col-lg-2 sidebar-container p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="avatar me-2">AD</div>
+                    <strong style="color:var(--navy)">Admin Portal</strong>
                 </div>
 
-                <nav class="nav flex-column">
+                <nav class="nav flex-column flex-grow-1">
                     <a href="/Admin/Dashboard" class="nav-link js-nav">📊 Dashboard</a>
                     <a href="/Admin/Policies" class="nav-link js-nav">📄 Policies</a>
                     <a href="/Admin/Claims" class="nav-link js-nav">🧾 Claims</a>
@@ -151,196 +99,85 @@
                 </nav>
 
                 <div class="mt-auto pt-3 border-top">
+                    <form asp-controller="Admin" asp-action="Logout" method="post" id="adminLogoutForm" style="display:none;">
+                        @Html.AntiForgeryToken()
+                    </form>
+
                     <a href="javascript:void(0)" id="adminLogoutBtn" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Logout
+                        <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </div>
             </aside>
 
-            <div class="modal fade" id="adminLogoutModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold" style="color: var(--navy);">Confirm Logout</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body py-4">
-                            Are you sure you want to end your administrative session?
-                        </div>
-                        <div class="modal-footer border-0 pt-0">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
-                            <button type="button" id="confirmAdminLogout" class="btn btn-primary" style="background: var(--navy); border-radius: 8px; padding-left: 25px; padding-right: 25px;">
-                                Logout
-                            </button>
-                        </div>
+            <main class="col-12 col-lg-10 main-section">
+                <header class="topbar d-flex align-items-center justify-content-between px-4 py-3">
+                    <div class="fw-semibold text-uppercase small tracking-wider" style="color:var(--navy)">
+                        @ViewData["Title"]
                     </div>
-                </div>
-            </div>
-
-            <main class="col-12 col-md-9 col-lg-10 p-0">
-                <header class="topbar d-flex align-items-center justify-content-between px-3 py-2">
-                    <div class="fw-semibold" style="color:var(--navy)">@ViewData["Title"]</div>
-                    <div class="avatar">SJ</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small d-none d-md-inline">@User.Identity?.Name</span>
+                        <div class="avatar">SJ</div>
+                    </div>
                 </header>
 
-                <section class="p-3">
+                <section class="p-4">
                     @RenderBody()
                 </section>
             </main>
         </div>
     </div>
 
+    <div class="modal fade" id="adminLogoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 text-dark">
+                    Are you sure you want to end your administrative session?
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmAdminLogout" class="btn btn-primary" style="background: var(--navy); border:none;">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // 1. HIGHLIGHT ACTIVE NAVIGATION
-        (function(){
-
-           const path = location.pathname.toLowerCase();
-
-           document.querySelectorAll('.js-nav').forEach(a=>{
-
-             const href = a.getAttribute('href')?.toLowerCase() || '';
-                // Checks if current path contains the link href (handles sub-actions)
-                if (path !== "/" && href !== "/" && path.includes(href)) {
-                    a.classList.add('active');
+        $(function () {
+            // 1. Highlight the current page link
+            const path = location.pathname.toLowerCase();
+            $('.js-nav').each(function() {
+                const href = $(this).attr('href').toLowerCase();
+                if (path.includes(href) && href !== "/") {
+                    $(this).addClass('active');
                 }
             });
-        })();
 
-        // 2. HELPER FUNCTIONS
-        function textMatch(h, n) {
-            return h.toLowerCase().includes((n || '').toLowerCase());
-        }
-
-        function toCSV($table) {
-            const lines = [], head = [];
-            $table.find('thead th').each(function () { head.push($(this).text().trim()); });
-            lines.push(head.join(','));
-            $table.find('tbody tr:visible').each(function () {
-                const cols = [];
-                $(this).children('td').each(function () {
-                    cols.push($(this).text().trim().replace(/\s+/g, ' '));
-                });
-                lines.push(cols.join(','));
-            });
-            return lines.join('\n');
-        }
-
-        function downloadCSV(content, name) {
-            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // 3. COMPONENT WIRING FUNCTIONS
-        function wireSearch(inputSel, tableSel) {
-            const $i = $(inputSel), $t = $(tableSel);
-            $i.on('input', function () {
-                const q = $(this).val().trim();
-                $t.find('tbody tr').each(function () {
-                    const tt = $(this).text();
-                    $(this).toggle(textMatch(tt, q) || q.length === 0);
-                });
-            });
-        }
-
-        function wireStatusButtons(btnSel, tableSel) {
-            const $b = $(btnSel), $t = $(tableSel);
-            $b.on('click', function () {
-                const status = $(this).data('status');
-                $b.removeClass('active');
-                $(this).addClass('active');
-                $t.find('tbody tr').each(function () {
-                    const st = String($(this).data('status') || '');
-                    const show = (status === 'All') || (st.toLowerCase() === String(status).toLowerCase());
-                    $(this).toggle(show);
-                });
-            });
-        }
-
-        function wireExport(btnSel, tableSel, name) {
-            $(btnSel).on('click', function () {
-                const csv = toCSV($(tableSel));
-                downloadCSV(csv, name);
-            });
-        }
-
-        function wirePolicyFilters() {
-            const $t = $('#policyTable');
-            function apply() {
-                const st = String($('#policyStatus').val() || 'All').toLowerCase();
-                const co = String($('#policyCountry').val() || 'All').toLowerCase();
-                const cv = String($('#policyCoverage').val() || 'All').toLowerCase();
-                $t.find('tbody tr').each(function () {
-                    const rs = String($(this).data('status') || '').toLowerCase();
-                    const rc = String($(this).data('country') || '').toLowerCase();
-                    const rv = String($(this).data('coverage') || '').toLowerCase();
-                    const ok = ((st === 'all' || rs === st) && (co === 'all' || rc === co) && (cv === 'all' || rv.includes(cv)));
-                    $(this).toggle(ok);
-                });
-            }
-            $('#policyApply').on('click', apply);
-            $('#policyStatus,#policyCountry,#policyCoverage').on('change', apply);
-        }
-
-        // 4. PAGE BOOTSTRAP & LOGOUT LOGIC
-        $(function () {
-            // --- Table & Filter Initializations ---
-            if ($('#dashboardTable').length) {
-                wireSearch('#dashboardSearch', '#dashboardTable');
-                wireStatusButtons('.status-btn', '#dashboardTable');
-                wireExport('#exportDashboard', '#dashboardTable', 'dashboard.csv');
-            }
-            if ($('#policyTable').length) {
-                wirePolicyFilters();
-            }
-            if ($('#claimsTable').length) {
-                wireSearch('#claimsSearch', '#claimsTable');
-                wireStatusButtons('.claims-status-btn', '#claimsTable');
-                wireExport('#exportClaims', '#claimsTable', 'claims.csv');
-            }
-            if ($('#paymentsTable').length) {
-                wireSearch('#paymentsSearch', '#paymentsTable');
-                wireStatusButtons('.payments-status-btn', '#paymentsTable');
-                wireExport('#exportPayments', '#paymentsTable', 'payments.csv');
-            }
-
-            // --- Logout Logic ---
-            // Open the modal when the sidebar logout is clicked
+            // 2. Show Modal when clicking Logout link
             $('#adminLogoutBtn').on('click', function (e) {
                 e.preventDefault();
-                const logoutModal = new bootstrap.Modal(document.getElementById('adminLogoutModal'));
+                var logoutModal = new bootstrap.Modal(document.getElementById('adminLogoutModal'));
                 logoutModal.show();
             });
 
-            // Handle the actual logout action
+            // 3. Submit the hidden form after confirmation
             $('#confirmAdminLogout').on('click', function () {
-                const $btn = $(this);
+                $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Logging out...');
 
-                // UI Feedback
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Logging out...');
-
-                // Clear Auth Data
+                // Clear local caches
                 localStorage.clear();
                 sessionStorage.clear();
 
-                // Clear Cookies
-                document.cookie.split(";").forEach(function(c) {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                });
-
-                // Redirect to Home/SignIn
-                // Small timeout to allow the user to see the "Logging out" state
-                setTimeout(function() {
-                    window.location.href = '@Url.Action("SignIn", "Home")';
-                }, 600);
+                // Submit the actual POST form
+                $('#adminLogoutForm').submit();
             });
         });
     </script>
