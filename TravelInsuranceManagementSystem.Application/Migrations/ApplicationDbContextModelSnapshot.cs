@@ -22,7 +22,82 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Policy", b =>
+            modelBuilder.Entity("SupportTicket", b =>
+                {
+                    b.Property<int>("TicketId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IssueDescription")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ResolvedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TicketStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TicketId");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("TicketDetail", b =>
+                {
+                    b.Property<int>("DetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactDetail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RelatedId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DetailId");
+
+                    b.HasIndex("TicketId")
+                        .IsUnique();
+
+                    b.ToTable("TicketDetails");
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
                 {
                     b.Property<int>("PolicyId")
                         .ValueGeneratedOnAdd()
@@ -58,7 +133,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.ToTable("Policies");
                 });
 
-            modelBuilder.Entity("PolicyMember", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
                 {
                     b.Property<int>("MemberId")
                         .ValueGeneratedOnAdd()
@@ -133,27 +208,44 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("PolicyMember", b =>
+            modelBuilder.Entity("TicketDetail", b =>
                 {
-                    b.HasOne("Policy", "Policy")
+                    b.HasOne("SupportTicket", "SupportTicket")
+                        .WithOne("ExtensionData")
+                        .HasForeignKey("TicketDetail", "TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SupportTicket");
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
+                {
+                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
                         .WithMany("Members")
                         .HasForeignKey("PolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolicyMember", null)
+                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.PolicyMember", null)
                         .WithMany("Members")
                         .HasForeignKey("PolicyMemberMemberId");
 
                     b.Navigation("Policy");
                 });
 
-            modelBuilder.Entity("Policy", b =>
+            modelBuilder.Entity("SupportTicket", b =>
+                {
+                    b.Navigation("ExtensionData")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("PolicyMember", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
                 {
                     b.Navigation("Members");
                 });
