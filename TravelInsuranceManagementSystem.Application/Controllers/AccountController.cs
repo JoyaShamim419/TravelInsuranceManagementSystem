@@ -29,7 +29,9 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.FullName),
+                    // FIX: ClaimTypes.Name MUST be the Email for the Dashboard lookup to work
+                    new Claim(ClaimTypes.Name, user.Email), 
+                    new Claim("FullName", user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role),
                     new Claim("UserId", user.Id.ToString())

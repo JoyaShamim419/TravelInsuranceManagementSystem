@@ -12,6 +12,11 @@ namespace TravelInsuranceManagementSystem.Application.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Policy> Policies { get; set; }
 
+        public DbSet<SupportTicket> SupportTickets { get; set; }
+
+        public DbSet<TicketDetail> TicketDetails { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // This ensures the Enum is stored as a String in the DB instead of an Integer
