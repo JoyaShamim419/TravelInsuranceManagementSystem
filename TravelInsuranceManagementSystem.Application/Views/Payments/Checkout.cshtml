@@ -1,0 +1,370 @@
+﻿@model TravelInsuranceManagementSystem.Models.Payment
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Complete Payment | Travel Buddy";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --navy: #001f3d;
+            --accent: #ed985f;
+            --divider: #e6e6e6;
+            --page-bg: #f5f7fb;
+        }
+
+        body {
+            background-color: var(--page-bg);
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .hero-mini {
+            background: var(--navy);
+            color: #fff;
+            padding: 40px 20px;
+            border-radius: 0 0 20px 20px;
+            text-align: center;
+            margin-bottom: -40px;
+        }
+
+        .checkout-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card-box {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--divider);
+        }
+
+        /* Payment Method Styling */
+        .method-selector {
+            border: 2px solid transparent; /* Changed default border */
+            background: #f0f4f8;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--navy);
+            cursor: pointer; /* Make it look clickable */
+            transition: all 0.3s ease;
+        }
+
+            .method-selector:hover {
+                background: #e1e7ee;
+            }
+
+            /* Active State for selected method */
+            .method-selector.active {
+                border-color: var(--navy);
+                background: #fff;
+                box-shadow: 0 4px 12px rgba(0,31,61,0.1);
+            }
+
+        .selector-circle {
+            height: 20px;
+            width: 20px;
+            border: 2px solid var(--navy);
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+            /* Inner dot logic */
+            .selector-circle::after {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: var(--navy);
+                border-radius: 50%;
+                opacity: 0; /* Hidden by default */
+                transition: opacity 0.2s;
+            }
+
+        /* Show dot when active */
+        .method-selector.active .selector-circle::after {
+            opacity: 1;
+        }
+
+        .btn-pay {
+            background: var(--navy);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+            .btn-pay:hover {
+                transform: translateY(-2px);
+                background: #003366;
+            }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--divider);
+            color: #333;
+        }
+
+        .label-dark {
+            color: #555;
+            font-weight: 600;
+        }
+
+        .value-dark {
+            color: #000;
+            font-weight: 700;
+        }
+
+        /* Input styling for Card */
+        .form-control-custom {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 10px 15px;
+            width: 100%;
+            margin-top: 5px;
+        }
+    </style>
+}
+
+<div class="hero-mini">
+    <h2>Secure Checkout</h2>
+    <p class="opacity-75">Select a method to complete your payment.</p>
+</div>
+
+<div class="container checkout-container py-5">
+    <div class="row g-4">
+
+        <div class="col-lg-7">
+            <div class="card-box">
+                <h4 class="mb-4" style="color: var(--navy); font-weight: 700;">Payment Method</h4>
+
+                <form id="paymentForm" action="@Url.Action("ProcessPayment", "Payments")" method="post">
+                    <input type="hidden" name="paymentId" value="@Model.PaymentId" />
+                    <input type="hidden" id="selectedPaymentMethod" name="paymentMethod" value="UPI" />
+
+                    <div class="method-selector active" onclick="selectMethod('UPI', this)">
+                        <div class="selector-circle"></div>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">UPI / QR Code</h6>
+                            <small class="text">GPay, PhonePe, Paytm</small>
+                        </div>
+                    </div>
+
+                    <div class="method-selector" onclick="selectMethod('Card', this)">
+                        <div class="selector-circle"></div>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">Credit / Debit Card</h6>
+                            <small class="text">Visa, Mastercard, RuPay</small>
+                        </div>
+                    </div>
+
+                    <div id="upiDetails" class="mt-4 p-4 bg-light rounded text-center">
+                        <h6 class="text-dark fw-bold mb-3">Scan with any UPI App</h6>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TravelBuddy-Pay-@Model.PaymentId"
+                             class="img-fluid mb-3 bg-white p-2 border shadow-sm"
+                             style="border-radius: 10px;" />
+                        <p class="small text-dark mb-0">Or enter UPI ID: <strong>travelbuddy@okaxis</strong></p>
+                    </div>
+
+                    <div id="cardDetails" class="mt-4 p-4 bg-light rounded" style="display: none;">
+    <h6 class="text-dark fw-bold mb-3">Enter Card Details</h6>
+    
+    <div class="mb-3">
+        <label class="small fw-bold text-secondary">Card Number</label>
+        <input type="text" id="txtCardNumber" name="CardNumber" class="form-control-custom" 
+               placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off" />
+        <span id="errCardNumber" class="text-danger small fw-bold" style="display:none;"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <label class="small fw-bold text-secondary">Expiry Date</label>
+            <input type="text" id="txtExpiry" class="form-control-custom" 
+                   placeholder="MM / YY" maxlength="5" autocomplete="off" />
+            <span id="errExpiry" class="text-danger small fw-bold" style="display:none;"></span>
+        </div>
+        <div class="col-6">
+            <label class="small fw-bold text-secondary">CVV</label>
+            <input type="password" id="txtCvv" class="form-control-custom" 
+                   placeholder="123" maxlength="3" autocomplete="off" />
+            <span id="errCvv" class="text-danger small fw-bold" style="display:none;"></span>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+            <label class="small fw-bold text-secondary">Card Holder Name</label>
+            <input type="text" id="txtName" class="form-control-custom" 
+                   placeholder="Name on Card" autocomplete="off" />
+            <span id="errName" class="text-danger small fw-bold" style="display:none;"></span>
+    </div>
+</div>
+
+                    <button type="submit" class="btn-pay mt-4">
+                        Pay ₹@Model.PaymentAmount
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <small class="text-dark">
+                            <i class="fas fa-lock me-1"></i> Encrypted & Secure Connection
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card-box" style="border-top: 4px solid var(--accent);">
+                <h5 class="mb-4" style="color: var(--navy); font-weight: 700;">Transaction Summary</h5>
+
+                <div class="summary-row">
+                    <span class="label-dark">Transaction ID</span>
+                    <span class="value-dark">#PAY-@Model.PaymentId</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label-dark">Policy Reference</span>
+                    <span class="value-dark">#POL-@Model.PolicyId</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label-dark">Date</span>
+                    <span class="value-dark">@Model.PaymentDate.ToString("dd MMM yyyy")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label-dark">Status</span>
+                    <span class="badge bg-warning text-dark">@Model.PaymentStatus</span>
+                </div>
+
+                <div class="summary-row" style="border-top: 2px solid var(--navy); margin-top: 10px; padding-top: 15px; border-bottom: none;">
+                    <span style="font-size: 1.2rem; font-weight: 800; color: var(--navy);">Total Amount</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent);">₹@Model.PaymentAmount</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // --- 1. Toggle Payment Method (UPI vs Card) ---
+        function selectMethod(method, element) {
+            document.getElementById("selectedPaymentMethod").value = method;
+
+            // Update UI classes
+            var selectors = document.querySelectorAll('.method-selector');
+            selectors.forEach(s => s.classList.remove('active'));
+            element.classList.add('active');
+
+            // Show/Hide Sections
+            if (method === 'UPI') {
+                $('#upiDetails').show();
+                $('#cardDetails').hide();
+            } else {
+                $('#upiDetails').hide();
+                $('#cardDetails').show();
+            }
+        }
+
+        $(document).ready(function () {
+
+            // --- 2. INPUT FORMATTING (Makes typing easier) ---
+
+            // Card Number: Allow only numbers, add space every 4 digits
+            $('#txtCardNumber').on('input', function() {
+                var val = $(this).val().replace(/\D/g, ''); // Remove non-digits
+                var newVal = '';
+                for(var i=0; i<val.length; i++) {
+                    if(i>0 && i%4 == 0) newVal += ' ';
+                    newVal += val[i];
+                }
+                $(this).val(newVal);
+                $('#errCardNumber').hide(); // Hide error while typing
+            });
+
+            // CVV: Allow only numbers
+            $('#txtCvv').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+                $('#errCvv').hide();
+            });
+
+            // Expiry: Auto-add slash (MM/YY)
+            $('#txtExpiry').on('input', function() {
+                var val = $(this).val().replace(/\D/g, '');
+                if(val.length >= 2) {
+                    $(this).val(val.substring(0,2) + '/' + val.substring(2,4));
+                } else {
+                    $(this).val(val);
+                }
+                $('#errExpiry').hide();
+            });
+
+            // Name: Hide error when typing
+            $('#txtName').on('input', function() { $('#errName').hide(); });
+
+
+            // --- 3. VALIDATION ON SUBMIT ---
+            $('#paymentForm').on('submit', function (e) {
+                var method = $('#selectedPaymentMethod').val();
+
+                // Only validate if "Card" is selected
+                if (method === 'Card') {
+                    var isValid = true;
+
+                    // A. Validate Card Number (Must be exactly 16 digits)
+                    var cardNum = $('#txtCardNumber').val().replace(/\s/g, ''); // Remove spaces
+                    if (cardNum.length !== 16) {
+                        $('#errCardNumber').text('Card number must be exactly 16 digits').show();
+                        isValid = false;
+                    }
+
+                    // B. Validate Expiry Date
+                    var expiry = $('#txtExpiry').val();
+                    // Regex checks for MM/YY format
+                    if (!expiry.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)) {
+                         $('#errExpiry').text('Invalid date format (MM/YY)').show();
+                         isValid = false;
+                    }
+
+                    // C. Validate CVV (Must be 3 digits)
+                    var cvv = $('#txtCvv').val();
+                    if (cvv.length !== 3) {
+                        $('#errCvv').text('CVV must be 3 digits').show();
+                        isValid = false;
+                    }
+
+                    // D. Validate Name (Cannot be empty)
+                    var name = $('#txtName').val().trim();
+                    if (name.length === 0) {
+                        $('#errName').text('Card holder name is required').show();
+                        isValid = false;
+                    } else if (!/^[a-zA-Z\s]*$/.test(name)) {
+                         $('#errName').text('Name should only contain letters').show();
+                         isValid = false;
+                    }
+
+                    // If any validation failed, STOP the form submit
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+}

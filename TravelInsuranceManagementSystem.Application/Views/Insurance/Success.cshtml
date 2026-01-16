@@ -1,6 +1,8 @@
 ﻿@{
     Layout = "_Layout";
     ViewData["Title"] = "Policy Generated";
+    // This grabs the ID (e.g., 5) from the URL bar so we can send it to the Payment page
+    var rawId = Context.Request.Query["id"];
 }
 
 <div class="container text-center" style="margin-top: 100px;">
@@ -8,14 +10,18 @@
         <div class="display-1 text-success mb-4">
             <i class="bi bi-check-circle-fill"></i>
         </div>
+
         <h2 class="fw-bold">Policy Generated Successfully!</h2>
+
         <p class="text-muted fs-5">Your Policy ID is:</p>
         <h1 class="display-4 fw-bold text-navy" style="color: #001f3d;">@ViewBag.PolicyDisplayId</h1>
 
         <div class="mt-5">
-            <button class="btn btn-lg px-5 text-white" style="background: #ed985f; border-radius: 10px;">
+            <a href="@Url.Action("Checkout", "Payments", new { insuranceId = rawId })"
+               class="btn btn-lg px-5 text-white"
+               style="background: #ed985f; border-radius: 10px; text-decoration: none; display: inline-block;">
                 Proceed to Pay
-            </button>
+            </a>
         </div>
     </div>
 </div>

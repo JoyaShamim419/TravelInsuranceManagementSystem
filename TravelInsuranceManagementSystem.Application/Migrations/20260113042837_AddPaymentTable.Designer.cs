@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelInsuranceManagementSystem.Application.Data;
 
@@ -11,9 +12,11 @@ using TravelInsuranceManagementSystem.Application.Data;
 namespace TravelInsuranceManagementSystem.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260113042837_AddPaymentTable")]
+    partial class AddPaymentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,81 +24,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("SupportTicket", b =>
-                {
-                    b.Property<int>("TicketId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IssueDescription")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("ResolvedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TicketStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TicketId");
-
-                    b.ToTable("SupportTickets");
-                });
-
-            modelBuilder.Entity("TicketDetail", b =>
-                {
-                    b.Property<int>("DetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactDetail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RelatedId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DetailId");
-
-                    b.HasIndex("TicketId")
-                        .IsUnique();
-
-                    b.ToTable("TicketDetails");
-                });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
                 {
@@ -193,18 +121,11 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResetToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("ResetTokenExpiry")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -244,19 +165,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
                 {
-            modelBuilder.Entity("TicketDetail", b =>
-                {
-                    b.HasOne("SupportTicket", "SupportTicket")
-                        .WithOne("ExtensionData")
-                        .HasForeignKey("TicketDetail", "TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SupportTicket");
-                });
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
-                {
                     b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
                         .WithMany("Members")
                         .HasForeignKey("PolicyId")
@@ -279,10 +187,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         .IsRequired();
 
                     b.Navigation("Policy");
-            modelBuilder.Entity("SupportTicket", b =>
-                {
-                    b.Navigation("ExtensionData")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>

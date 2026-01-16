@@ -1,0 +1,137 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Payment Failed";
+}
+
+<style>
+    /* 1. Card Style - Changed Top Border to RED */
+    .failed-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        padding: 50px 30px;
+        max-width: 550px;
+        margin: 50px auto;
+        border-top: 6px solid #dc3545; /* Bright Red Top Border */
+    }
+
+    /* 2. Icon Circle - Changed to Light RED Background */
+    .icon-circle-fail {
+        width: 90px;
+        height: 90px;
+        background: #f8d7da; /* Light red background */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+    }
+
+    /* 3. Button Styles */
+    .btn-dashboard {
+        background: var(--navy, #001f3d);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 20px;
+        transition: background 0.3s;
+        border: none;
+    }
+
+        .btn-dashboard:hover {
+            background: #003366;
+            color: white;
+        }
+
+    /* Secondary 'Try Again' Button */
+    .btn-try-again {
+        background: white;
+        color: #dc3545;
+        border: 2px solid #dc3545;
+        padding: 13px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 20px;
+        margin-right: 10px;
+        transition: all 0.3s;
+    }
+
+        .btn-try-again:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+    /* Table-like rows (Same as your Success page) */
+    .details-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 1.1rem;
+    }
+
+    .label-text {
+        font-weight: 600;
+        color: #001f3d;
+    }
+
+    .value-text {
+        font-weight: bold;
+        color: #000;
+    }
+</style>
+
+<div class="container">
+    <div class="failed-card">
+
+        <div class="icon-circle-fail">
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </div>
+
+        <h1 style="color: #dc3545; font-weight: 800; margin-bottom: 15px;">Payment Failed</h1>
+
+        <p style="font-size: 1.1rem; color: #333; margin-bottom: 30px;">
+            Your transaction was declined. <br>
+            Please check your card details or try a different payment method.
+        </p>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e9ecef;">
+
+            <div class="details-row">
+                <span class="label-text">Date</span>
+                <span class="value-text">@DateTime.Now.ToString("dd MMM yyyy")</span>
+            </div>
+
+            <div class="details-row">
+                <span class="label-text">Reason</span>
+                <span class="value-text">Declined / Error</span>
+            </div>
+
+            <div class="details-row" style="border-bottom: none;">
+                <span class="label-text">Status</span>
+                <span class="badge bg-danger" style="font-size: 1rem; padding: 8px 15px;">FAILED</span>
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="javascript:history.back()" class="btn-try-again">
+                <i class="fas fa-redo me-2"></i> Try Again
+            </a>
+
+            <a asp-controller="UserDashboard" asp-action="Dashboard" class="btn-dashboard">
+                Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>

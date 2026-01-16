@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Models;
 
 namespace TravelInsuranceManagementSystem.Application.Data
 {
@@ -11,6 +12,7 @@ namespace TravelInsuranceManagementSystem.Application.Data
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Policy> Policies { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         public DbSet<SupportTicket> SupportTickets { get; set; }
 

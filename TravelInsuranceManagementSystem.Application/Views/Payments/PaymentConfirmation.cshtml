@@ -1,0 +1,108 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Payment Success";
+}
+
+<style>
+    /* Clean, bright card style */
+    .success-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        padding: 50px 30px;
+        max-width: 550px;
+        margin: 50px auto;
+        border-top: 6px solid #28a745; /* Bright Green Top Border */
+    }
+
+    /* Big Green Checkmark Circle */
+    .icon-circle {
+        width: 90px;
+        height: 90px;
+        background: #d4edda; /* Light green background */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+    }
+
+    /* The 'Back to Home' button matching your Navy theme */
+    .btn-home {
+        background: var(--navy, #001f3d);
+        color: white;
+        padding: 15px 40px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        display: inline-block;
+        margin-top: 30px;
+        transition: background 0.3s;
+    }
+
+        .btn-home:hover {
+            background: #003366;
+            color: white;
+        }
+
+    /* Table-like rows for clear reading */
+    .details-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 1.1rem; /* Bigger text */
+    }
+
+    .label-text {
+        font-weight: 600;
+        color: #001f3d; /* Navy Color - Clear to read */
+    }
+
+    .value-text {
+        font-weight: bold;
+        color: #000; /* Pure Black */
+    }
+</style>
+
+<div class="container">
+    <div class="success-card">
+        <div class="icon-circle">
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+        </div>
+
+        <h1 style="color: #001f3d; font-weight: 800; margin-bottom: 15px;">Payment Successful!</h1>
+
+        <p style="font-size: 1.1rem; color: #333; margin-bottom: 30px;">
+            Your transaction has been completed. <br>
+            Your travel insurance policy is now <strong>Active</strong>.
+        </p>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e9ecef;">
+
+            <div class="details-row">
+                <span class="label-text">Transaction ID</span>
+                <span class="value-text">#PAY-@ViewContext.RouteData.Values["id"]</span>
+            </div>
+
+            <div class="details-row">
+                <span class="label-text">Payment Date</span>
+                <span class="value-text">@DateTime.Now.ToString("dd MMM yyyy")</span>
+            </div>
+
+            <div class="details-row" style="border-bottom: none;">
+                <span class="label-text">Status</span>
+                <span class="badge bg-success" style="font-size: 1rem; padding: 8px 15px;">SUCCESS</span>
+            </div>
+
+        </div>
+
+        <a asp-controller="UserDashboard" asp-action="Dashboard" class="btn-home">
+            Back to Dashboard
+        </a>
+    </div>
+</div>

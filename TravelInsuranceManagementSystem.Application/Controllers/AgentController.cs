@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq; // Required for OrderByDescending
+using System.Threading.Tasks; // Required for async/await
 using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
+// Ensure this namespace matches where your Payment.cs model is located
+using TravelInsuranceManagementSystem.Models;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
@@ -40,6 +44,19 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return View(tickets);
         }
 
+        // --- THIS IS THE UPDATED METHOD ---
+        public async Task<IActionResult> Payments()
+        {
+            // 1. Fetch data from the 'Payments' table
+            // 2. Include 'Policy' details (optional, but good practice)
+            // 3. Sort by Newest Date first
+            var payments = await _context.Payments
+                .Include(p => p.Policy)
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
+
+            // 4. Send the list to the View
+            return View(payments);
         // UPDATE OPERATION: AJAX endpoint to update status
         [HttpPost]
         public async Task<IActionResult> UpdateTicketStatus(int id, string status)
