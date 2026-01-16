@@ -74,9 +74,21 @@
     <a class="btn btn-outline-secondary" asp-controller="UserDashboard" asp-action="Dashboard">Back to Dashboard</a>
 </div>
 
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
 <div class="panel p-3">
-    @* Added method and name attributes for server binding *@
-    <form id="ticketForm" novalidate enctype="multipart/form-data" method="post">
+    <form id="ticketForm" novalidate enctype="multipart/form-data" method="post" asp-action="RaiseTicket" asp-controller="UserDashboard">
+
+        <input type="hidden" name="UserId" value="@ViewBag.CurrentUserId" />
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Your User ID</label>
+            <input class="form-control" value="@ViewBag.CurrentUserId" readonly style="background-color: #f0f0f0;" />
+        </div>
+
         <div class="row g-3">
             <div class="col-12">
                 <label class="form-label req">Subject</label>
@@ -144,7 +156,6 @@
             <div class="col-md-6">
                 <label class="form-label">Attachment (optional)</label>
                 <input id="attachment" name="Attachment" type="file" class="form-control" accept=".pdf,image/*" />
-
                 <div id="filePreview" class="file-preview mt-2 d-none">
                     <div class="d-flex align-items-center gap-2">
                         <span id="fileName" class="fw-semibold"></span>
@@ -180,17 +191,14 @@
             const fileInput = document.getElementById('attachment');
             const filePreview = document.getElementById('filePreview');
 
-            // Description counter
             description.addEventListener('input', () => {
                 descCounter.textContent = `${description.value.length} / 2000`;
             });
 
-            // Validation for Contact Detail
             function validateContactDetail() {
                 const method = contactMethod.value;
                 const val = contactDetail.value.trim();
                 let isValid = true;
-
                 if (!val) {
                     contactFeedback.textContent = "Contact detail is required.";
                     isValid = false;
@@ -201,26 +209,21 @@
                     isValid = /^(\+91[-\s]?)?[0]?[1-9]\d{9}$/.test(val.replace(/\s|-/g, ''));
                     contactFeedback.textContent = "Please enter a valid phone number.";
                 }
-
                 contactDetail.classList.toggle('is-invalid', !isValid);
                 return isValid;
             }
 
-            // File handling
             fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
                 if (!file) return;
-
                 if (file.size > 10 * 1024 * 1024) {
                     alert("File exceeds 10MB");
                     fileInput.value = "";
                     return;
                 }
-
                 document.getElementById('fileName').textContent = file.name;
                 document.getElementById('fileSize').textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
                 filePreview.classList.remove('d-none');
-
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -232,36 +235,28 @@
                         document.getElementById('imageHolder').appendChild(img);
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    document.getElementById('imageHolder').innerHTML = '<i class="bi bi-file-earmark-pdf fs-1 text-danger"></i>';
                 }
             });
 
             document.getElementById('clearFile').addEventListener('click', () => {
                 fileInput.value = '';
                 filePreview.classList.add('d-none');
+                document.getElementById('imageHolder').innerHTML = '';
             });
 
-            // Submit Logic
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                // Trigger Bootstrap native validation
+            form.addEventListener('submit', function (e) {
                 form.classList.add('was-validated');
-
                 const isContactValid = validateContactDetail();
 
                 if (!form.checkValidity() || !isContactValid) {
+                    e.preventDefault();
                     e.stopPropagation();
-                    return;
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
                 }
-
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
-
-                setTimeout(() => {
-                    alert('Success!');
-                    // Redirecting using the Razor-generated URL
-                    window.location.href = '@Url.Action("Dashboard", "UserDashboard")';
-                }, 1000);
             });
         })();
     </script>

@@ -12,39 +12,36 @@ using TravelInsuranceManagementSystem.Models;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
-    // Restrict access to users with the 'Agent' role only
     [Authorize(Roles = "Agent")]
-    // Prevent the browser from caching these private pages
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class AgentController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        // Constructor injecting the database context
         public AgentController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Dashboard()
-        {
-            return View();
-        }
+        public IActionResult Dashboard() => View();
 
-        // READ OPERATION: Fetch all policies including family members
         public async Task<IActionResult> Policies()
         {
             var policies = await _context.Policies
-                .Include(p => p.Members) // Eager load the family members
+                .Include(p => p.Members)
                 .OrderByDescending(p => p.PolicyId)
                 .ToListAsync();
-
             return View(policies);
         }
 
-        public IActionResult Claims()
+        // READ OPERATION: Fetch all tickets from the database
+        public async Task<IActionResult> SupportTickets()
         {
-            return View();
+            // Fetching tickets and ordering by most recent
+            var tickets = await _context.SupportTickets
+                .OrderByDescending(t => t.TicketId)
+                .ToListAsync();
+            return View(tickets);
         }
 
         // --- THIS IS THE UPDATED METHOD ---
@@ -60,24 +57,42 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
             // 4. Send the list to the View
             return View(payments);
+        // UPDATE OPERATION: AJAX endpoint to update status
+        [HttpPost]
+        public async Task<IActionResult> UpdateTicketStatus(int id, string status)
+        {
+            var ticket = await _context.SupportTickets.FindAsync(id);
+            if (ticket == null) return NotFound();
+
+            ticket.TicketStatus = status;
+            // Optionally set the AgentId of the person who resolved it
+            // ticket.AgentId = User.FindFirst("UserId")?.Value; 
+
+            _context.Update(ticket);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
         }
 
-        public IActionResult SupportTickets()
+        // DELETE OPERATION: Remove ticket from database
+        [HttpPost]
+        public async Task<IActionResult> DeleteTicket(int id)
         {
-            return View();
+            var ticket = await _context.SupportTickets.FindAsync(id);
+            if (ticket != null)
+            {
+                _context.SupportTickets.Remove(ticket);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(SupportTickets));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // Clear the authentication cookie explicitly
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Clear session data if any exists
             HttpContext.Session.Clear();
-
-            // Redirect to the Home/SignIn page after logout
             return RedirectToAction("SignIn", "Home");
         }
     }
