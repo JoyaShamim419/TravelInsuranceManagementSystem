@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
@@ -22,9 +22,20 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return View();
         }
 
-        public IActionResult Claims()
+        public async Task<IActionResult> Claims()
         {
-            return View("~/Views/UserDashboard/Claims.cshtml");
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim == null) return RedirectToAction("SignIn", "Account");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var myClaims = await _context.Claims
+                .Include(c => c.Policy)
+                .Where(c => c.Policy.UserId == userId)
+                .OrderByDescending(c => c.ClaimDate)
+                .ToListAsync();
+
+            return View(myClaims);
         }
 
         public IActionResult ClaimCreate()
@@ -32,44 +43,49 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return View("~/Views/UserDashboard/ClaimCreate.cshtml");
         }
 
-        public IActionResult Policies()
+        public async Task<IActionResult> Policies()
         {
-            return View("~/Views/UserDashboard/Policies.cshtml");
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim == null) return RedirectToAction("SignIn", "Account");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var myPolicies = await _context.Policies
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.TravelStartDate)
+                .ToListAsync();
+
+            return View(myPolicies);
         }
 
+        // --- UPDATED RAISE TICKET (GET) ---
         [HttpGet]
         public IActionResult RaiseTicket()
         {
-            // 1. Try to get email from Name claim
-            var email = User.Identity.Name;
+            // Pull the ID directly from the Claims you set in AccountController
+            var userId = User.FindFirst("UserId")?.Value;
 
-            // 2. Fallback: If Name is null, try to find the NameIdentifier claim
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(userId))
             {
-                email = User.FindFirstValue(ClaimTypes.Name);
+                TempData["ErrorMessage"] = "Session expired. Please re-login.";
+                return RedirectToAction("SignIn", "Account");
             }
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            // Pass the ID to the View (matches your @ViewBag.CurrentUserId)
+            ViewBag.CurrentUserId = userId;
 
-            if (user == null)
-            {
-                // This will help you debug if the session is alive but the lookup fails
-                ViewBag.Error = $"System error: Could not find a user record for '{email}'. Please re-login.";
-                return View("~/Views/UserDashboard/RaiseTicket.cshtml");
-            }
-
-            ViewBag.CurrentUserId = user.Id;
             return View("~/Views/UserDashboard/RaiseTicket.cshtml");
         }
 
+        // --- UPDATED RAISE TICKET (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RaiseTicket(IFormCollection form)
         {
-            var currentUserName = User.Identity.Name;
-            var userRecord = _context.Users.FirstOrDefault(u => u.Email == currentUserName);
+            // Securely get ID from Claims (Prevents form tampering)
+            var userId = User.FindFirst("UserId")?.Value;
 
-            if (userRecord == null)
+            if (string.IsNullOrEmpty(userId))
             {
                 ViewBag.Error = "User session not found. Please log in again.";
                 return View("~/Views/UserDashboard/RaiseTicket.cshtml");
@@ -81,20 +97,19 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 // 1. Create the CORE ticket 
                 var coreTicket = new SupportTicket
                 {
-                    // Use userRecord.Id (from your User model)
-                    UserId = userRecord.Id.ToString(),
+                    UserId = userId, // Using the ID directly from Claims
                     IssueDescription = form["Description"],
                     TicketStatus = "Open",
                     CreatedDate = DateTime.Now
                 };
 
                 _context.SupportTickets.Add(coreTicket);
-                await _context.SaveChangesAsync(); // Generates the TicketId
+                await _context.SaveChangesAsync();
 
-                // 2. Create the TICKET DETAILS (the extra table)
+                // 2. Create the TICKET DETAILS
                 var ticketDetail = new TicketDetail
                 {
-                    TicketId = coreTicket.TicketId, // FK to the core ticket
+                    TicketId = coreTicket.TicketId,
                     Subject = form["Subject"],
                     Category = form["Category"],
                     Priority = form["Priority"],
@@ -106,7 +121,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 _context.TicketDetails.Add(ticketDetail);
                 await _context.SaveChangesAsync();
 
-                // 3. Commit the transaction
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "Your ticket has been raised successfully!";
@@ -115,8 +129,10 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                // inner exception provides the most helpful error details
                 ViewBag.Error = "Database Error: " + (ex.InnerException?.Message ?? ex.Message);
+
+                // Re-populate the ID if the view needs to be returned
+                ViewBag.CurrentUserId = userId;
                 return View("~/Views/UserDashboard/RaiseTicket.cshtml");
             }
         }

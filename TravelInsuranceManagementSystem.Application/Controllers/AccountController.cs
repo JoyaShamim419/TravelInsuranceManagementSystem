@@ -6,19 +6,22 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
 
+// Alias to avoid conflict with Controller.User
+using AppUser = TravelInsuranceManagementSystem.Application.Models.User;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     public class AccountController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IPasswordHasher<AppUser> _passwordHasher;
         private readonly IConfiguration _config;
 
-        public AccountController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher, IConfiguration config)
+        public AccountController(ApplicationDbContext context, IPasswordHasher<AppUser> passwordHasher, IConfiguration config)
         {
             _context = context;
             _passwordHasher = passwordHasher;
@@ -31,8 +34,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string Email, string Password)
         {
-            var user = _context.Users.AsEnumerable()
-                .FirstOrDefault(u => u.Email.Equals(Email, StringComparison.Ordinal));
+            var user = _context.Users.FirstOrDefault(u => u.Email == Email);
 
             if (user != null)
             {
@@ -40,6 +42,15 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
                 if (verificationResult == PasswordVerificationResult.Success)
                 {
+                    // MODIFIED: Ensure UserId is included in the Cookie Claims
+                    var authClaims = new List<System.Security.Claims.Claim>
+                    {
+                        new System.Security.Claims.Claim(ClaimTypes.Name, user.FullName),
+                        new System.Security.Claims.Claim(ClaimTypes.Email, user.Email),
+                        new System.Security.Claims.Claim(ClaimTypes.Role, user.Role),
+                        new System.Security.Claims.Claim("UserId", user.Id.ToString())
+                    };
+
                     var token = GenerateJwtToken(user);
 
                     if (Request.Headers["Accept"].ToString().Contains("application/json"))
@@ -47,21 +58,14 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                         return Ok(new { token = token, user = user.FullName, role = user.Role });
                     }
 
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.FullName),
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, user.Role),
-                        new Claim("UserId", user.Id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
                     HttpContext.Session.SetString("JWToken", token);
 
                     if (user.Role == "Admin") return RedirectToAction("Dashboard", "Admin");
                     if (user.Role == "Agent") return RedirectToAction("Dashboard", "Agent");
+
                     return RedirectToAction("Dashboard", "UserDashboard");
                 }
             }
@@ -69,19 +73,16 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             if (Request.Headers["Accept"].ToString().Contains("application/json"))
                 return Unauthorized(new { message = "Invalid email or password" });
 
-            TempData["ErrorMessage"] = "Invalid email (case-sensitive) or password!";
+            TempData["ErrorMessage"] = "Invalid email or password!";
             return View("~/Views/Home/SignIn.cshtml");
         }
 
         [HttpPost]
-        public IActionResult SignUp(User user)
+        public IActionResult SignUp(AppUser user)
         {
-            if (_context.Users.AsEnumerable().Any(u => u.Email.Equals(user.Email, StringComparison.Ordinal)))
+            if (_context.Users.Any(u => u.Email == user.Email))
             {
-                if (Request.Headers["Accept"].ToString().Contains("application/json"))
-                    return BadRequest(new { message = "Email already registered" });
-
-                TempData["ErrorMessage"] = "This exact email is already registered!";
+                TempData["ErrorMessage"] = "This email is already registered!";
                 return View("~/Views/Home/SignIn.cshtml");
             }
 
@@ -94,13 +95,8 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            if (Request.Headers["Accept"].ToString().Contains("application/json"))
-                return Ok(new { message = "Registration successful" });
-
             return RedirectToAction("SignIn");
         }
-
-        // --- FORGOT PASSWORD FLOW ---
 
         [HttpGet]
         public IActionResult ForgotPassword() => View();
@@ -108,19 +104,12 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         [HttpPost]
         public IActionResult ForgotPassword(string email)
         {
-            // Case-sensitive check
-            var user = _context.Users.AsEnumerable().FirstOrDefault(u => u.Email.Equals(email, StringComparison.Ordinal));
-
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
             if (user == null)
             {
-                if (Request.Headers["Accept"].ToString().Contains("application/json"))
-                    return NotFound(new { message = "Email not found" });
-
-                ViewBag.Error = "Email address not found (Case Sensitive).";
+                ViewBag.Error = "Email address not found.";
                 return View();
             }
-
-            // In a real app, you'd send an email here. For now, we redirect to reset.
             return RedirectToAction("ResetPassword", new { email = email });
         }
 
@@ -136,23 +125,17 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         {
             if (newPassword != confirmPassword)
             {
-                if (Request.Headers["Accept"].ToString().Contains("application/json"))
-                    return BadRequest(new { message = "Passwords do not match" });
-
                 ViewBag.Error = "Passwords do not match.";
                 ViewBag.Email = email;
                 return View();
             }
 
-            var user = _context.Users.AsEnumerable().FirstOrDefault(u => u.Email.Equals(email, StringComparison.Ordinal));
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
             if (user != null)
             {
                 user.Password = _passwordHasher.HashPassword(user, newPassword);
                 _context.Update(user);
                 _context.SaveChanges();
-
-                if (Request.Headers["Accept"].ToString().Contains("application/json"))
-                    return Ok(new { message = "Password updated successfully" });
 
                 TempData["SuccessMessage"] = "Password reset successfully!";
                 return RedirectToAction("SignIn");
@@ -161,24 +144,29 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return BadRequest();
         }
 
-        // --- END FORGOT PASSWORD FLOW ---
+        // --- JWT GENERATION ---
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(AppUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+            string jwtKeyString = _config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is missing");
+            var key = Encoding.ASCII.GetBytes(jwtKeyString);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                // MODIFIED: Added UserId to the JWT Subject so it is available to API calls
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new System.Security.Claims.Claim(ClaimTypes.Name, user.FullName),
+                    new System.Security.Claims.Claim(ClaimTypes.Email, user.Email),
+                    new System.Security.Claims.Claim(ClaimTypes.Role, user.Role),
+                    new System.Security.Claims.Claim("UserId", user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
