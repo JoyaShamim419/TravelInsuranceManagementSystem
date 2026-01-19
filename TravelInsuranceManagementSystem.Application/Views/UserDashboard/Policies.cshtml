@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Application.Models.Policy>
+
+@{
     ViewData["Title"] = "Policies";
     Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
 }
@@ -74,6 +76,7 @@
             text-align: center;
         }
 
+        /* Status Colors */
         .badge-active {
             background: var(--bg-active);
             color: var(--color-active);
@@ -82,6 +85,11 @@
         .badge-expired {
             background: var(--bg-expired);
             color: var(--color-expired);
+        }
+        /* Added a default for cancelled or others */
+        .badge-cancelled {
+            background: #e2e3e5;
+            color: #383d41;
         }
 
         .btn-chip {
@@ -144,33 +152,43 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold">P01842</td>
-                        <td>Singapore</td>
-                        <td>2025-11-01</td>
-                        <td>2026-10-31</td>
-                        <td class="amount-cell">₹ 10,00,000</td>
-                        <td>Gold Plus</td>
-                        <td class="text-center"><span class="status-badge badge-active">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">P01037</td>
-                        <td>France</td>
-                        <td>2025-01-15</td>
-                        <td>2025-12-15</td>
-                        <td class="amount-cell">₹ 15,00,000</td>
-                        <td>Platinum</td>
-                        <td class="text-center"><span class="status-badge badge-active">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">P01016</td>
-                        <td>United Arab Emirates</td>
-                        <td>2024-06-01</td>
-                        <td>2024-06-15</td>
-                        <td class="amount-cell">₹ 5,00,000</td>
-                        <td>Silver Basic</td>
-                        <td class="text-center"><span class="status-badge badge-expired">Expired</span></td>
-                    </tr>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-shield-x fs-1 d-block mb-3 opacity-25"></i>
+                                No policies found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            // Logic to make CSS class match Enum (e.g., ACTIVE -> badge-active)
+                            var statusLower = item.PolicyStatus.ToString().ToLower();
+
+                            <tr>
+                                <td class="fw-bold">P-@item.PolicyId</td>
+
+                                <td>@item.DestinationCountry</td>
+
+                                <td>@item.TravelStartDate.ToString("yyyy-MM-dd")</td>
+
+                                <td>@item.TravelEndDate.ToString("yyyy-MM-dd")</td>
+
+                                <td class="amount-cell">₹ @item.CoverageAmount.ToString("N0")</td>
+
+                                <td>@item.CoverageType</td>
+
+                                <td class="text-center">
+                                    <span class="status-badge badge-@statusLower">
+                                        @item.PolicyStatus
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
@@ -214,7 +232,10 @@
                     const statusText = row.cells[6].innerText.trim();
 
                     const matchesSearch = !query || rowText.includes(query);
-                    const matchesStatus = (statusFilter === 'All') || (statusText === statusFilter);
+
+                    // Logic: Match "Active" == "active" (Case Insensitive)
+                    const matchesStatus = (statusFilter === 'All') ||
+                                          (statusText.toLowerCase() === statusFilter.toLowerCase());
 
                     row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
                 }

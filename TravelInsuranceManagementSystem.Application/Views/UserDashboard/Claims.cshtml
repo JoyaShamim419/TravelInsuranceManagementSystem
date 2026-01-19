@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Application.Models.Claim>
+
+@{
     ViewData["Title"] = "Claims";
     Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
 }
@@ -162,7 +164,7 @@
             <h1 class="fw-bold m-0" style="color:var(--color-navy);">Claims Dashboard</h1>
             <p class="text-muted small m-0">Managing @DateTime.Now.Year Active Claims</p>
         </div>
-        <a asp-action="ClaimCreate" class="btn btn-navy px-4 fw-bold">+ File New Claim</a>
+        <a asp-controller="Claims" asp-action="Create" class="btn btn-navy px-4 fw-bold">+ File New Claim</a>
     </div>
 
     <div class="panel p-3">
@@ -195,36 +197,49 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold">CLM-1027</td>
-                        <td class="text-muted">P01842</td>
-                        <td>Gold Plus</td>
-                        <td>Medical Emergency</td>
-                        <td class="text-end fw-bold">₹ 18,500</td>
-                        <td>2025-12-12</td>
-                        <td class="text-center"><span class="status status-pending">Pending</span></td>
-                        <td>AGT-772</td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">CLM-0986</td>
-                        <td class="text-muted">P01037</td>
-                        <td>Platinum</td>
-                        <td>Baggage Loss</td>
-                        <td class="text-end fw-bold">₹ 12,000</td>
-                        <td>2025-12-01</td>
-                        <td class="text-center"><span class="status status-approved">Approved</span></td>
-                        <td>AGT-104</td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">CLM-0941</td>
-                        <td class="text-muted">P01016</td>
-                        <td>Silver Basic</td>
-                        <td>Trip Cancellation</td>
-                        <td class="text-end fw-bold">₹ 7,900</td>
-                        <td>2025-11-19</td>
-                        <td class="text-center"><span class="status status-rejected">Rejected</span></td>
-                        <td>AGT-550</td>
-                    </tr>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                                No claims found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            // Convert Enum to Lowercase for CSS (e.g., "Pending" -> "pending")
+                            var statusLower = item.Status.ToString().ToLower();
+
+                            <tr>
+                                <td class="fw-bold">CLM-@item.ClaimId</td>
+
+                                <td class="text-muted">
+                                    @item.PolicyId
+                                </td>
+
+                                <td>Standard Plan</td>
+
+                                <td>@item.IncidentType</td>
+
+                                <td class="text-end fw-bold">₹ @item.ClaimAmount.ToString("N2")</td>
+
+                                <td>@item.ClaimDate.ToString("yyyy-MM-dd")</td>
+
+                                <td class="text-center">
+                                    <span class="status status-@statusLower">
+                                        @item.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @(item.AgentId == 0 ? "-" : "AGT-" + item.AgentId)
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
@@ -264,6 +279,7 @@
 
                 for (let row of rows) {
                     const rowText = row.innerText.toLowerCase();
+                    // Status is the 7th column (index 6)
                     const statusText = row.cells[6].innerText.trim();
 
                     const matchesSearch = !query || rowText.includes(query);
