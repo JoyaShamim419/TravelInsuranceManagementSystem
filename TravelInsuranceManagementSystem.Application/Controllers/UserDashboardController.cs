@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class UserDashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
