@@ -1,15 +1,16 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Models.Payment>
+
+@{
     ViewData["Title"] = "Agent Payments";
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
 
 <style>
-    /* PAGE BACKGROUND */
+    /* Keep your existing styles */
     body {
         background: #fafafa;
     }
 
-    /* TITLE */
     .page-title {
         font-size: 22px;
         font-weight: 700;
@@ -17,13 +18,11 @@
         margin-bottom: 10px;
     }
 
-    /* SEARCH */
     .search-box {
         max-width: 400px;
         margin-bottom: 15px;
     }
 
-    /* FILTER BUTTONS */
     .filter-buttons .btn {
         margin-right: 5px;
         border-radius: 20px;
@@ -34,7 +33,6 @@
             color: white;
         }
 
-    /* TABLE */
     table {
         background: #ffffff;
         border-radius: 10px;
@@ -51,7 +49,7 @@
         color: #333;
     }
 
-    /* BADGES */
+    /* Dynamic Badge Colors */
     .badge {
         padding: 6px 12px;
         border-radius: 20px;
@@ -73,30 +71,16 @@
         background: #f8d7da;
         color: #721c24;
     }
-
-    /* PLAN */
-    .plan-basic {
-        font-weight: 600;
-        color: #000;
-    }
-
-    .plan-premium {
-        font-weight: 700;
-        color: #1a73e8;
-    }
 </style>
 
 <div class="container-fluid">
 
-    <!-- TITLE -->
     <div class="page-title">Payments</div>
 
-    <!-- SEARCH + FILTER -->
     <div class="row align-items-center mb-3">
         <div class="col-md-6">
             <input type="text" class="form-control search-box" id="paymentSearch" placeholder="Search payments...">
         </div>
-
         <div class="col-md-6 text-end filter-buttons">
             <button class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">All</button>
             <button class="btn btn-outline-success btn-sm filter-btn" data-status="success">Success</button>
@@ -105,52 +89,60 @@
         </div>
     </div>
 
-    <!-- TABLE -->
     <div class="table-responsive">
         <table class="table table-bordered align-middle" id="paymentTable">
             <thead>
                 <tr>
-                    
                     <th>Policy ID</th>
                     <th>Payment ID</th>
-                   
                     <th>Amount</th>
                     <th>Date</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    // LOOP THROUGH DATABASE DATA
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">#POL-@item.PolicyId</td>
 
-                <tr>
-                   
-                    <td>P01015</td>
-                    <td>PAY-8821</td>
-                    
-                    <td>₹3,500</td>
-                    <td>2023-04-02</td>
-                    <td class="status">Success</td>
-                </tr>
+                            <td>#PAY-@item.PaymentId</td>
 
-                <tr>
-                   
-                    <td>P01116</td>
-                    <td>PAY-9932</td>
-                    
-                    <td>₹2,200</td>
-                    <td>2023-04-01</td>
-                    <td class="status">Pending</td>
-                </tr>
+                            <td class="fw-bold">₹@item.PaymentAmount</td>
 
-                <tr>
-                    
-                    <td>P01037</td>
-                    <td>PAY-7741</td>
-                    
-                    <td>₹1,580</td>
-                    <td>2023-11-20</td>
-                    <td class="status">Failed</td>
-                </tr>
+                            <td>@item.PaymentDate.ToString("yyyy-MM-dd")</td>
 
+                            <td class="status">
+                                @{
+                                    // Convert Enum to String for display and logic
+                                    var statusString = item.PaymentStatus.ToString();
+                                    var badgeClass = "badge-pending";
+
+                                    if (statusString == "SUCCESS")
+                                    {
+                                        badgeClass = "badge-success";
+                                    }
+                                    else if (statusString == "FAILED")
+                                    {
+                                        badgeClass = "badge-failed";
+                                    }
+                                }
+                                <span class="badge @badgeClass">@statusString</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted p-4">
+                            No payment records found.
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
@@ -159,7 +151,7 @@
 
 @section Scripts {
     <script>
-        /* SEARCH */
+        /* SEARCH SCRIPT */
         $("#paymentSearch").on("keyup", function () {
             var value = $(this).val().toLowerCase();
             $("#paymentTable tbody tr").filter(function () {
@@ -167,9 +159,8 @@
             });
         });
 
-        /* FILTER */
+        /* FILTER SCRIPT */
         $(".filter-btn").click(function () {
-
             $(".filter-btn").removeClass("active");
             $(this).addClass("active");
 
@@ -182,7 +173,11 @@
 
             $("#paymentTable tbody tr").each(function () {
                 var rowStatus = $(this).find(".status").text().toLowerCase();
-                $(this).toggle(rowStatus === status);
+                if (rowStatus.indexOf(status) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
             });
         });
     </script>

@@ -1,7 +1,42 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Models.Payment>
+
+@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    //ViewData["Title"] = "Payments";
+    ViewData["Title"] = "Payment History";
 }
+
+<style>
+    /* Custom Badge Styles to match your screenshot */
+    .badge-status {
+        padding: 8px 20px; /* Wider padding for pill shape */
+        border-radius: 50px; /* Fully rounded ends */
+        font-weight: 700; /* Bold text */
+        font-size: 0.85rem; /* Readable size */
+        text-transform: uppercase; /* SUCCESS instead of Success */
+        display: inline-block;
+        min-width: 100px; /* Uniform width */
+        text-align: center;
+        border: none;
+    }
+
+    /* Green Badge (Success) - Light Green Background, Dark Green Text */
+    .status-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    /* Yellow Badge (Pending) - Light Yellow Background, Dark Yellow/Brown Text */
+    .status-pending {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    /* Red Badge (Failed) - Light Red Background, Dark Red Text */
+    .status-failed {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+</style>
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <h2 class="m-0">Payments</h2>
@@ -26,51 +61,96 @@
     <table id="paymentsTable" class="table table-hover align-middle mb-0">
         <thead class="table-light">
             <tr>
-                <th>User ID</th>
                 <th>Policy ID</th>
                 <th>Payment ID</th>
-                <th>Plan</th>
                 <th>Amount</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Date</th>
+                <th>Payment Date</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            <tr data-status="Success">
-                <td>U001</td>
-                <td>P01015</td>
-                <td>PAY-8821</td>
-                <td>Basic</td>
-                <td>₹3,500</td>
-                <td>2023-04-01</td>
-                <td>2024-04-01</td>
-                <td>2023-04-02</td>
-                <td><span class="badge-pill badge-approved">Success</span></td>
-            </tr>
-            <tr data-status="Pending">
-                <td>U002</td>
-                <td>P01116</td>
-                <td>PAY-9932</td>
-                <td>Premium</td>
-                <td>₹2,200</td>
-                <td>2023-04-01</td>
-                <td>2023-04-01</td>
-                <td>2023-04-01</td>
-                <td><span class="badge-pill badge-pending">Pending</span></td>
-            </tr>
-            <tr data-status="Failed">
-                <td>U003</td>
-                <td>P01037</td>
-                <td>PAY-7741</td>
-                <td>Premium</td>
-                <td>₹1,580</td>
-                <td>2023-11-20</td>
-                <td>2024-11-20</td>
-                <td>2023-11-20</td>
-                <td><span class="badge-pill badge-rejected">Failed</span></td>
-            </tr>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    // Logic to get the correct class
+                    var rawStatus = item.PaymentStatus.ToString().ToUpper();
+                    var badgeClass = "status-pending"; // Default
+
+                    if (rawStatus == "SUCCESS")
+                    {
+                        badgeClass = "status-success";
+                    }
+                    else if (rawStatus == "FAILED")
+                    {
+                        badgeClass = "status-failed";
+                    }
+
+                    <tr data-status="@rawStatus">
+
+                        <td>#POL-@item.PolicyId</td>
+
+                        <td>#PAY-@item.PaymentId</td>
+
+                        <td class="fw-bold">₹@item.PaymentAmount</td>
+
+                        <td>@item.PaymentDate.ToString("yyyy-MM-dd")</td>
+
+                        <td>
+                            <span class="badge-status @badgeClass">@rawStatus</span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        No payment records found.
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        // 1. SEARCH FUNCTIONALITY
+        document.getElementById('paymentsSearch').addEventListener('keyup', function() {
+            let searchValue = this.value.toLowerCase();
+            let tableRows = document.querySelectorAll('#paymentsTable tbody tr');
+
+            tableRows.forEach(row => {
+                let rowText = row.innerText.toLowerCase();
+                if (rowText.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // 2. FILTER BUTTON FUNCTIONALITY
+        let filterButtons = document.querySelectorAll('.payments-status-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                let statusFilter = this.getAttribute('data-status').toUpperCase();
+                let tableRows = document.querySelectorAll('#paymentsTable tbody tr');
+
+                tableRows.forEach(row => {
+                    let rowStatus = row.getAttribute('data-status'); // "SUCCESS", "PENDING", etc.
+
+                    if (statusFilter === 'ALL' || rowStatus === statusFilter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+}

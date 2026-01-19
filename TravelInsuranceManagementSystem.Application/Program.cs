@@ -1,31 +1,73 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
 using TravelInsuranceManagementSystem.Application.Data;
+using TravelInsuranceManagementSystem.Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add Distributed Memory Cache (Required for Session)
-builder.Services.AddDistributedMemoryCache();
+// 1) Register Microsoft Identity Password Hasher
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// 2. Configure Session Services
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 mins of inactivity
-    options.Cookie.HttpOnly = true;                // Security: prevents JS access to session cookie
-    options.Cookie.IsEssential = true;             // Ensures session works even if user hasn't accepted cookies
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 
-// 3. Authentication Configuration
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+// 2) Authentication Configuration (Hybrid Fix)
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    // We use a custom selector to handle both Browser (Cookie) and Postman (JWT)
+    options.DefaultScheme = "SmartAuth";
+    options.DefaultChallengeScheme = "SmartAuth";
+})
+.AddPolicyScheme("SmartAuth", "JWT or Cookie", options =>
+{
+    options.ForwardDefaultSelector = context =>
     {
-        options.LoginPath = "/Account/SignIn";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(2);
-    });
+        var authHeader = context.Request.Headers["Authorization"].ToString();
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            return JwtBearerDefaults.AuthenticationScheme;
+        }
+        return CookieAuthenticationDefaults.AuthenticationScheme;
+    };
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/Account/SignIn";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.Cookie.Name = "TravelBuddyAuthCookie";
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        // IMPORTANT: Tell JWT to map the "role" claim correctly for [Authorize(Roles="...")]
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name
+    };
+});
 
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -39,13 +81,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// 4. Session Middleware (Must be between Routing and Authentication)
 app.UseSession();
-
-// 5. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
