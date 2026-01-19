@@ -8,8 +8,13 @@ namespace TravelInsuranceManagementSystem.Application.Models
     {
         [Key] // Defines policyId as the Primary Key
         public int PolicyId { get; set; }
+        public int UserId { get; set; }
+        public User User
+        {
+            get; set;
+        }
 
-        [Required]
+            [Required]
         [StringLength(100)]
         public string DestinationCountry { get; set; }
 

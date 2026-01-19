@@ -253,13 +253,14 @@
 //        public IActionResult AccessDenied() => View();
 //    }
 //}
-
+using InsuranceClaim = TravelInsuranceManagementSystem.Application.Models.Claim;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
+
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
@@ -284,12 +285,12 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             // Verify Password using BCrypt
             if (user != null && BCrypt.Net.BCrypt.Verify(Password, user.Password))
             {
-                var claims = new List<Claim>
+                var claims = new List<System.Security.Claims.Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("UserId", user.Id.ToString())
+                    new System.Security.Claims.Claim(ClaimTypes.Name, user.FullName),
+                    new System.Security.Claims.Claim(ClaimTypes.Email, user.Email),
+                    new System.Security.Claims.Claim(ClaimTypes.Role, user.Role),
+                    new System.Security.Claims.Claim("UserId", user.Id.ToString())
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
