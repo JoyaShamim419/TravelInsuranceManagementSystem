@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelInsuranceManagementSystem.Application.Data;
 
@@ -11,9 +12,11 @@ using TravelInsuranceManagementSystem.Application.Data;
 namespace TravelInsuranceManagementSystem.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119060139_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,56 +24,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Claim", b =>
-                {
-                    b.Property<int>("ClaimId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClaimId"));
-
-                    b.Property<int>("AgentId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ClaimAmount")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.Property<DateTime>("ClaimDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocumentPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("IncidentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IncidentType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("PolicyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ClaimId");
-
-                    b.HasIndex("PolicyId");
-
-                    b.ToTable("Claims");
-                });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
                 {
@@ -104,13 +57,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("PolicyId");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PolicyId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Policies");
                 });
@@ -291,28 +237,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.HasIndex("PolicyId");
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Claim", b =>
-                {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
-                        .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Policy");
-                });
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
-                {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
