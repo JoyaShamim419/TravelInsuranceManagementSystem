@@ -96,10 +96,6 @@
             padding: 16px;
         }
 
-        .offcanvas {
-            background: var(--card-bg);
-        }
-
         .summary-line {
             display: flex;
             justify-content: space-between;
@@ -117,101 +113,105 @@
 </div>
 
 <div class="container my-5">
-    <div class="section" id="policySection">
-        <h3>Policy Details</h3>
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Trip Start</label>
-                <input type="date" class="form-control" id="TripStart" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Trip End</label>
-                <input type="date" class="form-control" id="TripEnd" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Destination</label>
-                <input type="text" class="form-control" id="Destination" placeholder="e.g., Singapore" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Plan</label>
-                <select class="form-select" id="PlanType" required>
-                    <option value="">Select Plan</option>
-                    <option value="Basic">Basic</option>
-                    <option value="Premium">Premium</option>
-                </select>
-            </div>
-        </div>
-        <div class="divider"></div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Primary Email</label>
-                <input type="email" class="form-control" id="PrimaryEmail" required />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Primary Mobile</label>
-                <input type="tel" class="form-control" id="PrimaryMobile" required />
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="d-flex align-items-center justify-content-between">
-            <h3>Family Members</h3>
-            <button type="button" class="btn btn-soft" id="addMemberBtn">+ Add Member</button>
-        </div>
-        <div id="membersContainer" class="mt-3"></div>
-    </div>
-
-    <div class="section">
-        <h3>Nominee Details</h3>
-        <div class="card-plain">
+    <form id="insuranceForm">
+        <div class="section" id="policySection">
+            <h3>Policy Details</h3>
             <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Nominee Name</label>
-                    <input type="text" class="form-control" id="NomineeName" required />
+                <div class="col-md-3">
+                    <label class="form-label">Trip Start</label>
+                    <input type="date" class="form-control" id="TripStart" required />
+                    <small class="text-muted">Start date must be today or later.</small>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Relation</label>
-                    <select class="form-select" id="NomineeRelation" required>
-                        <option value="">Select</option>
-                        <option>Spouse</option>
-                        <option>Son</option>
-                        <option>Daughter</option>
-                        <option>Parent</option>
+                <div class="col-md-3">
+                    <label class="form-label">Trip End</label>
+                    <input type="date" class="form-control" id="TripEnd" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="Destination" placeholder="e.g., Singapore" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Plan</label>
+                    <select class="form-select" id="PlanType" required>
+                        <option value="">Select Plan</option>
+                        <option value="Basic">Basic</option>
+                        <option value="Premium">Premium</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Nominee Mobile</label>
-                    <input type="tel" class="form-control" id="NomineeMobile" />
+            </div>
+            <div class="divider"></div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Primary Email ID</label>
+                    <input type="email" class="form-control" id="PrimaryEmail" placeholder="Enter correct email id (e.g. name@mail.com)" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Primary Phone Number</label>
+                    <input type="tel" class="form-control" id="PrimaryMobile" placeholder="Enter correct 10-digit phone number" pattern="[0-9]{10}" title="Please enter exactly 10 digits" required />
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="section">
-        <h3>Declarations</h3>
-        <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="IsResident" required>
-            <label class="form-check-label" for="IsResident">All travellers are residents.</label>
+        <div class="section">
+            <div class="d-flex align-items-center justify-content-between">
+                <h3>Family Members</h3>
+                <button type="button" class="btn btn-soft" id="addMemberBtn">+ Add Member</button>
+            </div>
+            <div id="membersContainer" class="mt-3"></div>
         </div>
-        <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="IsNotPEP" required>
-            <label class="form-check-label" for="IsNotPEP">We are not PEP persons.</label>
-        </div>
-    </div>
 
-    <div class="sticky-submit d-flex align-items-center justify-content-between">
-        <div>
-            <strong style="color: var(--navy)">Ready to Protect?</strong><br>
-            <small class="text-muted">Review your details before generating ID.</small>
+        <div class="section">
+            <h3>Nominee Details</h3>
+            <div class="card-plain">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nominee Full Name</label>
+                        <input type="text" class="form-control" id="NomineeName" placeholder="Enter full name" pattern="[A-Za-z\s]+" title="Names should only contain letters" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Relation</label>
+                        <select class="form-select" id="NomineeRelation" required>
+                            <option value="">Select</option>
+                            <option>Spouse</option>
+                            <option>Son</option>
+                            <option>Daughter</option>
+                            <option>Parent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nominee Phone Number</label>
+                        <input type="tel" class="form-control" id="NomineeMobile" placeholder="Nominee's phone number" pattern="[0-9]{10}" title="Please enter exactly 10 digits" />
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-navy me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#summaryOffcanvas">View Summary</button>
-            <button id="submitBtn" class="btn btn-accent px-4">Submit & Generate ID</button>
+
+        <div class="section">
+            <h3>Declarations</h3>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="IsResident" required>
+                <label class="form-check-label" for="IsResident">All travellers are residents.</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="IsNotPEP" required>
+                <label class="form-check-label" for="IsNotPEP">We are not PEP persons.</label>
+            </div>
         </div>
-    </div>
+
+        <div class="sticky-submit d-flex align-items-center justify-content-between">
+            <div>
+                <strong style="color: var(--navy)">Verify Details</strong><br>
+                <small class="text-muted">Ensure all dates and contacts are correct.</small>
+            </div>
+            <div>
+                <button class="btn btn-navy me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#summaryOffcanvas">View Summary</button>
+                <button type="submit" id="submitBtn" class="btn btn-accent px-4">Submit & Generate ID</button>
+            </div>
+        </div>
+    </form>
 </div>
 
+@* Summary Offcanvas *@
 <div class="offcanvas offcanvas-end" tabindex="-1" id="summaryOffcanvas">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title">Form Summary</h5>
@@ -224,13 +224,26 @@
 
 @section Scripts {
     <script>
-        // Updated endpoint to point to the CreateFamily action in InsuranceController
         const createEndpoint = '@Url.Action("CreateFamily", "Insurance")';
         const successEndpoint = '@Url.Action("Success", "Insurance")';
-
         const membersContainer = document.getElementById('membersContainer');
         let memberCounter = 0;
 
+        // --- DATE VALIDATION LOGIC ---
+        const today = new Date().toISOString().split('T')[0];
+        const tripStartInput = document.getElementById('TripStart');
+        const tripEndInput = document.getElementById('TripEnd');
+
+        tripStartInput.setAttribute('min', today);
+
+        tripStartInput.addEventListener('change', function() {
+            tripEndInput.setAttribute('min', this.value);
+            if (tripEndInput.value && tripEndInput.value < this.value) {
+                tripEndInput.value = this.value;
+            }
+        });
+
+        // --- MEMBER TEMPLATE ---
         const memberTemplate = (index) => `
             <div class="card-plain member-card mb-3" data-index="${index}">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -246,11 +259,11 @@
                     </div>
                     <div class="col-md-5">
                         <label class="form-label">First Name</label>
-                        <input class="form-control field-watch" name="Members[${index}].FirstName" required />
+                        <input class="form-control field-watch" name="Members[${index}].FirstName" placeholder="Enter first name" pattern="[A-Za-z]+" title="Letters only" required />
                     </div>
                     <div class="col-md-5">
                         <label class="form-label">Last Name</label>
-                        <input class="form-control field-watch" name="Members[${index}].LastName" required />
+                        <input class="form-control field-watch" name="Members[${index}].LastName" placeholder="Enter last name" pattern="[A-Za-z]+" title="Letters only" required />
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Relation</label>
@@ -260,11 +273,11 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">DOB</label>
-                        <input type="date" class="form-control field-watch" name="Members[${index}].DOB" required />
+                        <input type="date" class="form-control field-watch" name="Members[${index}].DOB" max="${today}" required />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Mobile</label>
-                        <input type="tel" class="form-control field-watch" name="Members[${index}].Mobile" required />
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control field-watch" name="Members[${index}].Mobile" placeholder="10-digit number" pattern="[0-9]{10}" required />
                     </div>
                 </div>
             </div>`;
@@ -299,16 +312,20 @@
         }
 
         function collectFormData() {
-            const getVal = id => document.getElementById(id)?.value || '';
-            const data = {
-                // FIXED: Changed 'policy' to 'policyDetails' to match updated DTO
+            const getVal = id => document.getElementById(id)?.value.trim() || '';
+
+            return {
                 policyDetails: {
-                    TripStart: getVal('TripStart'), TripEnd: getVal('TripEnd'),
-                    Destination: getVal('Destination'), PlanType: getVal('PlanType'),
-                    PrimaryEmail: getVal('PrimaryEmail'), PrimaryMobile: getVal('PrimaryMobile')
+                    TripStart: getVal('TripStart'),
+                    TripEnd: getVal('TripEnd'),
+                    Destination: getVal('Destination'),
+                    PlanType: getVal('PlanType'),
+                    PrimaryEmail: getVal('PrimaryEmail').toLowerCase(),
+                    PrimaryMobile: getVal('PrimaryMobile')
                 },
                 nominee: {
-                    NomineeName: getVal('NomineeName'), NomineeRelation: getVal('NomineeRelation'),
+                    NomineeName: getVal('NomineeName'),
+                    NomineeRelation: getVal('NomineeRelation'),
                     NomineeMobile: getVal('NomineeMobile')
                 },
                 declarations: {
@@ -319,21 +336,20 @@
                     const obj = {};
                     card.querySelectorAll('[name]').forEach(input => {
                         const key = input.getAttribute('name').split('.').pop();
-                        obj[key] = input.value;
+                        obj[key] = input.value.trim();
                     });
                     return obj;
                 })
             };
-            return data;
         }
 
         function updateSummary() {
             const data = collectFormData();
-            // Using policyDetails here as well
             const lines = [
-                `<div class="summary-line"><b>Plan</b><span>${data.policyDetails.PlanType || '-'}</span></div>`,
-                `<div class="summary-line"><b>Trip</b><span>${data.policyDetails.TripStart} to ${data.policyDetails.TripEnd}</span></div>`,
-                `<div class="summary-line"><b>Members</b><span>${data.members.length}</span></div>`
+                `<div class="summary-line"><b>ID (Email)</b><span>${data.policyDetails.PrimaryEmail || '-'}</span></div>`,
+                `<div class="summary-line"><b>Phone</b><span>${data.policyDetails.PrimaryMobile || '-'}</span></div>`,
+                `<div class="summary-line"><b>Trip Start</b><span>${data.policyDetails.TripStart || 'Not set'}</span></div>`,
+                `<div class="summary-line"><b>Trip End</b><span>${data.policyDetails.TripEnd || 'Not set'}</span></div>`
             ];
             data.members.forEach((m, i) => {
                 lines.push(`<div class="summary-line"><span>${m.FirstName || 'Member ' + (i+1)}</span><span>${m.Relation || '-'}</span></div>`);
@@ -347,7 +363,9 @@
 
         document.getElementById('addMemberBtn').addEventListener('click', addMember);
 
-        document.getElementById('submitBtn').addEventListener('click', async (e) => {
+        document.getElementById('insuranceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
             const data = collectFormData();
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
@@ -363,18 +381,16 @@
 
                 if(res.ok) {
                     const responseData = await res.json();
-                    // REDIRECT: Go to the success page with the new Policy ID
                     window.location.href = `${successEndpoint}?id=${responseData.id}`;
                 } else {
                     const errorMsg = await res.text();
-                    alert("Submission failed. Please check form details: " + errorMsg);
+                    alert("Submission failed. Please verify your contact details and dates.");
                 }
             } catch (err) {
-                alert("Error connecting to server. Please try again.");
+                alert("Connection error. Check your internet.");
             }
         });
 
-        // Initialize with one member
         addMember();
     </script>
 }

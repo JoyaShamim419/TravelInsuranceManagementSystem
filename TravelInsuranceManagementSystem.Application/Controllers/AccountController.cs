@@ -9,6 +9,7 @@ using System.Text;
 using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
 
+
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     public class AccountController : Controller
