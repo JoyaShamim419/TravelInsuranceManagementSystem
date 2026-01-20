@@ -56,10 +56,17 @@
             color: #64748b;
             text-decoration: none;
             padding: 0.8rem 1rem;
-            border-radius: 10px;
+            border-radius: 0 10px 10px 0; /* Adjusted for better look with border-left */
             margin-bottom: 5px;
             font-weight: 500;
+            border-left: 4px solid transparent; /* Added to prevent shifting */
+            transition: all 0.2s ease;
         }
+
+            .nav-link-custom:hover {
+                background: #f1f5f9;
+                color: #2563eb;
+            }
 
             .nav-link-custom.active {
                 background: #eff6ff;
@@ -103,7 +110,14 @@
             padding: 1rem;
             border-top: 1px solid #f1f5f9;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+
+            .btn-signout:hover {
+                background: #fef2f2;
+            }
 
         @@media (max-width: 992px) {
             .sidebar {
@@ -119,9 +133,22 @@
                 margin-left: 0;
             }
         }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+
+        .sidebar.show + .main-content .overlay {
+            display: block;
+        }
     </style>
 
-    @* --- FIX: Added this line to render Styles from child views --- *@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -138,13 +165,23 @@
         </a>
 
         <nav class="nav-menu">
-            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "Claims" ? "active" : "")" asp-controller="UserDashboard" asp-action="Claims">
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "Dashboard" ? "active" : "")"
+               asp-controller="UserDashboard" asp-action="Dashboard">
+                <i class="bi bi-grid-1x2"></i> <span>Dashboard</span>
+            </a>
+
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "Claims" ? "active" : "")"
+               asp-controller="UserDashboard" asp-action="Claims">
                 <i class="bi bi-file-text"></i> <span>Claims</span>
             </a>
-            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "Policies" ? "active" : "")" asp-controller="UserDashboard" asp-action="Policies">
+
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "Policies" ? "active" : "")"
+               asp-controller="UserDashboard" asp-action="Policies">
                 <i class="bi bi-shield-check"></i> <span>Policies</span>
             </a>
-            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "RaiseTicket" ? "active" : "")" asp-controller="UserDashboard" asp-action="RaiseTicket">
+
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["Action"].ToString() == "RaiseTicket" ? "active" : "")"
+               asp-controller="UserDashboard" asp-action="RaiseTicket">
                 <i class="bi bi-chat-dots"></i> <span>Raise Ticket</span>
             </a>
         </nav>
@@ -180,10 +217,14 @@
             $('#menuToggle').on('click', function () {
                 $('#sidebarMenu').toggleClass('show');
             });
+
+            // Close sidebar when clicking overlay
+            $('#sidebarOverlay').on('click', function() {
+                $('#sidebarMenu').removeClass('show');
+            });
         });
     </script>
 
-    @* --- Use await for better performance in .NET Core --- *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

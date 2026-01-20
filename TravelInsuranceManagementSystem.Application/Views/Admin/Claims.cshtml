@@ -1,14 +1,46 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Application.Controllers.ClaimViewModel>
+
+@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     //ViewData["Title"] = "Claims";
 }
+
+<style>
+    .badge-pill {
+        padding: 0.4em 0.8em;
+        border-radius: 50rem;
+        font-size: 0.75em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-open {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    /* Yellow */
+    .badge-approved {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    /* Green */
+    .badge-rejected {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    /* Red */
+    .badge-pending {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+    /* Grey/Default */
+</style>
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <h2 class="m-0">Claims</h2>
     <div class="btn-group" role="group">
         <button class="btn btn-outline-primary claims-status-btn active" data-status="All">All</button>
-        <button class="btn btn-outline-primary claims-status-btn" data-status="Open">Open</button>
-        <button class="btn btn-outline-primary claims-status-btn" data-status="Approved">Approved</button>
+        <button class="btn btn-outline-primary claims-status-btn" data-status="Pending">Pending</button> <button class="btn btn-outline-primary claims-status-btn" data-status="Approved">Approved</button>
         <button class="btn btn-outline-primary claims-status-btn" data-status="Rejected">Rejected</button>
     </div>
 </div>
@@ -38,41 +70,80 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-status="Open">
-                <td>P01842</td>
-                <td>CUS-8821</td>
-                <td>John Doe</td>
-                <td>Basic</td>
-                <td>Medical</td>
-                <td>$5,500</td>
-                <td>2023-05-10</td>
-                <td><span class="badge-pill badge-open">Open</span></td>
-                <td><span class="text-muted fst-italic">Unassigned</span></td>
-            </tr>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">No claims found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    // Logic for badges
+                    var statusClass = "badge-pending";
+                    if (item.Status == "Approved") { statusClass = "badge-approved"; }
+                    else if (item.Status == "Rejected") { statusClass = "badge-rejected"; }
+                    else if (item.Status == "Pending" || item.Status == "Open") { statusClass = "badge-open"; }
 
-            <tr data-status="Approved">
-                <td>P01037</td>
-                <td>CUS-9932</td>
-                <td>Jane Smith</td>
-                <td>Premium</td>
-                <td>Trip Cancellation</td>
-                <td>$2,200</td>
-                <td>2023-09-01</td>
-                <td><span class="badge-pill badge-approved">Approved</span></td>
-                <td>Sarah Jenkins</td>
-            </tr>
+                    // Agent Name Styling
+                    var agentDisplay = item.AgentName;
+                    var agentClass = agentDisplay == "Unassigned" ? "text-muted fst-italic" : "fw-bold text-dark";
 
-            <tr data-status="Rejected">
-                <td>P01016</td>
-                <td>CUS-7741</td>
-                <td>Michael Scott</td>
-                <td>Premium</td>
-                <td>Medical</td>
-                <td>$3,200</td>
-                <td>2024-01-17</td>
-                <td><span class="badge-pill badge-rejected">Rejected</span></td>
-                <td>Mike Ross</td>
-            </tr>
+                    <tr data-status="@item.Status">
+                        <td>P-@item.PolicyId</td>
+                        <td>CUS-@item.CustomerId</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.Plan</td>
+                        <td>@item.CoverageType</td>
+                        <td>₹@item.Amount.ToString("N0")</td>
+                        <td>@item.ClaimDate.ToString("yyyy-MM-dd")</td>
+                        <td><span class="badge-pill @statusClass">@item.Status</span></td>
+                        <td><span class="@agentClass">@agentDisplay</span></td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Filter Buttons Logic
+            const buttons = document.querySelectorAll('.claims-status-btn');
+            const tableRows = document.querySelectorAll('#claimsTable tbody tr');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update Active Button
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const status = btn.getAttribute('data-status');
+
+                    tableRows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+
+                        // Show if "All" or if status matches (Case insensitive check logic if needed)
+                        if (status === 'All' || rowStatus === status) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Simple Search Logic
+            const searchInput = document.getElementById('claimsSearch');
+            searchInput.addEventListener('keyup', function(e) {
+                const term = e.target.value.toLowerCase();
+                tableRows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+}
