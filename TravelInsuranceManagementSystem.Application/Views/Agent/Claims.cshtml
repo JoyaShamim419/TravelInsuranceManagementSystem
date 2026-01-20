@@ -1,4 +1,7 @@
-﻿@{
+﻿@using TravelInsuranceManagementSystem.Application.Models
+@model IEnumerable<TravelInsuranceManagementSystem.Application.Models.Claim>
+
+@{
     ViewData["Title"] = "Agent Claims";
     Layout = "~/Views/Shared/_AgentLayout.cshtml";
 }
@@ -19,17 +22,13 @@
             text-transform: uppercase;
         }
 
-        .badge-open {
+        /* Mapping Status to Colors */
+        .badge-pending {
             background: #fff3cd;
             color: #856404;
         }
 
-        .badge-progress {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .badge-success {
+        .badge-approved {
             background: #d4edda;
             color: #155724;
         }
@@ -39,12 +38,7 @@
             color: #721c24;
         }
 
-        .badge-closed {
-            background: #e2e8f0;
-            color: #475569;
-        }
-        /* Neutral gray for closed */
-
+        /* Plan Styles */
         .plan-premium {
             font-weight: 700;
             color: #1a73e8;
@@ -82,15 +76,15 @@
     <div class="col-md-6">
         <div class="input-group search-box shadow-sm">
             <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-            <input type="text" id="claimSearch" class="form-control border-start-0" placeholder="Search by Policy ID or Name...">
+            <input type="text" id="claimSearch" class="form-control border-start-0" placeholder="Search by Policy ID or Customer Name...">
         </div>
     </div>
     <div class="col-md-6 text-md-end">
         <div class="btn-group shadow-sm">
             <button class="btn btn-white btn-sm filter-btn active" data-status="all">All</button>
-            <button class="btn btn-white btn-sm filter-btn" data-status="open">Open</button>
+            <button class="btn btn-white btn-sm filter-btn" data-status="pending">Pending</button>
             <button class="btn btn-white btn-sm filter-btn" data-status="approved">Approved</button>
-            <button class="btn btn-white btn-sm filter-btn" data-status="closed">Closed</button>
+            <button class="btn btn-white btn-sm filter-btn" data-status="rejected">Rejected</button>
         </div>
     </div>
 </div>
@@ -111,34 +105,47 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-row-id="P01842">
-                    <td class="ps-4 fw-bold">P01842</td>
-                    <td> John Doe <br /><small class="text-muted">CUST-101</small></td>
-                    <td class="plan-basic">Basic</td>
-                    <td>Medical</td>
-                    <td class="fw-bold">₹5,500</td>
-                    <td>2023-05-10</td>
-                    <td class="status-cell"><span class="badge-status badge-open">Open</span></td>
-                    <td class="text-center">
-                        <button class="btn-action edit-status-btn" data-id="P01842">
-                            <i class="bi bi-gear-fill me-1"></i> Manage
-                        </button>
-                    </td>
-                </tr>
-                <tr data-row-id="P01037">
-                    <td class="ps-4 fw-bold">P01037</td>
-                    <td> Jane Smith <br /><small class="text-muted">CUST-102</small></td>
-                    <td class="plan-premium">Premium</td>
-                    <td>Trip Cancellation</td>
-                    <td class="fw-bold">₹2,200</td>
-                    <td>2023-09-01</td>
-                    <td class="status-cell"><span class="badge-status badge-success">Approved</span></td>
-                    <td class="text-center">
-                        <button class="btn-action edit-status-btn" data-id="P01037">
-                            <i class="bi bi-gear-fill me-1"></i> Manage
-                        </button>
-                    </td>
-                </tr>
+                @foreach (var item in Model)
+                {
+                    // Determine Badge Color
+                    var statusLower = item.Status.ToString().ToLower();
+                    var badgeClass = "badge-" + statusLower; // badge-pending, badge-approved
+
+                    // Customer Name logic
+                    var customerName = item.Policy?.User?.FullName ?? "Unknown";
+                    var customerEmail = item.Policy?.User?.Email ?? "No Email";
+
+                    // Plan Name logic (Gold/Platinum)
+                    var planName = item.Policy?.CoverageType ?? "Standard";
+                    var planClass = planName.ToLower().Contains("platinum") ? "plan-premium" : "plan-basic";
+
+                    <tr data-row-id="@item.ClaimId">
+                        <td class="ps-4 fw-bold">@item.PolicyId</td>
+
+                        <td>
+                            @customerName <br />
+                            <small class="text-muted">@customerEmail</small>
+                        </td>
+
+                        <td class="@planClass">@planName</td>
+
+                        <td>@item.IncidentType</td>
+
+                        <td class="fw-bold">₹@item.ClaimAmount.ToString("N0")</td>
+
+                        <td>@item.ClaimDate.ToString("yyyy-MM-dd")</td>
+
+                        <td class="status-cell">
+                            <span class="badge-status @badgeClass">@item.Status</span>
+                        </td>
+
+                        <td class="text-center">
+                            <button class="btn-action edit-status-btn" data-id="@item.ClaimId">
+                                <i class="bi bi-gear-fill me-1"></i> Manage
+                            </button>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
@@ -154,11 +161,13 @@
             <div class="modal-body">
                 <input type="hidden" id="targetClaimId" />
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline-info text-dark status-opt" data-status="In-Progress">In-Progress</button>
+                    <button class="btn btn-outline-warning text-dark status-opt" data-status="Pending">Mark Pending</button>
                     <button class="btn btn-outline-success text-dark status-opt" data-status="Approved">Approve</button>
                     <button class="btn btn-outline-danger text-dark status-opt" data-status="Rejected">Reject</button>
+
                     <hr class="my-1">
-                    <button class="btn btn-secondary status-opt" data-status="Closed">Close Claim</button>
+
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -170,29 +179,41 @@
         $(document).ready(function () {
             const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
 
-            // Open Modal
+            // Open Modal and store the Claim ID
             $('.edit-status-btn').on('click', function() {
                 $('#targetClaimId').val($(this).data('id'));
                 statusModal.show();
             });
 
-            // Status Update Logic
+            // Handle Status Click (Pending, Approved, Rejected)
             $('.status-opt').on('click', function() {
-                const newStatus = $(this).data('status');
+                const newStatus = $(this).data('status'); // "Approved", "Rejected", "Pending"
                 const claimId = $('#targetClaimId').val();
-                const $cell = $(`tr[data-row-id="${claimId}"] .status-cell`);
 
-                let badgeClass = "badge-open";
-                if(newStatus === "In-Progress") badgeClass = "badge-progress";
-                if(newStatus === "Approved") badgeClass = "badge-success";
-                if(newStatus === "Rejected") badgeClass = "badge-rejected";
-                if(newStatus === "Closed") badgeClass = "badge-closed";
+                // 1. Send AJAX request to Server
+                $.post('/Agent/UpdateClaimStatus', { id: claimId, status: newStatus }, function(response) {
+                    if (response.success) {
 
-                $cell.html(`<span class="badge-status ${badgeClass}">${newStatus}</span>`);
-                statusModal.hide();
+                        // 2. Update UI only if success
+                        const $cell = $(`tr[data-row-id="${claimId}"] .status-cell`);
+                        let badgeClass = "badge-pending"; // Default
+
+                        if(newStatus === "Approved") badgeClass = "badge-approved";
+                        if(newStatus === "Rejected") badgeClass = "badge-rejected";
+
+                        $cell.html(`<span class="badge-status ${badgeClass}">${newStatus}</span>`);
+
+                        // Close modal
+                        statusModal.hide();
+                    } else {
+                        alert("Error updating status: " + response.message);
+                    }
+                }).fail(function() {
+                    alert("Server error. Please try again.");
+                });
             });
 
-            // Search
+            // Search Logic
             $("#claimSearch").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
                 $("#claimsTable tbody tr").filter(function () {
@@ -200,7 +221,7 @@
                 });
             });
 
-            // Filter
+            // Filter Logic (All, Pending, Approved, Rejected)
             $(".filter-btn").click(function () {
                 $(".filter-btn").removeClass("active btn-primary").addClass("btn-white");
                 $(this).addClass("active btn-primary").removeClass("btn-white");

@@ -1,9 +1,9 @@
-﻿
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System; // Added for Enum
 using System.Linq;
 using System.Threading.Tasks;
 using TravelInsuranceManagementSystem.Application.Data;
@@ -34,6 +34,49 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return View(policies);
         }
 
+        // READ OPERATION: Fetch all claims for the Agent to review
+        public async Task<IActionResult> Claims()
+        {
+            var claims = await _context.Claims
+                .Include(c => c.Policy)
+                .ThenInclude(p => p.User) // 👈 FETCH CUSTOMER DETAILS (For Name/Email)
+                .OrderByDescending(c => c.ClaimDate)
+                .ToListAsync();
+
+            return View(claims);
+        }
+
+        // UPDATE OPERATION: AJAX endpoint to update CLAIM status
+        [HttpPost]
+        public async Task<IActionResult> UpdateClaimStatus(int id, string status)
+        {
+            var claim = await _context.Claims.FindAsync(id);
+            if (claim == null) return Json(new { success = false, message = "Claim not found" });
+
+            // 1. Get the Logged-in Agent's ID
+            var agentIdString = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(agentIdString))
+            {
+                return Json(new { success = false, message = "Session expired. Please re-login." });
+            }
+            int agentId = int.Parse(agentIdString);
+
+            // 2. Parse Status and Update
+            if (Enum.TryParse<ClaimStatus>(status, true, out var newStatus))
+            {
+                claim.Status = newStatus;
+
+                // 👇 THIS IS THE FIX: Save the Agent's ID to the claim!
+                claim.AgentId = agentId;
+
+                _context.Update(claim);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false, message = "Invalid Status" });
+        }
+
         // READ OPERATION: Fetch all tickets from the database
         public async Task<IActionResult> SupportTickets()
         {
@@ -54,7 +97,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             return View(payments);
         }
 
-        // UPDATE OPERATION: AJAX endpoint to update status
+        // UPDATE OPERATION: AJAX endpoint to update TICKET status
         [HttpPost]
         public async Task<IActionResult> UpdateTicketStatus(int id, string status)
         {

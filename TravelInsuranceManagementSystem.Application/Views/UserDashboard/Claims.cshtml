@@ -25,7 +25,7 @@
             overflow: hidden;
         }
 
-        /* Dynamic Search Box Styling */
+        /* Search & Filter Styling */
         .search-wrapper {
             position: relative;
             max-width: 400px;
@@ -210,17 +210,16 @@
                     {
                         @foreach (var item in Model)
                         {
-                            // Convert Enum to Lowercase for CSS (e.g., "Pending" -> "pending")
                             var statusLower = item.Status.ToString().ToLower();
 
                             <tr>
                                 <td class="fw-bold">CLM-@item.ClaimId</td>
 
-                                <td class="text-muted">
-                                    @item.PolicyId
-                                </td>
+                                <td class="text-muted">@item.PolicyId</td>
 
-                                <td>Standard Plan</td>
+                                <td class="fw-bold text-primary">
+                                    @(item.Policy != null ? item.Policy.CoverageType : "N/A")
+                                </td>
 
                                 <td>@item.IncidentType</td>
 
@@ -229,9 +228,7 @@
                                 <td>@item.ClaimDate.ToString("yyyy-MM-dd")</td>
 
                                 <td class="text-center">
-                                    <span class="status status-@statusLower">
-                                        @item.Status
-                                    </span>
+                                    <span class="status status-@statusLower">@item.Status</span>
                                 </td>
 
                                 <td>
