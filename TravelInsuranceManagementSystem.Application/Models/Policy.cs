@@ -57,6 +57,10 @@ namespace TravelInsuranceManagementSystem.Application.Models
 
         // Foreign Key to Policy
         public int PolicyId { get; set; }
+
         public Policy Policy { get; set; }
+
+
+        
     }
 }
