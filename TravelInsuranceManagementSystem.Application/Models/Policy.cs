@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; // Added for List<>
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,7 +16,7 @@ namespace TravelInsuranceManagementSystem.Application.Models
 
         [Required]
         [StringLength(100)]
-        public string DestinationCountry { get; set; }
+        public string DestinationCountry { get; set; } = string.Empty; // Initialize to empty string
 
         [Required]
         public DateTime TravelStartDate { get; set; }
@@ -28,7 +28,7 @@ namespace TravelInsuranceManagementSystem.Application.Models
         public decimal CoverageAmount { get; set; }
 
         [StringLength(100)]
-        public string CoverageType { get; set; }
+        public string CoverageType { get; set; } = string.Empty; // Initialize to empty string
 
         [Required]
         public PolicyStatus PolicyStatus { get; set; }
@@ -48,15 +48,18 @@ namespace TravelInsuranceManagementSystem.Application.Models
     {
         [Key]
         public int MemberId { get; set; }
-        public string Title { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Relation { get; set; }
+
+        public string Title { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Relation { get; set; } = string.Empty;
         public DateTime DOB { get; set; }
         public string Mobile { get; set; }
 
         // Foreign Key to Policy
         public int PolicyId { get; set; }
-        public Policy Policy { get; set; }
+
+        // Use 'null!' to ignore warning, as EF Core handles the relationship
+        public  Policy Policy { get; set; } ;
     }
 }
