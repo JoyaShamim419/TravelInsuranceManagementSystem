@@ -12,24 +12,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Policies",
-                columns: table => new
-                {
-                    PolicyId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DestinationCountry = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    TravelStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TravelEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CoverageAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CoverageType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PolicyStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Policies", x => x.PolicyId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SupportTickets",
                 columns: table => new
                 {
@@ -60,6 +42,84 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TicketDetails",
+                columns: table => new
+                {
+                    DetailId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketId = table.Column<int>(type: "int", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RelatedId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactDetail = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketDetails", x => x.DetailId);
+                    table.ForeignKey(
+                        name: "FK_TicketDetails_SupportTickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "SupportTickets",
+                        principalColumn: "TicketId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Policies",
+                columns: table => new
+                {
+                    PolicyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DestinationCountry = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    TravelStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TravelEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CoverageAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CoverageType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PolicyStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Policies", x => x.PolicyId);
+                    table.ForeignKey(
+                        name: "FK_Policies_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Claims",
+                columns: table => new
+                {
+                    ClaimId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PolicyId = table.Column<int>(type: "int", nullable: false),
+                    IncidentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IncidentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClaimAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    ClaimDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AgentId = table.Column<int>(type: "int", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    DocumentPath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Claims", x => x.ClaimId);
+                    table.ForeignKey(
+                        name: "FK_Claims_Policies_PolicyId",
+                        column: x => x.PolicyId,
+                        principalTable: "Policies",
+                        principalColumn: "PolicyId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,35 +175,20 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         principalColumn: "MemberId");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "TicketDetails",
-                columns: table => new
-                {
-                    DetailId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketId = table.Column<int>(type: "int", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RelatedId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactDetail = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TicketDetails", x => x.DetailId);
-                    table.ForeignKey(
-                        name: "FK_TicketDetails_SupportTickets_TicketId",
-                        column: x => x.TicketId,
-                        principalTable: "SupportTickets",
-                        principalColumn: "TicketId",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Claims_PolicyId",
+                table: "Claims",
+                column: "PolicyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_PolicyId",
                 table: "Payments",
                 column: "PolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Policies_UserId",
+                table: "Policies",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PolicyMember_PolicyId",
@@ -166,6 +211,9 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Claims");
+
+            migrationBuilder.DropTable(
                 name: "Payments");
 
             migrationBuilder.DropTable(
@@ -175,13 +223,13 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 name: "TicketDetails");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Policies");
 
             migrationBuilder.DropTable(
                 name: "SupportTickets");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

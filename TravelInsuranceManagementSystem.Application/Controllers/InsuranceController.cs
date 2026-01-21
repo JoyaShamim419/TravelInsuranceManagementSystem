@@ -14,25 +14,18 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             _context = context;
         }
 
-        // 1. GET: Show the Form
         [HttpGet]
-        public IActionResult FamilyInsurance()
-        {
-            return View();
-        }
+        public IActionResult FamilyInsurance() => View();
 
-        // 2. POST: Create (Save the data)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFamily([FromBody] FamilyInsuranceDto data)
         {
-            // Changed data.Policy to data.PolicyDetails to resolve the Ambiguity error
             if (data == null || data.PolicyDetails == null)
                 return BadRequest("No data received.");
 
             try
             {
-                // MAP DTO TO YOUR DATABASE ENTITY (Policy + Members)
                 var newPolicy = new Policy
                 {
                     DestinationCountry = data.PolicyDetails.Destination,
@@ -41,10 +34,10 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                     CoverageType = data.PolicyDetails.PlanType,
                     PolicyStatus = PolicyStatus.ACTIVE,
 
-                    // Logic to set coverage amount based on plan
+                    // KEPT: Your original coverage logic
                     CoverageAmount = data.PolicyDetails.PlanType == "Premium" ? 50000 : 10000,
 
-                    // Map the list of members from the DTO to the Database Entity (PolicyMember)
+                    // KEPT: Your member mapping logic
                     Members = data.Members.Select(m => new PolicyMember
                     {
                         Title = m.Title,
@@ -59,21 +52,19 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 _context.Policies.Add(newPolicy);
                 await _context.SaveChangesAsync();
 
-                // Return the generated database ID so JS can redirect to Success page
                 return Ok(new { message = "Policy generated successfully!", id = newPolicy.PolicyId });
             }
             catch (Exception ex)
             {
-                // Log the error (optional) and return failure
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                // IMPROVED: Now tells you exactly which database field failed
+                var innerMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return StatusCode(500, "Internal server error: " + innerMsg);
             }
         }
 
-        // 3. GET: Success Page (Redirect destination)
         [HttpGet]
         public IActionResult Success(int id)
         {
-            // Formats the ID as P-00001, P-00002, etc.
             ViewBag.PolicyDisplayId = "P-" + id.ToString("D5");
             return View();
         }

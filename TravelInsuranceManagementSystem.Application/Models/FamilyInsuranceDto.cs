@@ -13,7 +13,6 @@ namespace TravelInsuranceManagementSystem.Application.Models
 
     public class PolicyDto
     {
-        // Ensure these match EXACTLY what is used in the Controller
         public DateTime TripStart { get; set; }
         public DateTime TripEnd { get; set; }
         public string Destination { get; set; }
