@@ -12,8 +12,8 @@ using TravelInsuranceManagementSystem.Application.Data;
 namespace TravelInsuranceManagementSystem.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260119094805_init")]
-    partial class init
+    [Migration("20260120050714_FixPolicyUserId")]
+    partial class FixPolicyUserId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,7 +106,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.Property<DateTime>("TravelStartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("PolicyId");
@@ -142,9 +142,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.Property<int>("PolicyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PolicyMemberMemberId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Relation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -156,8 +153,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     b.HasKey("MemberId");
 
                     b.HasIndex("PolicyId");
-
-                    b.HasIndex("PolicyMemberMemberId");
 
                     b.ToTable("PolicyMember");
                 });
@@ -309,9 +304,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 {
                     b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -323,10 +316,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         .HasForeignKey("PolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.PolicyMember", null)
-                        .WithMany("Members")
-                        .HasForeignKey("PolicyMemberMemberId");
 
                     b.Navigation("Policy");
                 });
@@ -354,11 +343,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
-                {
-                    b.Navigation("Members");
-                });
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
                 {
                     b.Navigation("Members");
                 });

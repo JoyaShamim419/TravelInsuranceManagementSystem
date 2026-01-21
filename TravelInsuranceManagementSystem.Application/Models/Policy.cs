@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,15 +7,14 @@ namespace TravelInsuranceManagementSystem.Application.Models
 {
     public class Policy
     {
-        [Key] // Defines policyId as the Primary Key
+        [Key]
         public int PolicyId { get; set; }
-        public int UserId { get; set; }
-        public User User
-        {
-            get; set;
-        }
 
-            [Required]
+        // Made nullable so it doesn't fail if User session is empty
+        public int? UserId { get; set; }
+        public User? User { get; set; }
+
+        [Required]
         [StringLength(100)]
         public string DestinationCountry { get; set; }
 
@@ -24,7 +24,7 @@ namespace TravelInsuranceManagementSystem.Application.Models
         [Required]
         public DateTime TravelEndDate { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")] // Matches your decimal(10,2) requirement
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal CoverageAmount { get; set; }
 
         [StringLength(100)]
@@ -32,16 +32,18 @@ namespace TravelInsuranceManagementSystem.Application.Models
 
         [Required]
         public PolicyStatus PolicyStatus { get; set; }
-        public List<PolicyMember> Members { get; internal set; }
+
+        // Changed to public set to allow EF to track the collection properly
+        public List<PolicyMember> Members { get; set; } = new List<PolicyMember>();
     }
 
-    // Enum to handle the specific status options
     public enum PolicyStatus
     {
         ACTIVE,
         EXPIRED,
         CANCELLED
     }
+
     public class PolicyMember
     {
         [Key]
@@ -52,8 +54,6 @@ namespace TravelInsuranceManagementSystem.Application.Models
         public string Relation { get; set; }
         public DateTime DOB { get; set; }
         public string Mobile { get; set; }
-        public List<PolicyMember> Members { get; set; } = new List<PolicyMember>();
-
 
         // Foreign Key to Policy
         public int PolicyId { get; set; }
