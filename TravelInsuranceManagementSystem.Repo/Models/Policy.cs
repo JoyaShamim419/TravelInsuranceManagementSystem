@@ -60,6 +60,6 @@ namespace TravelInsuranceManagementSystem.Application.Models
         public int PolicyId { get; set; }
 
         // Use 'null!' to ignore warning, as EF Core handles the relationship
-        public  Policy Policy { get; set; } ;
+        public  Policy Policy { get; set; } 
     }
 }

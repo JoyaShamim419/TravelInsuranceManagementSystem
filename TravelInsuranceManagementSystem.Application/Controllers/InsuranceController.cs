@@ -1,19 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TravelInsuranceManagementSystem.Application.Data;
 using TravelInsuranceManagementSystem.Application.Models;
-
+using TravelInsuranceManagementSystem.Services.Interfaces;
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     public class InsuranceController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPolicyService _policyService;
 
-        public InsuranceController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
+        public InsuranceController(IPolicyService policyService) { _policyService = policyService; }
         [HttpGet]
         public IActionResult FamilyInsurance() => View();
 
@@ -25,38 +19,15 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 return BadRequest("No data received.");
 
             try
-            {
-                var newPolicy = new Policy
-                {
-                    DestinationCountry = data.PolicyDetails.Destination,
-                    TravelStartDate = data.PolicyDetails.TripStart,
-                    TravelEndDate = data.PolicyDetails.TripEnd,
-                    CoverageType = data.PolicyDetails.PlanType,
-                    PolicyStatus = PolicyStatus.ACTIVE,
+            {                // Get User ID from Claimsvar userIdString = User.FindFirst("UserId")?.Value;
+                //int userId = string.IsNullOrEmpty(userIdString) ? 0 : int.Parse(userIdString);
+                var userIdClaim = User.FindFirst("UserId")?.Value; string userIdString = userIdClaim ?? "0"; int userId = int.Parse(userIdString);
+                int policyId = await _policyService.CreateFamilyPolicyAsync(data, userId);
 
-                    // KEPT: Your original coverage logic
-                    CoverageAmount = data.PolicyDetails.PlanType == "Premium" ? 50000 : 10000,
-
-                    // KEPT: Your member mapping logic
-                    Members = data.Members.Select(m => new PolicyMember
-                    {
-                        Title = m.Title,
-                        FirstName = m.FirstName,
-                        LastName = m.LastName,
-                        Relation = m.Relation,
-                        DOB = m.DOB,
-                        Mobile = m.Mobile
-                    }).ToList()
-                };
-
-                _context.Policies.Add(newPolicy);
-                await _context.SaveChangesAsync();
-
-                return Ok(new { message = "Policy generated successfully!", id = newPolicy.PolicyId });
+                return Ok(new { message = "Policy generated successfully!", id = policyId });
             }
             catch (Exception ex)
             {
-                // IMPROVED: Now tells you exactly which database field failed
                 var innerMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return StatusCode(500, "Internal server error: " + innerMsg);
             }
