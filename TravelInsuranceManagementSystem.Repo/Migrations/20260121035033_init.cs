@@ -75,7 +75,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 {
                     PolicyId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
                     DestinationCountry = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     TravelStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TravelEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -90,8 +90,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         name: "FK_Policies_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -156,8 +155,7 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                     Relation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DOB = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Mobile = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PolicyId = table.Column<int>(type: "int", nullable: false),
-                    PolicyMemberMemberId = table.Column<int>(type: "int", nullable: true)
+                    PolicyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,11 +166,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                         principalTable: "Policies",
                         principalColumn: "PolicyId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PolicyMember_PolicyMember_PolicyMemberMemberId",
-                        column: x => x.PolicyMemberMemberId,
-                        principalTable: "PolicyMember",
-                        principalColumn: "MemberId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -194,11 +187,6 @@ namespace TravelInsuranceManagementSystem.Application.Migrations
                 name: "IX_PolicyMember_PolicyId",
                 table: "PolicyMember",
                 column: "PolicyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PolicyMember_PolicyMemberMemberId",
-                table: "PolicyMember",
-                column: "PolicyMemberMemberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TicketDetails_TicketId",
