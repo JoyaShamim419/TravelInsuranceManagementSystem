@@ -1,147 +1,44 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
-using Microsoft.Extensions.Configuration;
-
-using Microsoft.IdentityModel.Tokens;
-
-using System.IdentityModel.Tokens.Jwt;
-
-using System.Security.Claims; // For ClaimTypes
-
-using System.Text;
-
 using TravelInsuranceManagementSystem.Application.Models;
-
-using TravelInsuranceManagementSystem.Repo.Interfaces;
-
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Services.Implementation
-
 {
-
     public class AccountService : IAccountService
-
     {
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        private readonly IUserRepository _userRepo;
-
-        private readonly IPasswordHasher<User> _passwordHasher;
-
-        private readonly IConfiguration _config;
-
-        public AccountService(IUserRepository userRepo, IPasswordHasher<User> passwordHasher, IConfiguration config)
-
+        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-
-            _userRepo = userRepo;
-
-            _passwordHasher = passwordHasher;
-
-            _config = config;
-
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        public User Authenticate(string email, string password)
-
+        public async Task<SignInResult> Authenticate(string email, string password)
         {
-
-            var user = _userRepo.GetByEmail(email);
-
-            if (user == null) return null;
-
-            var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
-
-            return result == PasswordVerificationResult.Success ? user : null;
-
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return SignInResult.Failed;
+            return await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
         }
 
-        public string GenerateJwtToken(User user)
-
+        public async Task<IdentityResult> RegisterUser(User user, string password)
         {
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
-
-            // FIXED: Using Full Namespace path to avoid ambiguity with the 'Claim' Model
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-
-            {
-
-                Subject = new ClaimsIdentity(new[]
-
-                {
-
-                    new System.Security.Claims.Claim(ClaimTypes.Name, user.FullName),
-
-                    new System.Security.Claims.Claim(ClaimTypes.Email, user.Email),
-
-                    new System.Security.Claims.Claim(ClaimTypes.Role, user.Role),
-
-                    new System.Security.Claims.Claim("UserId", user.Id.ToString())
-
-                }),
-
-                Expires = DateTime.UtcNow.AddHours(2),
-
-                Issuer = _config["Jwt:Issuer"],
-
-                Audience = _config["Jwt:Audience"],
-
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(token);
-
-        }
-
-        public bool RegisterUser(User user)
-
-        {
-
-            if (_userRepo.Exists(user.Email)) return false;
-
             if (user.Email.ToLower().Contains("@admin")) user.Role = "Admin";
-
             else if (user.Email.ToLower().Contains("@agent")) user.Role = "Agent";
-
             else user.Role = "User";
 
-            user.Password = _passwordHasher.HashPassword(user, user.Password);
-
-            _userRepo.Add(user);
-
-            _userRepo.Save();
-
-            return true;
-
+            user.UserName = user.Email;
+            return await _userManager.CreateAsync(user, password);
         }
 
-        public bool ResetPassword(string email, string newPassword)
+        public async Task<User> GetUserByEmail(string email) => await _userManager.FindByEmailAsync(email);
 
+        public async Task<string> GeneratePasswordResetToken(User user) => await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        public async Task<IdentityResult> ResetPassword(User user, string token, string newPassword)
         {
-
-            var user = _userRepo.GetByEmail(email);
-
-            if (user == null) return false;
-
-            user.Password = _passwordHasher.HashPassword(user, newPassword);
-
-            _userRepo.Update(user);
-
-            _userRepo.Save();
-
-            return true;
-
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
-
-        public User GetUserByEmail(string email) => _userRepo.GetByEmail(email);
-
     }
-
 }

@@ -1,223 +1,143 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-using Microsoft.AspNetCore.Authentication;
-
-using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Microsoft.AspNetCore.Identity;
+using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Services.Interfaces;
 using System.Security.Claims;
 
-using TravelInsuranceManagementSystem.Models; // Adjust to your Model namespace
-
-using TravelInsuranceManagementSystem.Services.Interfaces;
-
 namespace TravelInsuranceManagementSystem.Application.Controllers
-
 {
-
     public class AccountController : Controller
-
     {
-
         private readonly IAccountService _accountService;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
 
-        public AccountController(IAccountService accountService)
-
+        public AccountController(IAccountService accountService, SignInManager<User> signInManager, UserManager<User> userManager)
         {
-
             _accountService = accountService;
-
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpGet]
-
         public IActionResult SignIn() => View("~/Views/Home/SignIn.cshtml");
 
         [HttpPost]
-
         public async Task<IActionResult> SignIn(string Email, string Password)
-
         {
-
-            var user = _accountService.Authenticate(Email, Password);
+            // 1. Fetch user to verify they exist and get their custom Role property
+            var user = await _accountService.GetUserByEmail(Email);
 
             if (user != null)
-
             {
+                // 2. Initial password check
+                var result = await _signInManager.PasswordSignInAsync(user, Password, isPersistent: false, lockoutOnFailure: false);
 
-                // 1. Generate JWT for Session/API
-
-                var token = _accountService.GenerateJwtToken(user);
-
-                // 2. Prepare Claims
-
-                var authClaims = new List<Claim>
-
+                if (result.Succeeded)
                 {
+                    // 3. FIX: Use fully qualified name 'System.Security.Claims.Claim' 
+                    // This resolves the error where it confuses your Model 'Claim' with Security 'Claim'
+                    var claims = new List<System.Security.Claims.Claim>
+                    {
+                        new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role),
+                        new System.Security.Claims.Claim("UserId", user.Id.ToString()),
+                        new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Email)
+                    };
 
-                    new Claim(ClaimTypes.Name, user.FullName),
+                    // 4. Sign in again with the specific Role and UserId claims attached
+                    await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claims);
 
-                    new Claim(ClaimTypes.Email, user.Email),
-
-                    new Claim(ClaimTypes.Role, user.Role),
-
-                    new Claim("UserId", user.Id.ToString())
-
-                };
-
-                // 3. Handle JSON/API Requests
-
-                if (Request.Headers["Accept"].ToString().Contains("application/json"))
-
-                {
-
-                    return Ok(new { token = token, user = user.FullName, role = user.Role });
-
+                    // 5. Redirect based on the role found in DB
+                    return user.Role switch
+                    {
+                        "Admin" => RedirectToAction("Dashboard", "Admin"),
+                        "Agent" => RedirectToAction("Dashboard", "Agent"),
+                        _ => RedirectToAction("Dashboard", "UserDashboard")
+                    };
                 }
-
-                // 4. Handle Cookie Authentication
-
-                var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-                // 5. Store Token in Session
-
-                HttpContext.Session.SetString("JWToken", token);
-
-                // 6. Role-based Redirection
-
-                return user.Role switch
-
-                {
-
-                    "Admin" => RedirectToAction("Dashboard", "Admin"),
-
-                    "Agent" => RedirectToAction("Dashboard", "Agent"),
-
-                    _ => RedirectToAction("Dashboard", "UserDashboard")
-
-                };
-
             }
 
-            // Handle Unauthorized for JSON
-
-            if (Request.Headers["Accept"].ToString().Contains("application/json"))
-
-                return Unauthorized(new { message = "Invalid email or password" });
-
             TempData["ErrorMessage"] = "Invalid email or password!";
-
             return View("~/Views/Home/SignIn.cshtml");
-
         }
 
         [HttpPost]
-
-        public IActionResult SignUp(Models.User user)
-
+        public async Task<IActionResult> SignUp(User user)
         {
-
-            bool isRegistered = _accountService.RegisterUser(user);
-
-            if (isRegistered)
-
+            // RegisterUser handles hashing the password via Identity UserManager
+            var result = await _accountService.RegisterUser(user, user.Password);
+            if (result.Succeeded)
             {
-
+                TempData["SuccessMessage"] = "Registration successful! Please sign in.";
                 return RedirectToAction("SignIn");
-
             }
 
-            TempData["ErrorMessage"] = "This email is already registered!";
-
+            // Combine errors into a single string for the view
+            TempData["ErrorMessage"] = string.Join(" ", result.Errors.Select(e => e.Description));
             return View("~/Views/Home/SignIn.cshtml");
+        }
 
+        // FIX: This method prevents the 404 error when a user is unauthorized
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         [HttpGet]
-
         public IActionResult ForgotPassword() => View();
 
         [HttpPost]
-
-        public IActionResult ForgotPassword(string email)
-
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-
-            var user = _accountService.GetUserByEmail(email);
-
+            var user = await _accountService.GetUserByEmail(email);
             if (user == null)
-
             {
-
                 ViewBag.Error = "Email address not found.";
-
                 return View();
-
             }
 
-            return RedirectToAction("ResetPassword", new { email = email });
-
+            var token = await _accountService.GeneratePasswordResetToken(user);
+            return RedirectToAction("ResetPassword", new { email = email, token = token });
         }
 
         [HttpGet]
-
-        public IActionResult ResetPassword(string email)
-
+        public IActionResult ResetPassword(string email, string token)
         {
-
             ViewBag.Email = email;
-
+            ViewBag.Token = token;
             return View();
-
         }
 
         [HttpPost]
-
-        public IActionResult ResetPassword(string email, string newPassword, string confirmPassword)
-
+        public async Task<IActionResult> ResetPassword(string email, string token, string newPassword, string confirmPassword)
         {
-
             if (newPassword != confirmPassword)
-
             {
-
                 ViewBag.Error = "Passwords do not match.";
-
                 ViewBag.Email = email;
-
+                ViewBag.Token = token;
                 return View();
-
             }
 
-            bool success = _accountService.ResetPassword(email, newPassword);
-
-            if (success)
-
+            var user = await _accountService.GetUserByEmail(email);
+            if (user != null)
             {
-
-                TempData["SuccessMessage"] = "Password reset successfully!";
-
-                return RedirectToAction("SignIn");
-
+                var result = await _accountService.ResetPassword(user, token, newPassword);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Password reset successfully!";
+                    return RedirectToAction("SignIn");
+                }
+                ViewBag.Error = string.Join(" ", result.Errors.Select(e => e.Description));
             }
-
-            return BadRequest();
-
+            return View();
         }
 
         public async Task<IActionResult> Logout()
-
         {
-
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            HttpContext.Session.Clear();
-
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
-
         }
-
     }
-
 }
