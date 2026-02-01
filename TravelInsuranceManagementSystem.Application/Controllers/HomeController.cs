@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Repo.Models;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {

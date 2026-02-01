@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TravelInsuranceManagementSystem.Application.Data;
+using TravelInsuranceManagementSystem.Repo.Data;
 
 #nullable disable
 
 namespace TravelInsuranceManagementSystem.Repo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260129164025_IdentitySetup")]
-    partial class IdentitySetup
+    [Migration("20260201071538_AddAgentLogic")]
+    partial class AddAgentLogic
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,7 +158,34 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Claim", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<decimal>("PaymentAmount")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PolicyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("PolicyId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.Claim", b =>
                 {
                     b.Property<int>("ClaimId")
                         .ValueGeneratedOnAdd()
@@ -208,7 +235,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("Claims");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.Policy", b =>
                 {
                     b.Property<int>("PolicyId")
                         .ValueGeneratedOnAdd()
@@ -249,7 +276,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("Policies");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.PolicyMember", b =>
                 {
                     b.Property<int>("MemberId")
                         .ValueGeneratedOnAdd()
@@ -290,7 +317,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("PolicyMember");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.SupportTicket", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.SupportTicket", b =>
                 {
                     b.Property<int>("TicketId")
                         .ValueGeneratedOnAdd()
@@ -322,7 +349,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("SupportTickets");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.TicketDetail", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.TicketDetail", b =>
                 {
                     b.Property<int>("DetailId")
                         .ValueGeneratedOnAdd()
@@ -365,7 +392,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("TicketDetails");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.User", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -441,33 +468,6 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Models.Payment", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
-
-                    b.Property<decimal>("PaymentAmount")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PaymentStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PolicyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("PolicyId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -479,7 +479,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", null)
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -488,7 +488,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", null)
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -503,7 +503,7 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", null)
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -512,16 +512,16 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", null)
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Claim", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Models.Payment", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.Policy", "Policy")
                         .WithMany()
                         .HasForeignKey("PolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -530,18 +530,29 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.Navigation("Policy");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.Claim", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.User", "User")
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.Policy", "Policy")
+                        .WithMany()
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Policy");
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.Policy", b =>
+                {
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.PolicyMember", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.PolicyMember", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.Policy", "Policy")
                         .WithMany("Members")
                         .HasForeignKey("PolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -550,34 +561,23 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                     b.Navigation("Policy");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.TicketDetail", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.TicketDetail", b =>
                 {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.SupportTicket", "SupportTicket")
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.SupportTicket", "SupportTicket")
                         .WithOne("ExtensionData")
-                        .HasForeignKey("TravelInsuranceManagementSystem.Application.Models.TicketDetail", "TicketId")
+                        .HasForeignKey("TravelInsuranceManagementSystem.Repo.Models.TicketDetail", "TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("SupportTicket");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Models.Payment", b =>
-                {
-                    b.HasOne("TravelInsuranceManagementSystem.Application.Models.Policy", "Policy")
-                        .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Policy");
-                });
-
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.Policy", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.Policy", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("TravelInsuranceManagementSystem.Application.Models.SupportTicket", b =>
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.SupportTicket", b =>
                 {
                     b.Navigation("ExtensionData")
                         .IsRequired();

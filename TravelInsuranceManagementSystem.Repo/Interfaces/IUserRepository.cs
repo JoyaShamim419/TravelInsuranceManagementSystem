@@ -1,4 +1,4 @@
-﻿using TravelInsuranceManagementSystem.Application.Models; // Ensure this points to where your models moved
+﻿using TravelInsuranceManagementSystem.Repo.Models; // Ensure this points to where your models moved
  
 namespace TravelInsuranceManagementSystem.Repo.Interfaces
 {

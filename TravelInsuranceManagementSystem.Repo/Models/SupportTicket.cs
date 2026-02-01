@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TravelInsuranceManagementSystem.Application.Models; // Add this if needed
+using TravelInsuranceManagementSystem.Repo.Models; // Add this if needed
 
-namespace TravelInsuranceManagementSystem.Application.Models
+namespace TravelInsuranceManagementSystem.Repo.Models
 {
     public class SupportTicket
     {

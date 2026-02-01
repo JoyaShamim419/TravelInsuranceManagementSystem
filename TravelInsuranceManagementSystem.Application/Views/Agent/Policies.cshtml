@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TravelInsuranceManagementSystem.Application.Models.Policy>
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.Policy>
 
 @{
     ViewData["Title"] = "Agent Policies";
@@ -139,9 +139,9 @@
                                     // Handle logic for Status Badge styling
                                     var statusClass = item.PolicyStatus switch
                                     {
-                                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.ACTIVE => "status-active",
-                                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.EXPIRED => "status-expired",
-                                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.CANCELLED => "status-cancelled",
+                                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.ACTIVE => "status-active",
+                                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.EXPIRED => "status-expired",
+                                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.CANCELLED => "status-cancelled",
                                         _ => "status-expired"
                                     };
                                 }
@@ -153,17 +153,17 @@
                                     var paymentClass = "pill-pending";
                                     var paymentText = "Pending";
 
-                                    if (item.PolicyStatus == TravelInsuranceManagementSystem.Application.Models.PolicyStatus.ACTIVE)
+                                    if (item.PolicyStatus == TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.ACTIVE)
                                     {
                                         paymentClass = "pill-paid";
                                         paymentText = "Paid";
                                     }
-                                    else if (item.PolicyStatus == TravelInsuranceManagementSystem.Application.Models.PolicyStatus.CANCELLED)
+                                    else if (item.PolicyStatus == TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.CANCELLED)
                                     {
                                         paymentClass = "pill-overdue";
                                         paymentText = "Refunded";
                                     }
-                                    else if (item.PolicyStatus == TravelInsuranceManagementSystem.Application.Models.PolicyStatus.EXPIRED)
+                                    else if (item.PolicyStatus == TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.EXPIRED)
                                     {
                                         paymentClass = "pill-overdue";
                                         paymentText = "Closed";

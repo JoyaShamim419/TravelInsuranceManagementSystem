@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TravelInsuranceManagementSystem.Application.Models.Policy>
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.Policy>
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -46,9 +46,9 @@
 
                     var statusBadge = item.PolicyStatus switch
                     {
-                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.ACTIVE => "bg-success",
-                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.EXPIRED => "bg-secondary",
-                        TravelInsuranceManagementSystem.Application.Models.PolicyStatus.CANCELLED => "bg-danger",
+                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.ACTIVE => "bg-success",
+                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.EXPIRED => "bg-secondary",
+                        TravelInsuranceManagementSystem.Repo.Models.PolicyStatus.CANCELLED => "bg-danger",
                         _ => "bg-info"
                     };
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TravelInsuranceManagementSystem.Application.Models
+namespace TravelInsuranceManagementSystem.Repo.Models
 {
     public class TicketDetail
     {

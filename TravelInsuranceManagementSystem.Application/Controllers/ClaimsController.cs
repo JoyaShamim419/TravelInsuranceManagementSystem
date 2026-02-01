@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-using TravelInsuranceManagementSystem.Application.Models;
-
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
-// Alias to resolve the ambiguity between your Model and System.Security.Claims
+// Alias to resolve ambiguity between Model and System.Security.Claims
 
-using InsuranceClaim = TravelInsuranceManagementSystem.Application.Models.Claim;
-
-using System.Security.Claims;
-
+using InsuranceClaim = TravelInsuranceManagementSystem.Repo.Models.Claim;
+ 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 
 {
@@ -50,7 +45,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
         {
 
-            // 1. Get Logged-in User ID from the Security Claims
+            // 1. Get Logged-in User ID
 
             var userIdString = User.FindFirst("UserId")?.Value;
 
@@ -66,7 +61,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
             string uniqueFileName = null;
 
-            // 2. Handle File Upload
+            // 2. Handle File Upload (Presentation Layer Logic)
 
             if (claim.DocumentFile != null)
 
@@ -96,9 +91,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
             }
 
-            // 3. Call Service for Business Validation and Saving
-
-            // This 'claim' is the InsuranceClaim model
+            // 3. Call Service (Passes logic down to Repo)
 
             var result = await _claimService.SubmitClaimAsync(claim, userId, uniqueFileName);
 
@@ -112,7 +105,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
             }
 
-            // 4. Handle Errors if validation fails
+            // 4. Handle Errors
 
             ModelState.AddModelError("PolicyId", result.Message);
 

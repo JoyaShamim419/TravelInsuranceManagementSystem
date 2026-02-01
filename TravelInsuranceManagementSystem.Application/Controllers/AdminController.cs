@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using TravelInsuranceManagementSystem.Application.Models;
-using TravelInsuranceManagementSystem.Services.Interfaces;
-
+using TravelInsuranceManagementSystem.Repo.Models;
+using TravelInsuranceManagementSystem.Models; // Assumed location based on Repo structureusing TravelInsuranceManagementSystem.Services.Interfaces;
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     [Authorize(Roles = "Admin")]
@@ -13,25 +12,18 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         private readonly IAdminService _adminService;
         private readonly SignInManager<User> _signInManager;
 
-        public AdminController(IAdminService adminService, SignInManager<User> signInManager)
-        {
-            _adminService = adminService;
-            _signInManager = signInManager;
-        }
-
+        public AdminController(IAdminService adminService, SignInManager<User> signInManager) { _adminService = adminService; _signInManager = signInManager; }
         public IActionResult Dashboard()
         {
             ViewData["Title"] = "Admin Dashboard";
             return View();
         }
-
         public async Task<IActionResult> Policies()
         {
             ViewData["Title"] = "Policy Management";
             var policies = await _adminService.GetPolicyManagementDataAsync();
             return View(policies);
         }
-
         public async Task<IActionResult> Payments()
         {
             ViewData["Title"] = "Payment History";
@@ -50,7 +42,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // FIX: Use Identity's SignInManager to sign out
             await _signInManager.SignOutAsync();
             HttpContext.Session.Clear();
             return RedirectToAction("SignIn", "Account");

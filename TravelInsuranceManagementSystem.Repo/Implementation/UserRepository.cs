@@ -1,5 +1,5 @@
-﻿using TravelInsuranceManagementSystem.Application.Data;
-using TravelInsuranceManagementSystem.Application.Models;
+﻿using TravelInsuranceManagementSystem.Repo.Data;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Repo.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Repo.Implementation

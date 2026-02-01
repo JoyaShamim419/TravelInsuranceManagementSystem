@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Services.Implementation

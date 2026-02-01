@@ -1,12 +1,10 @@
-﻿using TravelInsuranceManagementSystem.Application.Models;
-using TravelInsuranceManagementSystem.Models;
-
-namespace TravelInsuranceManagementSystem.Services.Interfaces
+﻿using TravelInsuranceManagementSystem.Repo.Models;
+using TravelInsuranceManagementSystem.Models; // Adjust namespace if ClaimViewModel is elsewherenamespace TravelInsuranceManagementSystem.Services.Interfaces{
+public interface IAdminService
 {
-    public interface IAdminService
-    {
-        Task<List<Policy>> GetPolicyManagementDataAsync();
-        Task<List<Payment>> GetPaymentHistoryAsync();
-        Task<List<ClaimViewModel>> GetClaimsOverviewAsync();
-    }
+    Task<List<Policy>> GetPolicyManagementDataAsync();
+    Task<List<Payment>> GetPaymentHistoryAsync();
+    Task<List<ClaimViewModel>> GetClaimsOverviewAsync();
 }
+
+ 

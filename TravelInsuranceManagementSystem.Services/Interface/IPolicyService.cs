@@ -1,4 +1,5 @@
-﻿using TravelInsuranceManagementSystem.Application.Models;
+﻿using TravelInsuranceManagementSystem.Repo.Models;
+
 namespace TravelInsuranceManagementSystem.Services.Interfaces
 {
     public interface IPolicyService

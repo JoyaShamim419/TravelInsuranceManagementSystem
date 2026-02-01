@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity; // Added this
 
-namespace TravelInsuranceManagementSystem.Application.Models
+namespace TravelInsuranceManagementSystem.Repo.Models
 {
     public class User : IdentityUser<int> // Necessary change
     {

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TravelInsuranceManagementSystem.Application.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace TravelInsuranceManagementSystem.Application.Models
+namespace TravelInsuranceManagementSystem.Repo.Models
 {
     public class Claim
     {
