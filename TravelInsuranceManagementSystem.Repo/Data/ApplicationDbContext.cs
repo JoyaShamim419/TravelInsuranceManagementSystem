@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Models;
 
-namespace TravelInsuranceManagementSystem.Application.Data
+namespace TravelInsuranceManagementSystem.Repo.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {

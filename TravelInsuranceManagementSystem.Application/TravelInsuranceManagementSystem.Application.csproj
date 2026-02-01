@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TravelInsuranceManagementSystem.Repo\TravelInsuranceManagementSystem.Repo.csproj" />
     <ProjectReference Include="..\TravelInsuranceManagementSystem.Services\TravelInsuranceManagementSystem.Services.csproj" />
   </ItemGroup>
 

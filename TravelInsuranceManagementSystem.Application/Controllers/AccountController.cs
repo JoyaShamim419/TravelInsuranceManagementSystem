@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Services.Interfaces;
-using System.Security.Claims;
+
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
@@ -52,7 +52,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                     {
                         "Admin" => RedirectToAction("Dashboard", "Admin"),
                         "Agent" => RedirectToAction("Dashboard", "Agent"),
-                        _ => RedirectToAction("Dashboard", "UserDashboard")
+                        _ => RedirectToAction("Index", "Home")
                     };
                 }
             }

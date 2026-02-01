@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TravelInsuranceManagementSystem.Application.Models;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Services.Interfaces;
+
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     public class InsuranceController : Controller
     {
         private readonly IPolicyService _policyService;
 
-        public InsuranceController(IPolicyService policyService) { _policyService = policyService; }
+        public InsuranceController(IPolicyService policyService)
+        {
+            _policyService = policyService;
+        }
+
         [HttpGet]
         public IActionResult FamilyInsurance() => View();
 
@@ -19,9 +24,12 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 return BadRequest("No data received.");
 
             try
-            {                // Get User ID from Claimsvar userIdString = User.FindFirst("UserId")?.Value;
-                //int userId = string.IsNullOrEmpty(userIdString) ? 0 : int.Parse(userIdString);
-                var userIdClaim = User.FindFirst("UserId")?.Value; string userIdString = userIdClaim ?? "0"; int userId = int.Parse(userIdString);
+            {
+                // Get User ID from Claims safely
+                var userIdString = User.FindFirst("UserId")?.Value;
+                int userId = string.IsNullOrEmpty(userIdString) ? 0 : int.Parse(userIdString);
+
+                // Call Service (which now delegates logic to Repo)
                 int policyId = await _policyService.CreateFamilyPolicyAsync(data, userId);
 
                 return Ok(new { message = "Policy generated successfully!", id = policyId });

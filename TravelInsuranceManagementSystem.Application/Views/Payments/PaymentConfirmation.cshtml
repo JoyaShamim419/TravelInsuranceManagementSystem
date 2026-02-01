@@ -1,108 +1,164 @@
-﻿@{
+﻿@model TravelInsuranceManagementSystem.Models.Payment
+
+@{
+
     Layout = "_Layout";
-    ViewData["Title"] = "Payment Success";
+
+    ViewData["Title"] = "Payment Success | Travel Buddy";
+
 }
 
 <style>
-    /* Clean, bright card style */
+
     .success-card {
         background: white;
         border-radius: 15px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         text-align: center;
-        padding: 50px 30px;
-        max-width: 550px;
+        padding: 40px;
+        max-width: 600px;
         margin: 50px auto;
-        border-top: 6px solid #28a745; /* Bright Green Top Border */
+        border-top: 6px solid #28a745;
     }
 
-    /* Big Green Checkmark Circle */
-    .icon-circle {
-        width: 90px;
-        height: 90px;
-        background: #d4edda; /* Light green background */
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 25px;
+    #receipt-content {
+        background: white;
+        padding: 20px;
+        text-align: left;
     }
 
-    /* The 'Back to Home' button matching your Navy theme */
-    .btn-home {
-        background: var(--navy, #001f3d);
-        color: white;
-        padding: 15px 40px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.1rem;
-        display: inline-block;
-        margin-top: 30px;
-        transition: background 0.3s;
+    .pdf-header {
+        display: none;
+        text-align: center;
+        border-bottom: 2px solid #001f3d;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
     }
 
-        .btn-home:hover {
-            background: #003366;
-            color: white;
-        }
-
-    /* Table-like rows for clear reading */
     .details-row {
         display: flex;
         justify-content: space-between;
-        padding: 15px 0;
-        border-bottom: 1px solid #eee;
-        font-size: 1.1rem; /* Bigger text */
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
     }
 
     .label-text {
         font-weight: 600;
-        color: #001f3d; /* Navy Color - Clear to read */
+        color: #666;
     }
 
     .value-text {
+        font-weight: 700;
+        color: #000;
+    }
+
+    .btn-download {
+        background: #ed985f;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
         font-weight: bold;
-        color: #000; /* Pure Black */
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-dashboard {
+        display: block;
+        margin-top: 15px;
+        color: #001f3d;
+        text-decoration: none;
+        font-weight: bold;
     }
 </style>
 
 <div class="container">
     <div class="success-card">
-        <div class="icon-circle">
-            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 6L9 17l-5-5"></path>
-            </svg>
+        <div class="mb-3">
+            <i class="fas fa-check-circle fa-4x text-success"></i>
         </div>
+        <h2 style="color: #001f3d; font-weight: 800;">Success!</h2>
+        <p class="text-muted">Your payment was processed successfully.</p>
 
-        <h1 style="color: #001f3d; font-weight: 800; margin-bottom: 15px;">Payment Successful!</h1>
-
-        <p style="font-size: 1.1rem; color: #333; margin-bottom: 30px;">
-            Your transaction has been completed. <br>
-            Your travel insurance policy is now <strong>Active</strong>.
-        </p>
-
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e9ecef;">
+        <div id="receipt-content">
+            <div class="pdf-header">
+                <h2 style="color: #001f3d;">TRAVEL BUDDY INSURANCE</h2>
+                <p style="color: #ed985f; font-weight: bold;">PAYMENT RECEIPT</p>
+            </div>
 
             <div class="details-row">
                 <span class="label-text">Transaction ID</span>
-                <span class="value-text">#PAY-@ViewContext.RouteData.Values["id"]</span>
+                <span class="value-text">#PAY-@Model.PaymentId</span>
             </div>
-
             <div class="details-row">
-                <span class="label-text">Payment Date</span>
-                <span class="value-text">@DateTime.Now.ToString("dd MMM yyyy")</span>
+                <span class="label-text">Policy ID</span>
+                <span class="value-text">#POL-@Model.PolicyId</span>
             </div>
-
-            <div class="details-row" style="border-bottom: none;">
-                <span class="label-text">Status</span>
-                <span class="badge bg-success" style="font-size: 1rem; padding: 8px 15px;">SUCCESS</span>
+            <div class="details-row">
+                <span class="label-text">Date</span>
+                <span class="value-text">@Model.PaymentDate.ToString("dd MMM yyyy, hh:mm tt")</span>
             </div>
+            <div class="details-row" style="background:#f9f9f9; padding:10px; border:none; margin-top:10px;">
+                <span class="label-text" style="color:#001f3d;">Amount Paid</span>
+                <span class="value-text" style="color:#28a745; font-size:1.2rem;">₹@Model.PaymentAmount</span>
+            </div>
+            <p id="pdf-footer" style="display:none; text-align:center; font-size:10px; margin-top:20px;">
 
+                System generated receipt for Travel Buddy Insurance.
+            </p>
         </div>
 
-        <a asp-controller="UserDashboard" asp-action="Dashboard" class="btn-home">
+        <button onclick="downloadPDF()" class="btn-download">
+            <i class="fas fa-download me-2"></i> Download Receipt (PDF)
+        </button>
+
+        <a asp-controller="UserDashboard" asp-action="Dashboard" class="btn-dashboard">
+
             Back to Dashboard
         </a>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+
+        function downloadPDF() {
+
+            const element = document.getElementById('receipt-content');
+
+            const header = document.querySelector('.pdf-header');
+
+            const footer = document.getElementById('pdf-footer');
+
+            header.style.display = 'block';
+
+            footer.style.display = 'block';
+
+            const opt = {
+
+                margin: 0.5,
+
+                filename: 'TravelBuddy_Receipt_@Model.PaymentId' + '.pdf',
+
+                image: { type: 'jpeg', quality: 0.98 },
+
+                html2canvas: { scale: 2 },
+
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+
+                header.style.display = 'none';
+
+                footer.style.display = 'none';
+
+            });
+
+        }
+    </script>
+
+}

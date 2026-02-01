@@ -55,6 +55,10 @@
             color: var(--navy);
         }
 
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
         .divider {
             border-top: 1px dashed var(--divider);
             margin: 12px 0;
@@ -149,7 +153,7 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Primary Mobile</label>
-                <input type="tel" class="form-control" id="PrimaryMobile" required />
+                <input type="tel" class="form-control" id="PrimaryMobile" placeholder="10-12 digits" required />
             </div>
         </div>
     </div>
@@ -182,7 +186,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Nominee Mobile</label>
-                    <input type="tel" class="form-control" id="NomineeMobile" />
+                    <input type="tel" class="form-control" id="NomineeMobile" required />
                 </div>
             </div>
         </div>
@@ -199,7 +203,6 @@
             <label class="form-check-label" for="IsNotPEP">We are not PEP persons.</label>
         </div>
     </div>
-
 
     <div class="sticky-submit d-flex align-items-center justify-content-between">
         <div>
@@ -225,248 +228,184 @@
 
 @section Scripts {
     <script>
+        const createEndpoint = '@Url.Action("CreateFamily", "Insurance")';
+        const successEndpoint = '@Url.Action("Success", "Insurance")';
+        const membersContainer = document.getElementById('membersContainer');
+        let memberCounter = 0;
 
-                // Updated endpoint to point to the CreateFamily action in InsuranceController
+        // --- STRICT DATE VALIDATION SETUP ---
+        const today = new Date().toISOString().split('T')[0];
+        const tripStartInput = document.getElementById('TripStart');
+        const tripEndInput = document.getElementById('TripEnd');
 
-                const createEndpoint = '@Url.Action("CreateFamily", "Insurance")';
+        // Prevent selecting past dates for Trip Start
+        tripStartInput.setAttribute('min', today);
 
-                const successEndpoint = '@Url.Action("Success", "Insurance")';
+        // When Trip Start changes, update Trip End's minimum possible date
+        tripStartInput.addEventListener('change', function () {
+            tripEndInput.setAttribute('min', this.value);
+            if (tripEndInput.value && tripEndInput.value < this.value) {
+                tripEndInput.value = this.value;
+            }
+            updateSummary();
+        });
 
-                const membersContainer = document.getElementById('membersContainer');
-
-                let memberCounter = 0;
-
-                const memberTemplate = (index) => `
+        const memberTemplate = (index) => `
         <div class="card-plain member-card mb-3" data-index="${index}">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="card-title mb-0">Member #${index + 1}</h5>
-        <button type="button" class="btn btn-outline-danger btn-sm remove-member-btn">Remove</button>
-        </div>
-        <div class="row g-3">
-        <div class="col-md-2">
-        <label class="form-label">Title</label>
-        <select class="form-select field-watch" name="Members[${index}].Title" required>
-        <option value="">Title</option><option>Mr</option><option>Mrs</option><option>Ms</option>
-        </select>
-        </div>
-        <div class="col-md-5">
-        <label class="form-label">First Name</label>
-        <input class="form-control field-watch" name="Members[${index}].FirstName" required />
-        </div>
-        <div class="col-md-5">
-        <label class="form-label">Last Name</label>
-        <input class="form-control field-watch" name="Members[${index}].LastName" required />
-        </div>
-        <div class="col-md-4">
-        <label class="form-label">Relation</label>
-        <select class="form-select field-watch" name="Members[${index}].Relation" required>
-        <option value="">Select</option><option>Self</option><option>Spouse</option><option>Child</option>
-        </select>
-        </div>
-        <div class="col-md-4">
-        <label class="form-label">DOB</label>
-        <input type="date" class="form-control field-watch" name="Members[${index}].DOB" required />
-        </div>
-        <div class="col-md-4">
-        <label class="form-label">Mobile</label>
-        <input type="tel" class="form-control field-watch" name="Members[${index}].Mobile" required />
-        </div>
-        </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Member #${index + 1}</h5>
+                <button type="button" class="btn btn-outline-danger btn-sm remove-member-btn">Remove</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">Title</label>
+                    <select class="form-select field-watch" name="Members[${index}].Title" required>
+                        <option value="">Title</option><option>Mr</option><option>Mrs</option><option>Ms</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">First Name</label>
+                    <input class="form-control field-watch" name="Members[${index}].FirstName" required />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Last Name</label>
+                    <input class="form-control field-watch" name="Members[${index}].LastName" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Relation</label>
+                    <select class="form-select field-watch" name="Members[${index}].Relation" required>
+                        <option value="">Select</option><option>Self</option><option>Spouse</option><option>Child</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">DOB</label>
+                    <input type="date" class="form-control field-watch" name="Members[${index}].DOB" max="${today}" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mobile</label>
+                    <input type="tel" class="form-control field-watch" name="Members[${index}].Mobile" pattern="[0-9]{10,12}" required />
+                </div>
+            </div>
         </div>`;
 
-                function addMember() {
+        function addMember() {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = memberTemplate(memberCounter++);
+            membersContainer.appendChild(wrapper.firstElementChild);
+            updateSummary();
+        }
 
-                    const wrapper = document.createElement('div');
+        membersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-member-btn')) {
+                e.target.closest('.member-card').remove();
+                reIndexMembers();
+                updateSummary();
+            }
+        });
 
-                    wrapper.innerHTML = memberTemplate(memberCounter++);
-
-                    membersContainer.appendChild(wrapper.firstElementChild);
-
-                    updateSummary();
-
-                }
-
-                membersContainer.addEventListener('click', (e) => {
-
-                    if (e.target.classList.contains('remove-member-btn')) {
-
-                        e.target.closest('.member-card').remove();
-
-                        reIndexMembers();
-
-                        updateSummary();
-
-                    }
-
+        function reIndexMembers() {
+            const cards = membersContainer.querySelectorAll('.member-card');
+            memberCounter = 0;
+            cards.forEach((card, i) => {
+                card.setAttribute('data-index', i);
+                card.querySelector('.card-title').innerText = `Member #${i + 1}`;
+                card.querySelectorAll('[name]').forEach(input => {
+                    const name = input.getAttribute('name');
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
                 });
+                memberCounter++;
+            });
+        }
 
-                function reIndexMembers() {
-
-                    const cards = membersContainer.querySelectorAll('.member-card');
-
-                    memberCounter = 0;
-
-                    cards.forEach((card, i) => {
-
-                        card.setAttribute('data-index', i);
-
-                        card.querySelector('.card-title').innerText = `Member #${i + 1}`;
-
-                        card.querySelectorAll('[name]').forEach(input => {
-
-                            const name = input.getAttribute('name');
-
-                            input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
-
-                        });
-
-                        memberCounter++;
-
+        function collectFormData() {
+            const getVal = id => document.getElementById(id)?.value || '';
+            return {
+                policyDetails: {
+                    TripStart: getVal('TripStart'), TripEnd: getVal('TripEnd'),
+                    Destination: getVal('Destination'), PlanType: getVal('PlanType'),
+                    PrimaryEmail: getVal('PrimaryEmail'), PrimaryMobile: getVal('PrimaryMobile')
+                },
+                nominee: {
+                    NomineeName: getVal('NomineeName'), NomineeRelation: getVal('NomineeRelation'),
+                    NomineeMobile: getVal('NomineeMobile')
+                },
+                declarations: {
+                    IsResident: document.getElementById('IsResident').checked,
+                    IsNotPEP: document.getElementById('IsNotPEP').checked
+                },
+                members: Array.from(membersContainer.querySelectorAll('.member-card')).map(card => {
+                    const obj = {};
+                    card.querySelectorAll('[name]').forEach(input => {
+                        const key = input.getAttribute('name').split('.').pop();
+                        obj[key] = input.value;
                     });
+                    return obj;
+                })
+            };
+        }
 
+        function updateSummary() {
+            const data = collectFormData();
+            const lines = [
+                `<div class="summary-line"><b>Plan</b><span>${data.policyDetails.PlanType || '-'}</span></div>`,
+                `<div class="summary-line"><b>Trip</b><span>${data.policyDetails.TripStart || '??'} to ${data.policyDetails.TripEnd || '??'}</span></div>`,
+                `<div class="summary-line"><b>Members</b><span>${data.members.length}</span></div>`
+            ];
+            data.members.forEach((m, i) => {
+                lines.push(`<div class="summary-line"><span>${m.FirstName || 'Member ' + (i + 1)}</span><span>${m.Relation || '-'}</span></div>`);
+            });
+            document.getElementById('summaryBody').innerHTML = lines.join('');
+        }
+
+        document.addEventListener('input', (e) => {
+            if (e.target.id || e.target.classList.contains('field-watch')) updateSummary();
+        });
+
+        document.getElementById('addMemberBtn').addEventListener('click', addMember);
+
+        document.getElementById('submitBtn').addEventListener('click', async (e) => {
+            const allInputs = document.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            allInputs.forEach(input => {
+                if (!input.value || (input.type === "checkbox" && !input.checked)) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
                 }
+            });
 
-                function collectFormData() {
+            if (!isValid) {
+                alert("Please complete all required fields correctly.");
+                return;
+            }
 
-                    const getVal = id => document.getElementById(id)?.value || '';
+            const data = collectFormData();
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                    const data = {
-
-                        // FIXED: Changed 'policy' to 'policyDetails' to match updated DTO
-
-                        policyDetails: {
-
-                            TripStart: getVal('TripStart'), TripEnd: getVal('TripEnd'),
-
-                            Destination: getVal('Destination'), PlanType: getVal('PlanType'),
-
-                            PrimaryEmail: getVal('PrimaryEmail'), PrimaryMobile: getVal('PrimaryMobile')
-
-                        },
-
-                        nominee: {
-
-                            NomineeName: getVal('NomineeName'), NomineeRelation: getVal('NomineeRelation'),
-
-                            NomineeMobile: getVal('NomineeMobile')
-
-                        },
-
-                        declarations: {
-
-                            IsResident: document.getElementById('IsResident').checked,
-
-                            IsNotPEP: document.getElementById('IsNotPEP').checked
-
-                        },
-
-                        members: Array.from(membersContainer.querySelectorAll('.member-card')).map(card => {
-
-                            const obj = {};
-
-                            card.querySelectorAll('[name]').forEach(input => {
-
-                                const key = input.getAttribute('name').split('.').pop();
-
-                                obj[key] = input.value;
-
-                            });
-
-                            return obj;
-
-                        })
-
-                    };
-
-                    return data;
-
-                }
-
-                function updateSummary() {
-
-                    const data = collectFormData();
-
-                    // Using policyDetails here as well
-
-                    const lines = [
-
-                        `<div class="summary-line"><b>Plan</b><span>${data.policyDetails.PlanType || '-'}</span></div>`,
-
-                        `<div class="summary-line"><b>Trip</b><span>${data.policyDetails.TripStart} to ${data.policyDetails.TripEnd}</span></div>`,
-
-                        `<div class="summary-line"><b>Members</b><span>${data.members.length}</span></div>`
-
-                    ];
-
-                    data.members.forEach((m, i) => {
-
-                        lines.push(`<div class="summary-line"><span>${m.FirstName || 'Member ' + (i+1)}</span><span>${m.Relation || '-'}</span></div>`);
-
-                    });
-
-                    document.getElementById('summaryBody').innerHTML = lines.join('');
-
-                }
-
-                document.addEventListener('input', (e) => {
-
-                    if (e.target.id || e.target.classList.contains('field-watch')) updateSummary();
-
+            try {
+                const res = await fetch(createEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(data)
                 });
 
-                document.getElementById('addMemberBtn').addEventListener('click', addMember);
+                if (res.ok) {
+                    const responseData = await res.json();
+                    window.location.href = `${successEndpoint}?id=${responseData.id}`;
+                } else {
+                    const errorMsg = await res.text();
+                    alert("Submission failed: " + errorMsg);
+                }
+            } catch (err) {
+                alert("Error connecting to server. Please try again.");
+            }
+        });
 
-                document.getElementById('submitBtn').addEventListener('click', async (e) => {
-
-                    const data = collectFormData();
-
-                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-                    try {
-
-                        const res = await fetch(createEndpoint, {
-
-                            method: 'POST',
-
-                            headers: {
-
-                                'Content-Type': 'application/json',
-
-                                'RequestVerificationToken': token
-
-                            },
-
-                            body: JSON.stringify(data)
-
-                        });
-
-                        if(res.ok) {
-
-                            const responseData = await res.json();
-
-                            // REDIRECT: Go to the success page with the new Policy ID
-
-                            window.location.href = `${successEndpoint}?id=${responseData.id}`;
-
-                        } else {
-
-                            const errorMsg = await res.text();
-
-                            alert("Submission failed. Please check form details: " + errorMsg);
-
-                        }
-
-                    } catch (err) {
-
-                        alert("Error connecting to server. Please try again.");
-
-                    }
-
-                });
-
-                // Initialize with one member
-
-                addMember();
+        addMember();
     </script>
-
 }

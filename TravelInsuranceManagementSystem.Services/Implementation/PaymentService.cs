@@ -1,66 +1,40 @@
-﻿using TravelInsuranceManagementSystem.Application.Models;
-using TravelInsuranceManagementSystem.Models;
+﻿using TravelInsuranceManagementSystem.Models;
 using TravelInsuranceManagementSystem.Repo.Interfaces;
+using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Services.Implementation
+
 {
+
     public class PaymentService : IPaymentService
+
     {
+
         private readonly IPaymentRepository _paymentRepo;
-        private readonly IPolicyRepository _policyRepo;
 
-        public PaymentService(IPaymentRepository paymentRepo, IPolicyRepository policyRepo)
+        public PaymentService(IPaymentRepository paymentRepo)
+
         {
+
             _paymentRepo = paymentRepo;
-            _policyRepo = policyRepo;
+
         }
 
-        public Payment InitializePayment(int policyId)
-        {
-            var existing = _paymentRepo.GetPendingPaymentByPolicyId(policyId);
-            if (existing != null) return existing;
+        public Payment InitializePayment(int policyId) =>
 
-            // Fixes CS0103: 'policy' now exists in this context
-            var policy = _policyRepo.GetById(policyId);
-            if (policy == null) return null;
+            _paymentRepo.GetOrCreatePayment(policyId);
 
-            var newPayment = new Payment
-            {
-                PolicyId = policyId,
-                PaymentDate = DateTime.Now,
-                PaymentStatus = PaymentStatus.PENDING,
-                PaymentAmount = (policy.CoverageType == "Premium") ? 5000 : 2500
-            };
+        public bool ProcessPayment(int paymentId, string cardNumber) =>
 
-            _paymentRepo.AddPayment(newPayment);
-            _paymentRepo.Save();
-            return newPayment;
-        }
+            _paymentRepo.ExecutePaymentProcessing(paymentId, cardNumber);
 
-        public bool ProcessPayment(int paymentId, string cardNumber)
-        {
-            var payment = _paymentRepo.GetPaymentById(paymentId);
-            if (payment == null) return false;
+        // New Implementation
 
-            // Fixes CS0103: 'isFailed' is explicitly declared
-            bool isFailed = payment.PaymentAmount <= 0 ||
-                           (!string.IsNullOrEmpty(cardNumber) && cardNumber.Replace(" ", "") == "0000000000000000");
+        public Payment GetPaymentDetails(int paymentId) =>
 
-            if (isFailed)
-            {
-                payment.PaymentStatus = PaymentStatus.FAILED;
-            }
-            else
-            {
-                payment.PaymentStatus = PaymentStatus.SUCCESS;
-            }
+            _paymentRepo.GetPaymentById(paymentId);
 
-            payment.PaymentDate = DateTime.Now;
-            _paymentRepo.UpdatePayment(payment);
-            _paymentRepo.Save();
-
-            return payment.PaymentStatus == PaymentStatus.SUCCESS;
-        }
     }
+
 }
