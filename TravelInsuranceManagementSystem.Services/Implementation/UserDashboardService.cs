@@ -22,5 +22,8 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
 
         public async Task RaiseSupportTicketAsync(IFormCollection form, int userId) =>
             await _repo.RaiseSupportTicketAsync(form, userId);
+
+        public async Task<UserDashboardViewModel> GetDashboardSummaryAsync(int userId) =>
+            await _repo.GetDashboardSummaryAsync(userId);
     }
 }

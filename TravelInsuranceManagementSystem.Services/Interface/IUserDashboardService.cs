@@ -16,6 +16,10 @@ namespace TravelInsuranceManagementSystem.Services.Interfaces
 
         Task RaiseSupportTicketAsync(IFormCollection form, int userId);
 
+        // Updated return type
+
+        Task<UserDashboardViewModel> GetDashboardSummaryAsync(int userId);
+
     }
 
 }
