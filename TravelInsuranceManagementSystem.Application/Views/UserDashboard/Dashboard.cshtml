@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.Claim>
+﻿@model TravelInsuranceManagementSystem.Repo.Models.UserDashboardViewModel
 
 @{
 
@@ -11,86 +11,55 @@
 @section Styles {
     <style>
 
-        /* Page-specific styles (Bootstrap-friendly) */
+        /* Page-specific styles */
 
         .kpi-card {
-
             border: 1px solid #d7d7d7;
-
             border-radius: .75rem;
-
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-
         }
 
         .chip {
-
             display: inline-flex;
-
             align-items: center;
-
             gap: .5rem;
-
             background: linear-gradient(135deg, #f7b980, #ed985f);
-
             color: #001f3d;
-
             padding: .35rem .6rem;
-
             border-radius: 1rem;
-
             font-weight: 600;
-
             font-size: .8rem;
-
         }
 
         .panel {
-
             background: #ffffff;
-
             border: 1px solid #d7d7d7;
-
             border-radius: .75rem;
-
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-
         }
 
         .status {
-
             border-radius: 1rem;
-
             padding: .2rem .55rem;
-
             font-weight: 600;
-
             font-size: .8rem;
-
         }
 
+        /* Status Colors mapping to ViewModel strings */
+
         .status-approved {
-
             background: #d2f6d6;
-
             color: #0b5c19;
-
         }
 
         .status-pending {
-
             background: #fff2cc;
-
             color: #7a5b00;
-
         }
 
         .status-rejected {
-
             background: #ffd9d6;
-
             color: #7a0b00;
-
         }
     </style>
 
@@ -102,28 +71,28 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Active Policies</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.ActivePolicies</div>
+            <div class="h5 fw-bold text-dark">@Model.ActivePolicies</div>
             <span class="chip mt-2">In Good Standing</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Open Claims</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.OpenClaims</div>
+            <div class="h5 fw-bold text-dark">@Model.OpenClaims</div>
             <span class="chip mt-2">Action Required</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Tickets Raised</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.Tickets</div>
+            <div class="h5 fw-bold text-dark">@Model.Tickets</div>
             <span class="chip mt-2">Support</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Upcoming Trips</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.UpcomingTrips</div>
+            <div class="h5 fw-bold text-dark">@Model.UpcomingTrips</div>
             <span class="chip mt-2">Plan Ahead</span>
         </div>
     </div>
@@ -132,55 +101,57 @@
 <div class="row g-3">
     <div class="col-12 col-xl-12">
         <div class="panel p-3">
-            <h5 class="mb-3" style="color:#001f3d;">Recent Claims</h5>
+            <h5 class="mb-3" style="color:#001f3d;">Recent Activity</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Claim </th>
-                            <th>Policy</th>
-                            <th>Date Filed</th>
-                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Reference ID</th>
+                            <th>Description</th>
+                            <th>Date</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
 
-                        @if (Model != null && Model.Any())
+                        @if (Model.RecentActivities != null && Model.RecentActivities.Any())
 
                         {
 
-                            foreach (var claim in Model)
+                            foreach (var item in Model.RecentActivities)
 
                             {
                                 <tr>
-                                    <td>CLM-@claim.ClaimId</td>
-                                    <td>@(claim.Policy != null ? "POL-" + claim.Policy.PolicyId : "N/A")</td>
-                                    <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                                    <td>₹ @claim.ClaimAmount</td>
                                     <td>
 
-                                        @if (claim.Status == TravelInsuranceManagementSystem.Repo.Models.ClaimStatus.Approved)
+                                        @if (item.Type == "Policy")
 
                                         {
-                                            <span class="status status-approved">Approved</span>
+                                            <span class="fw-bold text-primary">Policy</span>
 
                                         }
 
-                                        else if (claim.Status == TravelInsuranceManagementSystem.Repo.Models.ClaimStatus.Rejected)
+                                        else if (item.Type == "Claim")
 
                                         {
-                                            <span class="status status-rejected">Rejected</span>
+
+                                            <span class="fw-bold text-warning">Claim</span>
 
                                         }
 
                                         else
 
                                         {
-                                            <span class="status status-pending">Pending</span>
+
+                                            <span class="fw-bold text-secondary">Ticket</span>
 
                                         }
                                     </td>
+                                    <td>@item.ReferenceId</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                                    <td><span class="status @item.StatusColor">@item.Status</span></td>
                                 </tr>
 
                             }
@@ -191,7 +162,7 @@
 
                         {
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No recent claims found.</td>
+                                <td colspan="5" class="text-center text-muted">No recent activity found.</td>
                             </tr>
 
                         }

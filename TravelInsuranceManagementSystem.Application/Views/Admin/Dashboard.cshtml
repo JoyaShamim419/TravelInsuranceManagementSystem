@@ -1,164 +1,184 @@
-﻿@model TravelInsuranceManagementSystem.Repo.Models.UserDashboardViewModel
+﻿@model TravelInsuranceManagementSystem.Repo.Models.AdminDashboardViewModel
 
 @{
 
-    ViewData["Title"] = "User Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 
-    Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
-
-}
-
-@section Styles {
-    <style>
-
-        .kpi-card {
-            border: 1px solid #d7d7d7;
-            border-radius: .75rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-        }
-
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            background: linear-gradient(135deg, #f7b980, #ed985f);
-            color: #001f3d;
-            padding: .35rem .6rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            font-size: .8rem;
-        }
-
-        .panel {
-            background: #ffffff;
-            border: 1px solid #d7d7d7;
-            border-radius: .75rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-        }
-
-        .status {
-            border-radius: 1rem;
-            padding: .2rem .55rem;
-            font-weight: 600;
-            font-size: .8rem;
-        }
-
-        .status-approved {
-            background: #d2f6d6;
-            color: #0b5c19;
-        }
-
-        .status-pending {
-            background: #fff2cc;
-            color: #7a5b00;
-        }
-
-        .status-rejected {
-            background: #ffd9d6;
-            color: #7a0b00;
-        }
-    </style>
+    //ViewData["Title"] = "Dashboard";
 
 }
 
-<h1 class="fw-bold" style="color:#001f3d;">User Dashboard</h1>
+<style>
 
-<div class="row g-3 mb-3">
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card kpi-card p-3">
-            <div class="small text-muted">Active Policies</div>
-            <div class="h5 fw-bold text-dark">@Model.ActivePolicies</div>
-            <span class="chip mt-2">In Good Standing</span>
-        </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card kpi-card p-3">
-            <div class="small text-muted">Open Claims</div>
-            <div class="h5 fw-bold text-dark">@Model.OpenClaims</div>
-            <span class="chip mt-2">Action Required</span>
-        </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card kpi-card p-3">
-            <div class="small text-muted">Tickets Raised</div>
-            <div class="h5 fw-bold text-dark">@Model.Tickets</div>
-            <span class="chip mt-2">Support</span>
-        </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card kpi-card p-3">
-            <div class="small text-muted">Upcoming Trips</div>
-            <div class="h5 fw-bold text-dark">@Model.UpcomingTrips</div>
-            <span class="chip mt-2">Plan Ahead</span>
-        </div>
+    /* Badge Styles matching your layout */
+
+    .badge-pill {
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+
+    .badge-approved {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-rejected {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-open {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+</style>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="m-0">Dashboard</h2>
+    <div class="btn-group" role="group">
+        <button class="btn btn-outline-primary status-btn active" data-status="All">All</button>
+        <button class="btn btn-outline-primary status-btn" data-status="Active">Active</button>
+        <button class="btn btn-outline-primary status-btn" data-status="Pending">Pending</button>
+        <button class="btn btn-outline-primary status-btn" data-status="Resolved">Resolved</button>
     </div>
 </div>
 
-<div class="row g-3">
-    <div class="col-12 col-xl-12">
-        <div class="panel p-3">
-            <h5 class="mb-3" style="color:#001f3d;">Recent Activity</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Type</th>
-                            <th>Reference ID</th>
-                            <th>Description</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+<div class="row g-2 mb-3">
+    <div class="col-12 col-md-6">
+        <input id="dashboardSearch" class="form-control" placeholder="Search recent activity..." />
+    </div>
+    <div class="col-12 col-md-6 text-md-end">
+        <button id="exportDashboard" class="btn btn-primary">Export CSV</button>
+    </div>
+</div>
 
-                        @if (Model.RecentActivities != null && Model.RecentActivities.Any())
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="card p-3">
+            <div class="text-muted small">Active Policies</div>
+            <div class="fs-4 fw-bold">@Model.ActivePolicies</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card p-3">
+            <div class="text-muted small">Open Claims</div>
+            <div class="fs-4 fw-bold">@Model.OpenClaims</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card p-3">
+            <div class="text-muted small">Payments Today</div>
+            <div class="fs-4 fw-bold">
 
-                        {
-
-                            foreach (var item in Model.RecentActivities)
-
-                            {
-                                <tr>
-                                    <td>
-
-                                        @if (item.Type == "Policy")
-                                        {
-                                            <span class="fw-bold text-primary">Policy</span>
-                                        }
-
-                                        else if (item.Type == "Claim")
-                                        {
-
-                                            <span class="fw-bold text-warning">Claim</span>
-                                        }
-
-                                        else
-                                        {
-
-                                            <span class="fw-bold text-secondary">Ticket</span>
-                                        }
-                                    </td>
-                                    <td>@item.ReferenceId</td>
-                                    <td>@item.Description</td>
-                                    <td>@item.Date.ToString("yyyy-MM-dd")</td>
-                                    <td><span class="status @item.StatusColor">@item.Status</span></td>
-                                </tr>
-
-                            }
-
-                        }
-
-                        else
-
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">No recent activity found.</td>
-                            </tr>
-
-                        }
-                    </tbody>
-                </table>
+                @((Model.TodayRevenue >= 1000) ? (Model.TodayRevenue / 1000).ToString("0.##") + "K" : Model.TodayRevenue.ToString("0"))
             </div>
         </div>
     </div>
+    <div class="col-6 col-lg-3">
+        <div class="card p-3">
+            <div class="text-muted small">Support Tickets</div>
+            <div class="fs-4 fw-bold">@Model.OpenTickets</div>
+        </div>
+    </div>
 </div>
+
+<div class="table-responsive">
+    <table id="dashboardTable" class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Type</th>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (Model.RecentActivities != null && Model.RecentActivities.Any())
+
+            {
+
+                foreach (var item in Model.RecentActivities)
+
+                {
+                    <tr data-status="@(item.Status == "ACTIVE" || item.Status == "Approved" ? "Active" : (item.Status == "Pending" || item.Status == "Open" ? "Pending" : "Resolved"))">
+                        <td>@item.Type</td>
+                        <td>@item.ReferenceId</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td><span class="badge-pill @item.StatusColor">@item.Status</span></td>
+                    </tr>
+
+                }
+
+            }
+
+            else
+
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No recent activity found.</td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            // SEARCH
+
+            $("#dashboardSearch").on("keyup", function () {
+
+                var value = $(this).val().toLowerCase();
+
+                $("#dashboardTable tbody tr").filter(function () {
+
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+
+                });
+
+            });
+
+            // FILTER BUTTONS
+
+            $(".status-btn").click(function () {
+
+                $(".status-btn").removeClass("active");
+
+                $(this).addClass("active");
+
+                var status = $(this).data("status");
+
+                if (status === "All") {
+
+                    $("#dashboardTable tbody tr").show();
+
+                } else {
+
+                    $("#dashboardTable tbody tr").hide();
+
+                    // Simple filter logic: mapping button status to row data-status attribute
+
+                    $("#dashboardTable tbody tr[data-status='" + status + "']").show();
+
+                }
+
+            });
+
+        });
+    </script>
+
+}

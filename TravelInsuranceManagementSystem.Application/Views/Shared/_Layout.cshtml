@@ -16,51 +16,72 @@
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                         <li class="nav-item">
+
                             @if (User.Identity.IsAuthenticated)
+
                             {
                                 <a class="nav-link fw-bold text-warning" href="/Home/Insuarance">
                                     <i class="bi bi-shield-check"></i> Insurance
 
                                 </a>
+
                             }
+
                             else
+
                             {
 
                                 <a class="nav-link fw-bold text-warning" href="/Account/SignIn?returnUrl=/Home/Insuarance">
                                     <i class="bi bi-shield-check"></i> Insurance
 
                                 </a>
+
                             }
                         </li>
                         <li class="nav-item"><a class="nav-link" href="#contact-footer">ContactUs</a></li>
                         <li class="ms-lg-3 d-flex align-items-center">
+
                             @if (User.Identity.IsAuthenticated)
+
                             {
-                                @if(User.IsInRole("Admin")){
+
+                                @if (User.IsInRole("Admin"))
+                                {
                                     <a class="btn btn-outline-success btn-sm me-2" href="/Admin/Dashboard">
                                         <i class="bi bi-speedometer2"></i> Admin Panel
 
                                     </a>
-                                }else if (User.IsInRole("Agent"))
+
+                                }
+                                else if (User.IsInRole("Agent"))
+
                                 {
 
                                     <a class="btn btn-outline-success btn-sm me-2" href="/Agent/Dashboard">
                                         <i class="bi bi-person-badge"></i> Agent Panel
 
                                     </a>
+
                                 }
+
                                 else
+
                                 {
 
                                     <a class="btn btn-outline-success btn-sm me-2" href="/UserDashboard/Dashboard">
                                         <i class="bi bi-layout-text-window-reverse"></i> Dashboard
 
                                     </a>
+
                                 }
-}
-else
-{
+
+                            }
+
+                            else
+
+                            {
                                 <a class="btn btn-cta-primary nav-link" href="/Account/SignIn">User Login</a>
+
                             }
                         </li>
                     </ul>
