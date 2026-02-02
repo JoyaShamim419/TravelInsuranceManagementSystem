@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using TravelInsuranceManagementSystem.Repo.Models;
-using TravelInsuranceManagementSystem.Models;    // Ensure ClaimViewModel is accessible here
-using TravelInsuranceManagementSystem.Repo.Data; // Ensure this points to your DbContext namespace
+
+using TravelInsuranceManagementSystem.Models;
+
+using TravelInsuranceManagementSystem.Repo.Data;
+
 using TravelInsuranceManagementSystem.Repo.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Repo.Implementation
@@ -24,29 +28,15 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
         public async Task<List<Policy>> GetAllPoliciesWithMembersAsync() =>
 
-            await _context.Policies
-
-                .Include(p => p.Members)
-
-                .OrderByDescending(p => p.PolicyId)
-
-                .ToListAsync();
+            await _context.Policies.Include(p => p.Members).OrderByDescending(p => p.PolicyId).ToListAsync();
 
         public async Task<List<Payment>> GetAllPaymentsWithPoliciesAsync() =>
 
-            await _context.Payments
-
-                .Include(p => p.Policy)
-
-                .OrderByDescending(p => p.PaymentDate)
-
-                .ToListAsync();
+            await _context.Payments.Include(p => p.Policy).OrderByDescending(p => p.PaymentDate).ToListAsync();
 
         public async Task<List<ClaimViewModel>> GetClaimsOverviewAsync()
 
         {
-
-            // Logic moved from Service to Repository
 
             return await (from c in _context.Claims
 
@@ -85,6 +75,136 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
                               AgentName = agent != null ? agent.FullName : "Unassigned"
 
                           }).ToListAsync();
+
+        }
+
+        // --- NEW DASHBOARD LOGIC ---
+
+        public async Task<AdminDashboardViewModel> GetDashboardSummaryAsync()
+
+        {
+
+            var dto = new AdminDashboardViewModel();
+
+            // 1. KPI Counts
+
+            dto.ActivePolicies = await _context.Policies.CountAsync(p => p.PolicyStatus == PolicyStatus.ACTIVE);
+
+            dto.OpenClaims = await _context.Claims.CountAsync(c => c.Status == ClaimStatus.Pending);
+
+            dto.OpenTickets = await _context.SupportTickets.CountAsync(t => t.TicketStatus == "Open");
+
+            // 2. Revenue (Today)
+
+            var today = DateTime.Today;
+
+            dto.TodayRevenue = await _context.Payments
+
+                .Where(p => p.PaymentStatus == PaymentStatus.SUCCESS && p.PaymentDate.Date == today)
+
+                .SumAsync(p => p.PaymentAmount);
+
+            // 3. Fetch Recent Activities (Top 5 from each category)
+
+            // Policies
+
+            var recentPolicies = await _context.Policies
+
+                .Include(p => p.User)
+
+                .OrderByDescending(p => p.TravelStartDate)
+
+                .Take(5)
+
+                .Select(p => new AdminDashboardActivity
+
+                {
+
+                    Type = "Policy",
+
+                    ReferenceId = "P-" + p.PolicyId,
+
+                    CustomerName = p.User != null ? p.User.FullName : "Unknown",
+
+                    Date = p.TravelStartDate,
+
+                    Status = p.PolicyStatus.ToString(),
+
+                    StatusColor = p.PolicyStatus == PolicyStatus.ACTIVE ? "badge-approved" : "badge-pending"
+
+                }).ToListAsync();
+
+            // Claims
+
+            var recentClaims = await _context.Claims
+
+                .Include(c => c.Policy).ThenInclude(p => p.User)
+
+                .OrderByDescending(c => c.ClaimDate)
+
+                .Take(5)
+
+                .Select(c => new AdminDashboardActivity
+
+                {
+
+                    Type = "Claim",
+
+                    ReferenceId = "C-" + c.ClaimId,
+
+                    CustomerName = c.Policy.User != null ? c.Policy.User.FullName : "Unknown",
+
+                    Date = c.ClaimDate,
+
+                    Status = c.Status.ToString(),
+
+                    StatusColor = c.Status == ClaimStatus.Approved ? "badge-approved" : (c.Status == ClaimStatus.Rejected ? "badge-rejected" : "badge-pending")
+
+                }).ToListAsync();
+
+            // Tickets
+
+            var recentTickets = await _context.SupportTickets
+
+                .OrderByDescending(t => t.CreatedDate)
+
+                .Take(5)
+
+                .Select(t => new AdminDashboardActivity
+
+                {
+
+                    Type = "Ticket",
+
+                    ReferenceId = "T-" + t.TicketId,
+
+                    CustomerName = "User #" + t.UserId,
+
+                    Date = t.CreatedDate,
+
+                    Status = t.TicketStatus,
+
+                    StatusColor = t.TicketStatus == "Open" ? "badge-pending" : "badge-open" // reusing badge-open style for Resolved/Closed if needed
+
+                }).ToListAsync();
+
+            // 4. Merge & Sort
+
+            dto.RecentActivities.AddRange(recentPolicies);
+
+            dto.RecentActivities.AddRange(recentClaims);
+
+            dto.RecentActivities.AddRange(recentTickets);
+
+            dto.RecentActivities = dto.RecentActivities
+
+                .OrderByDescending(a => a.Date)
+
+                .Take(10)
+
+                .ToList();
+
+            return dto;
 
         }
 

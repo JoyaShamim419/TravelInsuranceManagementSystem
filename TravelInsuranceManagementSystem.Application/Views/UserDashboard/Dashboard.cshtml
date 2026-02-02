@@ -1,95 +1,134 @@
-﻿@{
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.Claim>
+
+@{
+
     ViewData["Title"] = "User Dashboard";
+
     Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
+
 }
 
 @section Styles {
     <style>
+
         /* Page-specific styles (Bootstrap-friendly) */
+
         .kpi-card {
+
             border: 1px solid #d7d7d7;
+
             border-radius: .75rem;
+
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+
         }
 
         .chip {
+
             display: inline-flex;
+
             align-items: center;
+
             gap: .5rem;
+
             background: linear-gradient(135deg, #f7b980, #ed985f);
+
             color: #001f3d;
+
             padding: .35rem .6rem;
+
             border-radius: 1rem;
+
             font-weight: 600;
+
             font-size: .8rem;
+
         }
 
         .panel {
+
             background: #ffffff;
+
             border: 1px solid #d7d7d7;
+
             border-radius: .75rem;
+
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+
         }
 
         .status {
+
             border-radius: 1rem;
+
             padding: .2rem .55rem;
+
             font-weight: 600;
+
             font-size: .8rem;
+
         }
 
         .status-approved {
+
             background: #d2f6d6;
+
             color: #0b5c19;
+
         }
 
         .status-pending {
+
             background: #fff2cc;
+
             color: #7a5b00;
+
         }
 
         .status-rejected {
+
             background: #ffd9d6;
+
             color: #7a0b00;
+
         }
     </style>
+
 }
 
 <h1 class="fw-bold" style="color:#001f3d;">User Dashboard</h1>
 
-<!-- KPI Cards -->
 <div class="row g-3 mb-3">
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Active Policies</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.ActivePolicies  3</div>
+            <div class="h5 fw-bold text-dark">@ViewBag.ActivePolicies</div>
             <span class="chip mt-2">In Good Standing</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Open Claims</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.OpenClaims  1</div>
+            <div class="h5 fw-bold text-dark">@ViewBag.OpenClaims</div>
             <span class="chip mt-2">Action Required</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Tickets Raised</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.Tickets  2</div>
+            <div class="h5 fw-bold text-dark">@ViewBag.Tickets</div>
             <span class="chip mt-2">Support</span>
         </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card kpi-card p-3">
             <div class="small text-muted">Upcoming Trips</div>
-            <div class="h5 fw-bold text-dark">@ViewBag.UpcomingTrips  2</div>
+            <div class="h5 fw-bold text-dark">@ViewBag.UpcomingTrips</div>
             <span class="chip mt-2">Plan Ahead</span>
         </div>
     </div>
 </div>
 
-<!-- Panels: Recent Claims + Quick Links -->
 <div class="row g-3">
     <div class="col-12 col-xl-12">
         <div class="panel p-3">
@@ -98,7 +137,7 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Claim #</th>
+                            <th>Claim </th>
                             <th>Policy</th>
                             <th>Date Filed</th>
                             <th>Amount</th>
@@ -106,36 +145,63 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>CLM-1027</td>
-                            <td>TRVL-PL-8731</td>
-                            <td>2025-12-12</td>
-                            <td>₹ 18,500</td>
-                            <td><span class="status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>CLM-0986</td>
-                            <td>TRVL-PL-8620</td>
-                            <td>2025-11-30</td>
-                            <td>₹ 12,000</td>
-                            <td><span class="status status-approved">Approved</span></td>
-                        </tr>
-                        <tr>
-                            <td>CLM-0941</td>
-                            <td>TRVL-PL-8514</td>
-                            <td>2025-11-18</td>
-                            <td>₹ 7,900</td>
-                            <td><span class="status status-rejected">Rejected</span></td>
-                        </tr>
+
+                        @if (Model != null && Model.Any())
+
+                        {
+
+                            foreach (var claim in Model)
+
+                            {
+                                <tr>
+                                    <td>CLM-@claim.ClaimId</td>
+                                    <td>@(claim.Policy != null ? "POL-" + claim.Policy.PolicyId : "N/A")</td>
+                                    <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                                    <td>₹ @claim.ClaimAmount</td>
+                                    <td>
+
+                                        @if (claim.Status == TravelInsuranceManagementSystem.Repo.Models.ClaimStatus.Approved)
+
+                                        {
+                                            <span class="status status-approved">Approved</span>
+
+                                        }
+
+                                        else if (claim.Status == TravelInsuranceManagementSystem.Repo.Models.ClaimStatus.Rejected)
+
+                                        {
+                                            <span class="status status-rejected">Rejected</span>
+
+                                        }
+
+                                        else
+
+                                        {
+                                            <span class="status status-pending">Pending</span>
+
+                                        }
+                                    </td>
+                                </tr>
+
+                            }
+
+                        }
+
+                        else
+
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No recent claims found.</td>
+                            </tr>
+
+                        }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    
 </div>
 
 @section Scripts {
-    <!-- Page-specific scripts (optional) -->
+
 }

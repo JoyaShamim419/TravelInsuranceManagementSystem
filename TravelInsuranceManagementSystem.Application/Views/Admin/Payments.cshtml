@@ -6,32 +6,32 @@
 }
 
 <style>
-    /* Custom Badge Styles to match your screenshot */
+    
     .badge-status {
-        padding: 8px 20px; /* Wider padding for pill shape */
-        border-radius: 50px; /* Fully rounded ends */
-        font-weight: 700; /* Bold text */
-        font-size: 0.85rem; /* Readable size */
-        text-transform: uppercase; /* SUCCESS instead of Success */
+        padding: 8px 20px; 
+        border-radius: 50px; 
+        font-weight: 700; 
+        font-size: 0.85rem; 
+        text-transform: uppercase; 
         display: inline-block;
-        min-width: 100px; /* Uniform width */
+        min-width: 100px; 
         text-align: center;
         border: none;
     }
 
-    /* Green Badge (Success) - Light Green Background, Dark Green Text */
+  
     .status-success {
         background-color: #d1e7dd;
         color: #0f5132;
     }
 
-    /* Yellow Badge (Pending) - Light Yellow Background, Dark Yellow/Brown Text */
+    
     .status-pending {
         background-color: #fff3cd;
         color: #664d03;
     }
 
-    /* Red Badge (Failed) - Light Red Background, Dark Red Text */
+
     .status-failed {
         background-color: #f8d7da;
         color: #842029;
@@ -88,9 +88,9 @@
 
                     <tr data-status="@rawStatus">
 
-                        <td>#POL-@item.PolicyId</td>
+                        <td>P-@item.PolicyId</td>
 
-                        <td>#PAY-@item.PaymentId</td>
+                        <td>PAY-@item.PaymentId</td>
 
                         <td class="fw-bold">₹@item.PaymentAmount</td>
 

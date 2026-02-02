@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using TravelInsuranceManagementSystem.Repo.Models;
 
-using TravelInsuranceManagementSystem.Services.Interfaces; // Matches the namespace above
+using TravelInsuranceManagementSystem.Services.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Application.Controllers
 
@@ -24,10 +24,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
         private readonly SignInManager<User> _signInManager;
 
-        // The error "IAgentService could not be found" happens because 
-
-        // the Service project failed to build. Fixing IAgentRepository fixes this.
-
         public AgentController(IAgentService agentService, SignInManager<User> signInManager)
 
         {
@@ -38,7 +34,19 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
         }
 
-        public IActionResult Dashboard() => View();
+        // --- UPDATED DASHBOARD METHOD ---
+
+        public async Task<IActionResult> Dashboard()
+
+        {
+
+            // Fetch real data from service
+
+            var summary = await _agentService.GetDashboardSummaryAsync();
+
+            return View(summary);
+
+        }
 
         public async Task<IActionResult> Policies()
 
@@ -67,8 +75,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         {
 
             var agentIdString = User.FindFirst("UserId")?.Value;
-
-            // Fallback: If UserId claim isn't found, try getting it from the User object
 
             if (string.IsNullOrEmpty(agentIdString))
 

@@ -1,45 +1,164 @@
-﻿
-
+﻿@model TravelInsuranceManagementSystem.Repo.Models.UserDashboardViewModel
 
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    //ViewData["Title"] = "Dashboard";
+
+    ViewData["Title"] = "User Dashboard";
+
+    Layout = "~/Views/Shared/_UserDashboardLayout.cshtml";
+
 }
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="m-0">Dashboard</h2>
-    <div class="btn-group" role="group">
-        <button class="btn btn-outline-primary status-btn active" data-status="All">All</button>
-        <button class="btn btn-outline-primary status-btn" data-status="Active">Active</button>
-        <button class="btn btn-outline-primary status-btn" data-status="Pending">Pending</button>
-        <button class="btn btn-outline-primary status-btn" data-status="Resolved">Resolved</button>
-    </div>
-</div>
 
-<div class="row g-2 mb-3">
-    <div class="col-12 col-md-6">
-        <input id="dashboardSearch" class="form-control" placeholder="Search recent activity..." />
-    </div>
-    <div class="col-12 col-md-6 text-md-end">
-        <button id="exportDashboard" class="btn btn-primary">Export CSV</button>
-    </div>
-</div>
+@section Styles {
+    <style>
 
-<!-- Simple KPIs -->
+        .kpi-card {
+            border: 1px solid #d7d7d7;
+            border-radius: .75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: linear-gradient(135deg, #f7b980, #ed985f);
+            color: #001f3d;
+            padding: .35rem .6rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: .8rem;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #d7d7d7;
+            border-radius: .75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .status {
+            border-radius: 1rem;
+            padding: .2rem .55rem;
+            font-weight: 600;
+            font-size: .8rem;
+        }
+
+        .status-approved {
+            background: #d2f6d6;
+            color: #0b5c19;
+        }
+
+        .status-pending {
+            background: #fff2cc;
+            color: #7a5b00;
+        }
+
+        .status-rejected {
+            background: #ffd9d6;
+            color: #7a0b00;
+        }
+    </style>
+
+}
+
+<h1 class="fw-bold" style="color:#001f3d;">User Dashboard</h1>
+
 <div class="row g-3 mb-3">
-    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Active Policies</div><div class="fs-4 fw-bold">132</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Open Claims</div><div class="fs-4 fw-bold">7</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Payments Today</div><div class="fs-4 fw-bold">₹48,500</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Support Tickets</div><div class="fs-4 fw-bold">5</div></div></div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card p-3">
+            <div class="small text-muted">Active Policies</div>
+            <div class="h5 fw-bold text-dark">@Model.ActivePolicies</div>
+            <span class="chip mt-2">In Good Standing</span>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card p-3">
+            <div class="small text-muted">Open Claims</div>
+            <div class="h5 fw-bold text-dark">@Model.OpenClaims</div>
+            <span class="chip mt-2">Action Required</span>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card p-3">
+            <div class="small text-muted">Tickets Raised</div>
+            <div class="h5 fw-bold text-dark">@Model.Tickets</div>
+            <span class="chip mt-2">Support</span>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card p-3">
+            <div class="small text-muted">Upcoming Trips</div>
+            <div class="h5 fw-bold text-dark">@Model.UpcomingTrips</div>
+            <span class="chip mt-2">Plan Ahead</span>
+        </div>
+    </div>
 </div>
 
-<div class="table-responsive">
-    <table id="dashboardTable" class="table table-hover align-middle mb-0">
-        <thead class="table-light"><tr><th>Type</th><th>Reference</th><th>Customer</th><th>Date</th><th>Status</th></tr></thead>
-        <tbody>
-            <tr data-status="Active"><td>Policy</td><td>P01842</td><td>Senem</td><td>2025-12-20</td><td><span class="badge-pill badge-approved">Active</span></td></tr>
-            <tr data-status="Pending"><td>Claim</td><td>C01016</td><td>Alex</td><td>2025-12-21</td><td><span class="badge-pill badge-pending">Pending</span></td></tr>
-            <tr data-status="Resolved"><td>Ticket</td><td>T01900</td><td>Harold</td><td>2025-12-22</td><td><span class="badge-pill badge-open">Resolved</span></td></tr>
-        </tbody>
-    </table>
-</div>
+<div class="row g-3">
+    <div class="col-12 col-xl-12">
+        <div class="panel p-3">
+            <h5 class="mb-3" style="color:#001f3d;">Recent Activity</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Type</th>
+                            <th>Reference ID</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
+                        @if (Model.RecentActivities != null && Model.RecentActivities.Any())
+
+                        {
+
+                            foreach (var item in Model.RecentActivities)
+
+                            {
+                                <tr>
+                                    <td>
+
+                                        @if (item.Type == "Policy")
+                                        {
+                                            <span class="fw-bold text-primary">Policy</span>
+                                        }
+
+                                        else if (item.Type == "Claim")
+                                        {
+
+                                            <span class="fw-bold text-warning">Claim</span>
+                                        }
+
+                                        else
+                                        {
+
+                                            <span class="fw-bold text-secondary">Ticket</span>
+                                        }
+                                    </td>
+                                    <td>@item.ReferenceId</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                                    <td><span class="status @item.StatusColor">@item.Status</span></td>
+                                </tr>
+
+                            }
+
+                        }
+
+                        else
+
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No recent activity found.</td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
