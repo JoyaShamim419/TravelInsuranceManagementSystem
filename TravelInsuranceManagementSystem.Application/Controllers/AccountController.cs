@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using TravelInsuranceManagementSystem.Repo.Models;
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
-
 namespace TravelInsuranceManagementSystem.Application.Controllers
 {
     public class AccountController : Controller
@@ -20,23 +19,29 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         }
 
         [HttpGet]
-        public IActionResult SignIn() => View("~/Views/Home/SignIn.cshtml");
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult SignIn(string returnUrl = null)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            // Pass the return URL to the View so it can be used in the form
+            ViewData["ReturnUrl"] = returnUrl;
+            return View("~/Views/Home/SignIn.cshtml");
+        }
 
         [HttpPost]
-        public async Task<IActionResult> SignIn(string Email, string Password)
+        public async Task<IActionResult> SignIn(string Email, string Password, string returnUrl = null)
         {
-            // 1. Fetch user to verify they exist and get their custom Role property
             var user = await _accountService.GetUserByEmail(Email);
 
             if (user != null)
             {
-                // 2. Initial password check
                 var result = await _signInManager.PasswordSignInAsync(user, Password, isPersistent: false, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                    // 3. FIX: Use fully qualified name 'System.Security.Claims.Claim' 
-                    // This resolves the error where it confuses your Model 'Claim' with Security 'Claim'
                     var claims = new List<System.Security.Claims.Claim>
                     {
                         new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role),
@@ -44,10 +49,16 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                         new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Email)
                     };
 
-                    // 4. Sign in again with the specific Role and UserId claims attached
                     await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claims);
 
-                    // 5. Redirect based on the role found in DB
+                    // --- REDIRECTION LOGIC ---
+                    // Case A: If user came from "Insurance" page, send them back there
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    {
+                        return LocalRedirect(returnUrl);
+                    }
+
+                    // Case B: Default Dashboard Redirection
                     return user.Role switch
                     {
                         "Admin" => RedirectToAction("Dashboard", "Admin"),
@@ -58,26 +69,24 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
             }
 
             TempData["ErrorMessage"] = "Invalid email or password!";
+            // Ensure ReturnUrl is preserved if login fails
+            ViewData["ReturnUrl"] = returnUrl;
             return View("~/Views/Home/SignIn.cshtml");
         }
 
         [HttpPost]
         public async Task<IActionResult> SignUp(User user)
         {
-            // RegisterUser handles hashing the password via Identity UserManager
             var result = await _accountService.RegisterUser(user, user.Password);
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Registration successful! Please sign in.";
                 return RedirectToAction("SignIn");
             }
-
-            // Combine errors into a single string for the view
             TempData["ErrorMessage"] = string.Join(" ", result.Errors.Select(e => e.Description));
             return View("~/Views/Home/SignIn.cshtml");
         }
 
-        // FIX: This method prevents the 404 error when a user is unauthorized
         [HttpGet]
         public IActionResult AccessDenied()
         {
@@ -96,7 +105,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 ViewBag.Error = "Email address not found.";
                 return View();
             }
-
             var token = await _accountService.GeneratePasswordResetToken(user);
             return RedirectToAction("ResetPassword", new { email = email, token = token });
         }

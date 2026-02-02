@@ -1,81 +1,76 @@
-﻿
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TravelBuddy</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
-    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
             <div class="container">
-                <a class="navbar-brand" href="/Home/Index">
-                    <img class="logo-img" src="~/assets/logo.png" alt="TravelBuddy">
-                    <span class="text-light">TravelBuddy</span>
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#tbNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="tbNav">
+                <a class="navbar-brand" href="/Home/Index"><img class="logo-img" src="~/assets/logo.png" alt="TravelBuddy"><span class="text-light">TravelBuddy</span></a><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#tbNav"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="tbNav">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Contact Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/Home/Insuarance">Insurance</a></li>
-                       
-                        <li class="ms-lg-3 d-flex align-items-center">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            @if (User.IsInRole("Admin"))
+                        <li class="nav-item">
+                            @if (User.Identity.IsAuthenticated)
                             {
-                                <a class="btn btn-outline-success btn-sm me-2" href="/Admin/Dashboard">
-                                    <i class="bi bi-speedometer2"></i> Admin Panel
-                                </a>
-                            }
-                            else if (User.IsInRole("Agent"))
-                            {
-                                <a class="btn btn-outline-success btn-sm me-2" href="/Agent/Dashboard">
-                                    <i class="bi bi-person-badge"></i> Agent Panel
+                                <a class="nav-link fw-bold text-warning" href="/Home/Insuarance">
+                                    <i class="bi bi-shield-check"></i> Insurance
+
                                 </a>
                             }
                             else
                             {
-                                @* This is for your standard User *@
-                                <a class="btn btn-outline-success btn-sm me-2" href="/UserDashboard/Dashboard">
-                                    <i class="bi bi-layout-text-window-reverse"></i> Dashboard
+
+                                <a class="nav-link fw-bold text-warning" href="/Account/SignIn?returnUrl=/Home/Insuarance">
+                                    <i class="bi bi-shield-check"></i> Insurance
+
                                 </a>
                             }
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="#contact-footer">ContactUs</a></li>
+                        <li class="ms-lg-3 d-flex align-items-center">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @if(User.IsInRole("Admin")){
+                                    <a class="btn btn-outline-success btn-sm me-2" href="/Admin/Dashboard">
+                                        <i class="bi bi-speedometer2"></i> Admin Panel
 
-                           
-                        }
-                        else
-                        {
-                            <a class="btn btn-cta-primary nav-link" href="/Home/SignIn">User Login</a>
-                        }
+                                    </a>
+                                }else if (User.IsInRole("Agent"))
+                                {
+
+                                    <a class="btn btn-outline-success btn-sm me-2" href="/Agent/Dashboard">
+                                        <i class="bi bi-person-badge"></i> Agent Panel
+
+                                    </a>
+                                }
+                                else
+                                {
+
+                                    <a class="btn btn-outline-success btn-sm me-2" href="/UserDashboard/Dashboard">
+                                        <i class="bi bi-layout-text-window-reverse"></i> Dashboard
+
+                                    </a>
+                                }
+}
+else
+{
+                                <a class="btn btn-cta-primary nav-link" href="/Account/SignIn">User Login</a>
+                            }
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
+    <div class="container-fluid"><main role="main" class="pb-3">            @RenderBody()</main></div>
+    <footer id="contact-footer" class="footer-dark py-5"><div class="container"><div class="row g-4"><div class="col-lg-4"><h4 class="mb-3">TravelBuddy</h4><p class="text-muted mb-4">                        Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.                        Donec velit neque auctor sit amet aliquam vel ullamcorper sit amet ligula.                    </p></div><div class="col-lg-2 col-md-4"><h6 class="footer-heading">Company</h6><ul class="list-unstyled footer-links"><li><a href="#"><i class="bi bi-chevron-right"></i> About</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Careers</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Press</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Blog</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Contact</a></li></ul></div><div class="col-lg-3 col-md-4"><h6 class="footer-heading">Solutions</h6><ul class="list-unstyled footer-links"><li><a href="#"><i class="bi bi-chevron-right"></i> Digital Strategy</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Cloud Computing</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Data Analytics</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> AI Solutions</a></li><li><a href="#"><i class="bi bi-chevron-right"></i> Cybersecurity</a></li></ul></div><div class="col-lg-3 col-md-4"><h6 class="footer-heading">Get in Touch</h6><ul class="list-unstyled footer-contact"><li><i class="bi bi-geo-alt-fill"></i> Plot No H-4, Siruseri IT Park - Project Office, First Cross Road, Siruseri<br> Tamil Nadu 603103, India</li><li><i class="bi bi-telephone-fill"></i> +1 (555) 987-6543</li><li><i class="bi bi-envelope-fill"></i> contact@cognizant.com</li></ul></div></div></div></footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
