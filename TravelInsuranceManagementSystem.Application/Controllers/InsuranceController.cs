@@ -44,7 +44,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
         [HttpGet]
         public IActionResult Success(int id)
         {
-            ViewBag.PolicyDisplayId = "P-" + id.ToString("D5");
+            ViewBag.PolicyDisplayId = "P-" + id;
             return View();
         }
     }

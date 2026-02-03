@@ -59,8 +59,8 @@
         <thead class="table-light">
             <tr>
                 <th>Policy ID</th>
-                <th>Customer ID</th>
-                <th>Customer Name</th>
+                <th>User ID</th>
+                <th>User Name</th>
                 <th>Plan</th>
                 <th>Coverage Type</th>
                 <th>Amount</th>
@@ -92,7 +92,7 @@
 
                     <tr data-status="@item.Status">
                         <td>P-@item.PolicyId</td>
-                        <td>CUS-@item.CustomerId</td>
+                        <td>@item.CustomerId</td>
                         <td>@item.CustomerName</td>
                         <td>@item.Plan</td>
                         <td>@item.CoverageType</td>

@@ -1,6 +1,7 @@
 ﻿using TravelInsuranceManagementSystem.Models;
+
 using TravelInsuranceManagementSystem.Repo.Interfaces;
-using TravelInsuranceManagementSystem.Repo.Models;
+
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
 namespace TravelInsuranceManagementSystem.Services.Implementation
@@ -28,8 +29,6 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
         public bool ProcessPayment(int paymentId, string cardNumber) =>
 
             _paymentRepo.ExecutePaymentProcessing(paymentId, cardNumber);
-
-        // New Implementation
 
         public Payment GetPaymentDetails(int paymentId) =>
 

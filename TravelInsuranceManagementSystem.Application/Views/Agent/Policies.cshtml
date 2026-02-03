@@ -115,7 +115,7 @@
                     <th class="ps-4">Policy ID</th>
                     <th>Plan Name</th>
                     <th>Destination</th>
-                    <th>Premium Amount</th>
+                    <th>Coverage Amount(Upto)</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Policy Status</th>
@@ -128,7 +128,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td class="ps-4 policy-id">P-@item.PolicyId.ToString("D5")</td>
+                            <td class="ps-4 policy-id">P-@item.PolicyId</td>
                             <td class="plan-type">@item.CoverageType</td>
                             <td>@item.DestinationCountry</td>
                             <td class="fw-bold">₹@item.CoverageAmount.ToString("N0")</td>

@@ -52,13 +52,9 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
         }
 
-        // --- UPDATED METHOD ---
-
         public IActionResult PaymentConfirmation(int id)
 
         {
-
-            // Fix: Fetch the payment details so the View has data for the PDF
 
             var payment = _paymentService.GetPaymentDetails(id);
 

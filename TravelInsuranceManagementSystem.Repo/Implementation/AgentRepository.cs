@@ -34,9 +34,17 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
             await _context.Claims.Include(c => c.Policy).ThenInclude(p => p.User).OrderByDescending(c => c.ClaimDate).ToListAsync();
 
+        // --- UPDATED METHOD: Added .Include(t => t.TicketDetails) ---
+
         public async Task<List<SupportTicket>> GetSupportTicketsAsync() =>
 
-            await _context.SupportTickets.OrderByDescending(t => t.TicketId).ToListAsync();
+            await _context.SupportTickets
+
+                .Include(t => t.ExtensionData) // <--- THIS LINE FIXES THE MISSING CONTACT INFO
+
+                .OrderByDescending(t => t.TicketId)
+
+                .ToListAsync();
 
         public async Task<List<Payment>> GetPaymentsWithPolicyAsync() =>
 
@@ -190,8 +198,6 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
             // Tickets
 
-            // Note: SupportTicket does not have a direct User navigation property in your model, showing User ID instead
-
             var recentTickets = await _context.SupportTickets
 
                 .OrderByDescending(t => t.CreatedDate)
@@ -241,3 +247,5 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
     }
 
 }
+
+
