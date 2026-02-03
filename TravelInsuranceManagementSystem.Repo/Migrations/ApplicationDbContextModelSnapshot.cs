@@ -322,6 +322,9 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
 
+                    b.Property<int?>("AgentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -337,11 +340,14 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("TicketId");
+
+                    b.HasIndex("AgentId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SupportTickets");
                 });
@@ -556,6 +562,23 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                         .IsRequired();
 
                     b.Navigation("Policy");
+                });
+
+            modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.SupportTicket", b =>
+                {
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", "Agent")
+                        .WithMany()
+                        .HasForeignKey("AgentId");
+
+                    b.HasOne("TravelInsuranceManagementSystem.Repo.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TravelInsuranceManagementSystem.Repo.Models.TicketDetail", b =>

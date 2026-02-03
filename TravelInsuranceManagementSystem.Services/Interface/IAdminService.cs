@@ -1,6 +1,6 @@
-﻿using TravelInsuranceManagementSystem.Repo.Models;
-
-using TravelInsuranceManagementSystem.Models;
+﻿using TravelInsuranceManagementSystem.Models;
+using TravelInsuranceManagementSystem.Models.ViewModels;
+using TravelInsuranceManagementSystem.Repo.Models;
 
 namespace TravelInsuranceManagementSystem.Services.Interfaces
 
@@ -19,6 +19,9 @@ namespace TravelInsuranceManagementSystem.Services.Interfaces
         // NEW
 
         Task<AdminDashboardViewModel> GetDashboardSummaryAsync();
+
+        Task<List<AgentWorkloadViewModel>> GetAgentsWithWorkloadAsync();
+        Task<bool> DeleteAgentAsync(int userId);
 
     }
 

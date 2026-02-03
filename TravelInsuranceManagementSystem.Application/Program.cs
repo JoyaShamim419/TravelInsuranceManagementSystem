@@ -16,15 +16,13 @@ using TravelInsuranceManagementSystem.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Database Configuration (UPDATED)
+// 1) Database Configuration
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
     options.UseSqlServer(
 
         builder.Configuration.GetConnectionString("DefaultConnection"),
-
-        // This line is CRITICAL for your multi-project structure:
 
         b => b.MigrationsAssembly("TravelInsuranceManagementSystem.Repo")
 
@@ -122,7 +120,39 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// 7) Middlewares
+// --- SEEDING LOGIC (ADDED) ---
+
+using (var scope = app.Services.CreateScope())
+
+{
+
+    var services = scope.ServiceProvider;
+
+    try
+
+    {
+
+        var userManager = services.GetRequiredService<UserManager<User>>();
+
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+        await SeedData.Initialize(userManager, roleManager);
+
+    }
+
+    catch (Exception ex)
+
+    {
+
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        logger.LogError(ex, "An error occurred while seeding the database.");
+
+    }
+
+}
+
+// -----------------------------
 
 if (!app.Environment.IsDevelopment())
 
@@ -140,8 +170,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Authentication MUST come before Authorization
-
 app.UseAuthentication();
 
 app.UseAuthorization();
@@ -155,3 +183,73 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+// --- SEEDER CLASS ---
+
+public static class SeedData
+
+{
+
+    public static async Task Initialize(UserManager<User> userManager, RoleManager<IdentityRole<int>> roleManager)
+
+    {
+
+        string[] roleNames = { "Admin", "Agent", "User" };
+
+        foreach (var roleName in roleNames)
+
+        {
+
+            if (!await roleManager.RoleExistsAsync(roleName))
+
+            {
+
+                await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+
+            }
+
+        }
+
+        // HARDCODED ADMIN
+
+        string adminEmail = "admin@travelbuddy.com";
+
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+        if (adminUser == null)
+
+        {
+
+            var admin = new User
+
+            {
+
+                UserName = adminEmail,
+
+                Email = adminEmail,
+
+                FullName = "System Administrator",
+
+                Role = "Admin",
+
+                EmailConfirmed = true
+
+            };
+
+            // Hardcoded Password
+
+            var result = await userManager.CreateAsync(admin, "Admin@123");
+
+            if (result.Succeeded)
+
+            {
+
+                await userManager.AddToRoleAsync(admin, "Admin");
+
+            }
+
+        }
+
+    }
+
+}
