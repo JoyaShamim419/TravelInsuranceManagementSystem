@@ -28,19 +28,21 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
         public async Task<List<Policy>> GetPoliciesWithMembersAsync() =>
 
-            await _context.Policies.Include(p => p.Members).OrderByDescending(p => p.PolicyId).ToListAsync();
+            await _context.Policies.Include(p => p.Members).Include(p => p.User).OrderByDescending(p => p.PolicyId).ToListAsync();
 
         public async Task<List<Claim>> GetClaimsWithCustomerAsync() =>
 
             await _context.Claims.Include(c => c.Policy).ThenInclude(p => p.User).OrderByDescending(c => c.ClaimDate).ToListAsync();
 
-        // --- UPDATED METHOD: Added .Include(t => t.TicketDetails) ---
+        // --- UPDATED METHOD: Keeps ExtensionData for the detailed view ---
 
         public async Task<List<SupportTicket>> GetSupportTicketsAsync() =>
 
             await _context.SupportTickets
 
-                .Include(t => t.ExtensionData) // <--- THIS LINE FIXES THE MISSING CONTACT INFO
+                .Include(t => t.ExtensionData) // Keeps contact info working
+
+                .Include(t => t.User)          // Fetch Customer Details for the main list
 
                 .OrderByDescending(t => t.TicketId)
 
@@ -112,7 +114,7 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
         }
 
-        // --- NEW DASHBOARD LOGIC ---
+        // --- DASHBOARD LOGIC (FIXED) ---
 
         public async Task<AgentDashboardViewModel> GetDashboardSummaryAsync()
 
@@ -138,7 +140,7 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
                 .SumAsync(p => p.PaymentAmount);
 
-            // 3. Activity Feed: Fetch top 5 items from each category
+            // 3. Activity Feed
 
             // Policies
 
@@ -196,9 +198,11 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
                 }).ToListAsync();
 
-            // Tickets
+            // Tickets (FIXED HERE)
 
             var recentTickets = await _context.SupportTickets
+
+                .Include(t => t.User) // <--- CRITICAL: Fetches Customer Name
 
                 .OrderByDescending(t => t.CreatedDate)
 
@@ -212,7 +216,9 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
                     ReferenceId = "T-" + t.TicketId,
 
-                    CustomerName = "User #" + t.UserId,
+                    // FIX: Shows Real Name instead of User ID
+
+                    CustomerName = t.User != null ? t.User.FullName : "User #" + t.UserId,
 
                     Date = t.CreatedDate,
 
@@ -230,13 +236,11 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
             dto.RecentActivities.AddRange(recentTickets);
 
-            // Sort by most recent date across all types
-
             dto.RecentActivities = dto.RecentActivities
 
                 .OrderByDescending(a => a.Date)
 
-                .Take(10) // Show top 10 activities on dashboard
+                .Take(10)
 
                 .ToList();
 
@@ -247,5 +251,3 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
     }
 
 }
-
-

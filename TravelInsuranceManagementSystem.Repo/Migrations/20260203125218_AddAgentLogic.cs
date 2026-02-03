@@ -55,23 +55,6 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SupportTickets",
-                columns: table => new
-                {
-                    TicketId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IssueDescription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    TicketStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResolvedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SupportTickets", x => x.TicketId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -202,27 +185,31 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TicketDetails",
+                name: "SupportTickets",
                 columns: table => new
                 {
-                    DetailId = table.Column<int>(type: "int", nullable: false)
+                    TicketId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketId = table.Column<int>(type: "int", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RelatedId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactDetail = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AgentId = table.Column<int>(type: "int", nullable: true),
+                    IssueDescription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    TicketStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResolvedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TicketDetails", x => x.DetailId);
+                    table.PrimaryKey("PK_SupportTickets", x => x.TicketId);
                     table.ForeignKey(
-                        name: "FK_TicketDetails_SupportTickets_TicketId",
-                        column: x => x.TicketId,
-                        principalTable: "SupportTickets",
-                        principalColumn: "TicketId",
+                        name: "FK_SupportTickets_AspNetUsers_AgentId",
+                        column: x => x.AgentId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SupportTickets_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -301,6 +288,31 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TicketDetails",
+                columns: table => new
+                {
+                    DetailId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketId = table.Column<int>(type: "int", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RelatedId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactDetail = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketDetails", x => x.DetailId);
+                    table.ForeignKey(
+                        name: "FK_TicketDetails_SupportTickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "SupportTickets",
+                        principalColumn: "TicketId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -359,6 +371,16 @@ namespace TravelInsuranceManagementSystem.Repo.Migrations
                 name: "IX_PolicyMember_PolicyId",
                 table: "PolicyMember",
                 column: "PolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportTickets_AgentId",
+                table: "SupportTickets",
+                column: "AgentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportTickets_UserId",
+                table: "SupportTickets",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TicketDetails_TicketId",
