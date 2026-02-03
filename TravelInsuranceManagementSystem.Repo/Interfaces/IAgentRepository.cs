@@ -10,13 +10,23 @@ namespace TravelInsuranceManagementSystem.Repo.Interfaces
 
     {
 
+        // 1. Policies
+
         Task<List<Policy>> GetPoliciesWithMembersAsync();
+
+        // 2. Claims
 
         Task<List<Claim>> GetClaimsWithCustomerAsync();
 
+        // 3. Support Tickets
+
         Task<List<SupportTicket>> GetSupportTicketsAsync();
 
+        // 4. Payments
+
         Task<List<Payment>> GetPaymentsWithPolicyAsync();
+
+        // 5. Update Actions
 
         Task<(bool Success, string Message)> UpdateClaimStatusAsync(int id, string status, int agentId);
 
@@ -24,7 +34,7 @@ namespace TravelInsuranceManagementSystem.Repo.Interfaces
 
         Task<bool> DeleteTicketAsync(int id);
 
-        // --- NEW METHOD ---
+        // 6. Dashboard Summary
 
         Task<AgentDashboardViewModel> GetDashboardSummaryAsync();
 

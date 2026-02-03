@@ -1,6 +1,11 @@
-﻿using TravelInsuranceManagementSystem.Models;
+﻿using Microsoft.EntityFrameworkCore; // Required for .Include()
+
+using TravelInsuranceManagementSystem.Models;
+
 using TravelInsuranceManagementSystem.Repo.Data;
+
 using TravelInsuranceManagementSystem.Repo.Interfaces;
+
 using TravelInsuranceManagementSystem.Repo.Models;
 
 namespace TravelInsuranceManagementSystem.Repo.Implementation
@@ -21,31 +26,75 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
         }
 
-        // --- RESTORED METHOD ---
-
         public Payment GetPaymentById(int id)
 
         {
 
-            return _context.Payments.Find(id);
+            return _context.Payments
+
+                .Include(p => p.Policy) // Include Policy for Confirmation details
+
+                .FirstOrDefault(p => p.PaymentId == id);
 
         }
-
-        // --- EXISTING LOGIC METHODS ---
 
         public Payment GetOrCreatePayment(int policyId)
 
         {
 
+            // 1. Check if a Pending payment already exists
+
             var existing = _context.Payments
+
+                .Include(p => p.Policy)
 
                 .FirstOrDefault(p => p.PolicyId == policyId && p.PaymentStatus == PaymentStatus.PENDING);
 
             if (existing != null) return existing;
 
-            var policy = _context.Policies.Find(policyId);
+            // 2. Fetch Policy AND Members to calculate cost
+
+            var policy = _context.Policies
+
+                .Include(p => p.Members) // Load members list
+
+                .FirstOrDefault(p => p.PolicyId == policyId);
 
             if (policy == null) return null;
+
+            // 3. Dynamic Calculation Logic
+
+            // Count members (if list is empty/null, assume 1 person)
+
+            int memberCount = (policy.Members != null && policy.Members.Any())
+
+                              ? policy.Members.Count
+
+                              : 1;
+
+            // Define Rates
+
+            decimal ratePerPerson = 0;
+
+            if (policy.CoverageType == "Premium")
+
+            {
+
+                ratePerPerson = 6000; // Premium Rate
+
+            }
+
+            else
+
+            {
+
+                ratePerPerson = 4000; // Basic Rate (As requested)
+
+            }
+
+            decimal totalAmount = ratePerPerson * memberCount;
+
+            // 4. Create Payment Record
 
             var newPayment = new Payment
 
@@ -57,13 +106,17 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
                 PaymentStatus = PaymentStatus.PENDING,
 
-                PaymentAmount = (policy.CoverageType == "Premium") ? 5000 : 2500
+                PaymentAmount = totalAmount // Calculated Value
 
             };
 
             _context.Payments.Add(newPayment);
 
             _context.SaveChanges();
+
+            // Load reference for view
+
+            newPayment.Policy = policy;
 
             return newPayment;
 
@@ -76,6 +129,8 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
             var payment = _context.Payments.Find(paymentId);
 
             if (payment == null) return false;
+
+            // Simple validation simulation
 
             bool isFailed = payment.PaymentAmount <= 0 ||
 

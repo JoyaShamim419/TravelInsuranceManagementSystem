@@ -1,5 +1,4 @@
-﻿@* Update 1: Ensure the model name matches your class exactly *@
-@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.SupportTicket>
+﻿@model IEnumerable<TravelInsuranceManagementSystem.Repo.Models.SupportTicket>
 
 @{
     ViewData["Title"] = "Agent Support Tickets";
@@ -124,8 +123,8 @@
             <thead>
                 <tr>
                     <th class="ps-4">ID</th>
-                    <th>Related Info</th>
-                    <th>Contact</th>
+                    <th>User ID</th>
+                    <th>Contact Info</th>
                     <th>Issue Detail</th>
                     <th>Date</th>
                     <th class="text-center">Status</th>
@@ -137,42 +136,68 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr data-row-id="@item.TicketId">
-                            <td class="ps-4 fw-bold">#T-@item.TicketId</td>
+                        // --- FIX IS HERE: Access the property directly, do NOT use FirstOrDefault() ---
+                        var details = item.ExtensionData;
 
-                            @* Showing UserId since RelatedId wasn't in your main model *@
-                            <td><span class="text-primary fw-semibold">User: @item.UserId</span></td>
+                        <tr data-row-id="@item.TicketId">
+                            <td class="ps-4 fw-bold">T-@item.TicketId</td>
+
+                            <td><span class="text-muted">@item.UserId</span></td>
 
                             <td>
-                                <div class="customer-info d-flex flex-column">
-                                    <span class="fw-bold">ID: @item.UserId</span>
-                                </div>
+                                @if (details != null)
+                                {
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                            @if (details.ContactMethod == "Email")
+                                            {
+                                                <i class="bi bi-envelope text-primary me-1"></i>
+                                            }
+                                            else if (details.ContactMethod == "WhatsApp")
+                                            {
+                                                <i class="bi bi-whatsapp text-success me-1"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-telephone text-info me-1"></i>
+                                            }
+                                            @details.ContactMethod
+                                        </span>
+                                        <span class="text-muted small">@details.ContactDetail</span>
+
+                                        @if (!string.IsNullOrEmpty(details.RelatedId))
+                                        {
+                                            <span class="badge bg-light text-secondary mt-1 border">Ref: @details.RelatedId</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">No details provided</span>
+                                }
                             </td>
 
                             <td>
                                 <div class="description-container">
-                                    @* Using IssueDescription from your model *@
-                                    <span class="short-text text-muted">
-                                        @(item.IssueDescription != null && item.IssueDescription.Length > 50
-                                                                        ? item.IssueDescription.Substring(0, 50) + "..."
-                                                                        : item.IssueDescription)
-                                    </span>
-                                    <div class="full-text d-none">@item.IssueDescription</div>
-                                    <br /><a class="see-more-btn">See More</a>
+                                    <span class="fw-bold d-block mb-1">@item.IssueDescription</span>
+
+                                    @if (details != null && !string.IsNullOrEmpty(details.Subject))
+                                    {
+                                        <small class="text-secondary">@details.Subject</small>
+                                    }
                                 </div>
                             </td>
 
-                            <td class="text-nowrap">@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-nowrap">@item.CreatedDate.ToString("MMM dd, yyyy")</td>
 
                             <td class="status-cell text-center">
                                 @{
-                                    // Mapping TicketStatus to your badge colors
                                     var badgeClass = item.TicketStatus switch
                                     {
-                                        "In-Progress" => "badge-progress",
-                                        "Resolved" => "badge-success",
-                                        "Rejected" => "badge-rejected",
-                                        "Closed" => "badge-closed",
+                                                        "In-Progress" => "badge-progress",
+                                                        "Resolved" => "badge-success",
+                                                        "Rejected" => "badge-rejected",
+                                                        "Closed" => "badge-closed",
                                         _ => "badge-open"
                                     };
                                 }
@@ -181,12 +206,10 @@
 
                             <td class="text-center">
                                 <div class="d-flex justify-content-center">
-                                    @* Edit Action *@
                                     <button class="btn-manage edit-status-btn" data-id="@item.TicketId">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    @* Delete Action *@
                                     <form asp-action="DeleteTicket" asp-controller="Agent" asp-route-id="@item.TicketId" method="post" onsubmit="return confirm('Permanently delete this ticket?');" style="display:inline;">
                                         <button type="submit" class="btn-manage btn-delete text-danger border-0">
                                             <i class="bi bi-trash"></i>
@@ -202,7 +225,6 @@
     </div>
 </div>
 
-@* Modal and Scripts stay similar but ensure ID consistency *@
 <div class="modal fade" id="statusModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg">
@@ -243,19 +265,11 @@
                 });
             });
 
-            // Search
             $("#ticketSearch").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
                 $("#ticketTable tbody tr").filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
-            });
-
-            // Toggle Text
-            $('.see-more-btn').on('click', function() {
-                const container = $(this).closest('.description-container');
-                container.find('.short-text, .full-text').toggleClass('d-none');
-                $(this).text($(this).text() === 'See More' ? 'See Less' : 'See More');
             });
         });
     </script>
