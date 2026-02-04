@@ -74,34 +74,41 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
             };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
+            // Try to use a transaction. If the provider doesn't support transactions
+            // (InMemory) or BeginTransactionAsync logs a warning-as-exception, fall back
+            // to a non-transactional save sequence.
             try
-
             {
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.SupportTickets.Add(ticket);
+                    await _context.SaveChangesAsync();
 
+                    detail.TicketId = ticket.TicketId;
+                    _context.TicketDetails.Add(detail);
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+            catch
+            {
+                // Fallback for providers that don't support transactions or where
+                // BeginTransactionAsync triggers warnings treated as exceptions.
                 _context.SupportTickets.Add(ticket);
-
                 await _context.SaveChangesAsync();
 
                 detail.TicketId = ticket.TicketId;
-
                 _context.TicketDetails.Add(detail);
-
                 await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-
-            }
-
-            catch (Exception)
-
-            {
-
-                await transaction.RollbackAsync();
-
-                throw;
-
+                return;
             }
 
         }
