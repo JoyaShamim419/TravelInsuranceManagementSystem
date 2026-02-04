@@ -31,8 +31,11 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
             await _context.Policies.Include(p => p.Members).OrderByDescending(p => p.PolicyId).ToListAsync();
 
         public async Task<List<Payment>> GetAllPaymentsWithPoliciesAsync() =>
-
-            await _context.Payments.Include(p => p.Policy).OrderByDescending(p => p.PaymentDate).ToListAsync();
+            await _context.Payments
+                .AsNoTracking()
+                .Include(p => p.Policy)
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
 
         public async Task<List<ClaimViewModel>> GetClaimsOverviewAsync()
 

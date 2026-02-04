@@ -49,8 +49,8 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
                 .ToListAsync();
 
         public async Task<List<Payment>> GetPaymentsWithPolicyAsync() =>
-
-            await _context.Payments.Include(p => p.Policy).OrderByDescending(p => p.PaymentDate).ToListAsync();
+            // Return payments directly; consumers can include policy if needed.
+            await _context.Payments.OrderByDescending(p => p.PaymentDate).ToListAsync();
 
         public async Task<(bool Success, string Message)> UpdateClaimStatusAsync(int id, string status, int agentId)
 

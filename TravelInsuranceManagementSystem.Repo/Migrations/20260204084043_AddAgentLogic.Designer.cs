@@ -12,7 +12,7 @@ using TravelInsuranceManagementSystem.Repo.Data;
 namespace TravelInsuranceManagementSystem.Repo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260203125218_AddAgentLogic")]
+    [Migration("20260204084043_AddAgentLogic")]
     partial class AddAgentLogic
     {
         /// <inheritdoc />

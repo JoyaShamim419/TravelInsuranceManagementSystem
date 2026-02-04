@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="TravelInsuranceManagementSystem.Application/TravelInsuranceManagementSystem.Application.csproj" />
+  <Project Path="TravelInsuranceManagementSystem.MoqTest/TravelInsuranceManagementSystem.MoqTest.csproj" Id="3dee9f24-3d4d-440b-9a9a-f5e557c60a06" />
   <Project Path="TravelInsuranceManagementSystem.Repo/TravelInsuranceManagementSystem.Repo.csproj" />
   <Project Path="TravelInsuranceManagementSystem.Services/TravelInsuranceManagementSystem.Services.csproj" />
 </Solution>
