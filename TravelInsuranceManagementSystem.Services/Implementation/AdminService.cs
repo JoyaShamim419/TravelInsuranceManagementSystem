@@ -2,16 +2,6 @@
 
 using Microsoft.EntityFrameworkCore;
 
-using System.Collections.Generic;
-
-using System.Threading.Tasks;
-
-using System.Linq;
-
-// --- CRITICAL NAMESPACE FIXES ---
-
-// These allow the code to find Payment, Policy, User, etc.
-
 using TravelInsuranceManagementSystem.Models;
 
 using TravelInsuranceManagementSystem.Repo.Models;
@@ -56,11 +46,10 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
 
         }
 
-        // ==========================================================
 
         // EXISTING REPOSITORY METHODS (Wrapped)
 
-        // ==========================================================
+       
 
         public async Task<List<Policy>> GetPolicyManagementDataAsync()
 
@@ -105,11 +94,11 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
         }
 
 
-        // ==========================================================
+      
 
         // NEW AGENT MANAGEMENT METHODS (Logic Implemented Here)
 
-        // ==========================================================
+      
 
         public async Task<List<AgentWorkloadViewModel>> GetAgentsWithWorkloadAsync()
 
@@ -135,16 +124,7 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
 
                     .CountAsync(c => c.AgentId == user.Id);
 
-                // Count Support Tickets handled by this agent
-
-                // We check if SupportTicket.AgentId matches the current User.Id
-
-                // NOTE: We do NOT use UserId here, because UserId refers to the Customer.
-
-                var ticketCount = await _context.SupportTickets
-
-                    .CountAsync(t => t.AgentId == user.Id);
-
+                
                 // Create the View Model for the card
 
                 var agentViewModel = new AgentWorkloadViewModel
@@ -163,11 +143,9 @@ namespace TravelInsuranceManagementSystem.Services.Implementation
 
                     ClaimsHandled = claimCount,
 
-                    TicketsHandled = ticketCount,
+                   
 
-                    // Agents do not handle policies directly, so we set this to 0
-
-                    PoliciesHandled = 0,
+                   
 
                     // Assuming all agents fetched are active
 
