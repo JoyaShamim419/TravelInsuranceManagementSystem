@@ -85,9 +85,6 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
                 {
 
                     // 3. Create Claims List
-
-                    // FIX: We use 'System.Security.Claims.Claim' explicitly to avoid conflict with your 'Claim' model class
-
                     var claims = new List<System.Security.Claims.Claim>
 
                     {

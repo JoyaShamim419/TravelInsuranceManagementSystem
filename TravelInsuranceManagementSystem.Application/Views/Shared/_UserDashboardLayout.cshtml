@@ -200,7 +200,7 @@
             <div class="ms-auto d-flex align-items-center gap-3">
                 <div class="user-profile">
                     <i class="bi bi-person-circle text-primary"></i>
-                    <span class="fw-bold">@User.Identity.Name</span>
+                    <span class="fw-bold">@User.FindFirst("FullName")?.Value</span>
                 </div>
             </div>
         </header>

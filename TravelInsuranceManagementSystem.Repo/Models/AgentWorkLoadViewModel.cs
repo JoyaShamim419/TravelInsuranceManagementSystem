@@ -16,11 +16,10 @@
 
         // Workload Stats
 
-        public int PoliciesHandled { get; set; }
-
+   
         public int ClaimsHandled { get; set; }
 
-        public int TicketsHandled { get; set; }
+       
 
         public bool IsActive { get; set; } = true; // Default status
 

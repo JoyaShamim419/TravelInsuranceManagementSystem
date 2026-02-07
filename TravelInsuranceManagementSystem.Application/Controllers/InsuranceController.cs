@@ -25,7 +25,7 @@ namespace TravelInsuranceManagementSystem.Application.Controllers
 
             try
             {
-                // Get User ID from Claims safely
+                // Get User ID from Identity Claims safely
                 var userIdString = User.FindFirst("UserId")?.Value;
                 int userId = string.IsNullOrEmpty(userIdString) ? 0 : int.Parse(userIdString);
 

@@ -2,7 +2,6 @@
 using TravelInsuranceManagementSystem.Services.Interfaces;
 
 // Alias to resolve ambiguity between Model and System.Security.Claims
-
 using InsuranceClaim = TravelInsuranceManagementSystem.Repo.Models.Claim;
  
 namespace TravelInsuranceManagementSystem.Application.Controllers
