@@ -66,10 +66,11 @@ namespace TravelInsuranceManagementSystem.Repo.Implementation
 
         public bool ExecutePaymentProcessing(int paymentId, string cardNumber)
         {
-            // --- CHANGE HERE: Use Include() to load Policy data ---
-            var payment = _context.Payments
-                .Include(p => p.Policy)
-                .FirstOrDefault(p => p.PaymentId == paymentId);
+            // Try to get the tracked entity first, then fall back to Include() query
+            var payment = _context.Payments.Find(paymentId)
+                          ?? _context.Payments
+                              .Include(p => p.Policy)
+                              .FirstOrDefault(p => p.PaymentId == paymentId);
             // -----------------------------------------------------
 
             if (payment == null) return false;
